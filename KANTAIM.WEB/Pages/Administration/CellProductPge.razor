@@ -12,9 +12,9 @@
 
     .tree-view-container {
         padding: 10px; /* Padding inside the tree view */
-         /* Add margin to the bottom to prevent overlap with action buttons */
+        /* Add margin to the bottom to prevent overlap with action buttons */
         overflow-y: auto; /* Enable vertical scroll */
-        height: 500px; /* Set a specific height */
+        height: calc(100vh - 240px);
     }
 
     .tree-title {
@@ -32,11 +32,11 @@
         box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
     }
 
-        .action-buttons .mud-grid-item {
-            display: flex;
-            justify-content: center; /* Center button horizontally */
-            align-items: center; /* Center button vertically */
-        }
+    .action-buttons .mud-grid-item {
+        display: flex;
+        justify-content: center; /* Center button horizontally */
+        align-items: center; /* Center button vertically */
+    }
 
     .sticky-header {
         position: sticky;
@@ -76,10 +76,10 @@
                 </div>
             </MudItem>
             <MudItem xs="6" Class="bordered-paper">
-                <div class="tree-title sticky-header" style=" margin-bottom: 60px;">
+                <div class="tree-title sticky-header">
                     <MudText Typo="Typo.h5">Produits</MudText>
                 </div>
-                <div class="tree-view-container">
+                <div class="tree-view-container" style=" margin-bottom: 60px;">
                     @if (ProductFamilies != null)
                     {
                         <MudTreeView Items="ProductTreeItems" MultiSelection="true" Hover="true" @bind-SelectedValues="ProductSelectedValues">

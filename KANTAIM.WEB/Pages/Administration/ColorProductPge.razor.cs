@@ -180,13 +180,17 @@ namespace KANTAIM.WEB.Pages.Administration
                         //if (!_ColorProductService.FindLink(ColorItem.Id, productItem.Id))
                         //{
                         // If the link does not exist, create it and add to the database
-                        var newColorProduct = new ColorProduct
+                        if (!_ColorProductService.FindLink(ColorItem.Id, productItem.Id))
                         {
-                            ColorID = ColorItem.Id,
-                            ProductID = productItem.Id
-                        };
+                            var newColorProduct = new ColorProduct
+                            {
+                                ColorID = ColorItem.Id,
+                                ProductID = productItem.Id
+                            };
 
-                        _ColorProductService.UpSert(newColorProduct);
+                            _ColorProductService.UpSert(newColorProduct);
+                        }
+                          
 
                         //}
                     }

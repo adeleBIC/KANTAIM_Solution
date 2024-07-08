@@ -179,8 +179,8 @@ namespace KANTAIM.WEB.Pages.Administration
                     {
                         // Check if the cell and product combination already exists in the database
 
-                        //if (!_cellProductService.FindLink(cellItem.Id, productItem.Id))
-                        //{
+                        if (!_cellProductService.FindLink(cellItem.Id, productItem.Id))
+                        {
                             // If the link does not exist, create it and add to the database
                             var newCellProduct = new CellProduct
                             {
@@ -190,7 +190,7 @@ namespace KANTAIM.WEB.Pages.Administration
 
                             _cellProductService.UpSert(newCellProduct);
 
-                        //}
+                        }
                     }
 
                 }
