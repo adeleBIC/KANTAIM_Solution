@@ -153,6 +153,10 @@ namespace KANTAIM.WEB.Pages.Kanban
             if(fillstatus == 1) // vide
             {
                 cells = _cellService.GetAll().Where(u => u.ForEmpty == true).ToList();
+                if(ContainerScanner.ContainerType.IsContainable == true)
+                {
+                    cells = cells.FindAll(u => u.IsPhantom == true); // if it is a bac empty, we stock it in the cell phantom and empty
+                }
                 foreach (Cell cell in cells)
                 {
                     if (cell.Status != 2 && cell.Id != ContainerScanner.CellId)
