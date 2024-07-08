@@ -24,13 +24,19 @@
     {
         @if (cells.Count() > 0)
         {
+            
             @foreach (var c in cells)
             {
-                <MudButton Class="bouton">
-                    @c.Name
-                </MudButton>
+
+                <h3 class="title">@c.Name</h3>
+                    
+            
 
             }
+                <h3 class="title">
+                Svp scannez la cellule qui est proposée
+            </h3>
+            <MudTextField @bind-Value="CellValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="cellScan"></MudTextField>
         }
         else
         {

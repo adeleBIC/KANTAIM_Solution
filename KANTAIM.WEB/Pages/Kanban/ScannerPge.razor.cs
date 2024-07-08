@@ -14,6 +14,7 @@ namespace KANTAIM.WEB.Pages.Kanban
     {
         [Inject] public ScanService _scanService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
+        public Cell CellScanner { get; set; }
         public string? TextValue { get; set; }
         public string? ContainerValue { get; set; }
         public string? PressValue { get; set; }
@@ -81,7 +82,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                                                 break;
                                             case 2:
                                                 /*Traite un contenaire qui stock avec produit, on peut sortir stock ou le déplacer.*/
-                                                NavigationManager.NavigateTo($"/ShipmentPge/2/{containerNumber}");
+                                                NavigationManager.NavigateTo($"/ShipmentPge/1/{containerNumber}");
                                                 break;
                                             case 3:
                                                 /*Après sortie le contenaire avec produit, on vas le mise en Machine*/
@@ -89,7 +90,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                                                 break;
                                             case 4:
                                                 /*Apres vidange le contenaire est vide, on Mise en rack.*/
-                                                NavigationManager.NavigateTo($"/StockagePge/4/{containerNumber}");
+                                                NavigationManager.NavigateTo($"/StockagePge/1/{containerNumber}");
                                                 break;
                                         }
                                     }
@@ -114,17 +115,15 @@ namespace KANTAIM.WEB.Pages.Kanban
                                 // Traiter la presse
                                 break;
                             case '4':
-                                // Traiter la cell
-
-                                CellName = parts[1];
-                                string X = parts[2];
-                                string Y = parts[3];
+                                    // Traiter la cell
+                                string X = parts[1];
+                                string Y = parts[2];
 
                                 if (int.TryParse(X, out int x) && int.TryParse(Y, out int y))
                                 {
-                                        //CellScanner = _cellService.GetByXY(x, y);
-                                       
-                                    }
+                                        CellScanner = _cellService.GetByXY(x, y);
+                                        NavigationManager.NavigateTo($"/StockagePge/4/{CellScanner.Id}");
+                                }
                                 break;
                             case '5':
                                     // Recherche le produit

@@ -38,12 +38,13 @@ namespace KANTAIM.WEB.Pages.Kanban
         public Product? product { get; set; }
         //public Product? productModified { get; set; }
         public ProdColor? colorOfProduct { get; set; }
-        public bool shipment { get; set; } = false; // 
+        public bool shipment { get; set; } = false;
         public bool stock { get; set; } = false;
         public bool bienStock { get; set; } = false;
         public bool maintenance { get; set; } = false; // pour indiquer si le contenaire est stock dans la zone maintenance
         //public ProdColor? colorOfProductModified { get; set; }
         public string? CellValue { get; set; }
+        public string? ContainerValue { get; set; }
 
         public Container? ContainerScanner { get; set; }
         public Log? logRescent { get; set; }
@@ -56,17 +57,56 @@ namespace KANTAIM.WEB.Pages.Kanban
         public Container? BacScanner { get; set; }
         public string? BacValue { get; set; }
         public string ContainerFeedback { get; set; } = string.Empty;
+        public int actionId;
+
         protected override void OnInitialized()
         {
-            ContainerScanner = _contenaireService.GetContainerByNumber(Number).FirstOrDefault();
-            if(ContainerScanner.ContainerType.TypeNumber != 2 || ContainerScanner.FillStatus != 1)
+            switch(Id)
+            {
+                //Scanner le contenaire
+                case 1:
+                    ContainerManage(Number);
+                    break;
+                //Scanner le cell
+                case 4:
+                    cellScanner = _cellService.GetById(Number);
+                    break;
+            }    
+        }
+        void ContainerScan(KeyboardEventArgs e)
+        {
+            if (e.Key == "Enter")
+            {
+                string[] parts = _scanService.scanCode(ContainerValue);
+                if (parts != null)
+                {
+                    int.TryParse(parts[0], out int type);
+                    int.TryParse(parts[1], out int containerNumber);
+                    //int.TryParse(parts[2], out int ContenaireType);
+                    if (type == 1)
+                    {
+                        ContainerManage(containerNumber);
+                    }
+                    else
+                    {
+                        _snackService.Add("Scp scannez un bac !", Severity.Error);
+                    }
+                }
+
+            }
+        }
+        void ContainerManage(int containerNumber)
+        {
+            ContainerScanner = _contenaireService.GetContainerByNumber(containerNumber).FirstOrDefault();
+            if (ContainerScanner.ContainerType.TypeNumber != 2 || ContainerScanner.FillStatus != 1)
             {
                 if (ContainerScanner.ContainerType.TypeNumber == 3) // S'il est palette, soit on fait stocker dans la cellule, soit on met bac dessus.
                 {
                     isPalette = true;
                 }
                 logRescent = _logService.GetByContenaireId(ContainerScanner.Id);
-                if (Id == 0 || Id == 2 || Id == 3)
+                actionId = ContainerScanner.ActionID;
+                if (actionId == 0 || actionId == 2 || actionId == 3)
                 {
                     FillstatusSelected(ContainerScanner.FillStatus);
                 }
@@ -78,13 +118,13 @@ namespace KANTAIM.WEB.Pages.Kanban
                         colorOfProduct = _colorService.GetById(logRescent.ProdColorID);
                     }
                 }
-            } else
+            }
+            else
             {
                 ContainerScanner = null;
                 _snackService.Add("Svp scannez une palette ou un contenaire !", Severity.Error);
                 NavigationManager.NavigateTo($"/ScannerPge");
             }
-            
         }
 
         void BacScan(KeyboardEventArgs e)
@@ -96,11 +136,18 @@ namespace KANTAIM.WEB.Pages.Kanban
                 {
                     int.TryParse(parts[0], out int type);
                     int.TryParse(parts[1], out int BacNumber);
-                    int.TryParse(parts[2], out int ContenaireType);
-                    if (type == 1 && ContenaireType == 2)
+                    //int.TryParse(parts[2], out int ContenaireType);
+                    if (type == 1 )
                     {
                         BacScanner = _contenaireService.GetContainerByNumber(BacNumber).FirstOrDefault();
-                        TransferBacToPalette(BacScanner, ContainerScanner);
+                        if(BacScanner.ContainerType.IsContainable)
+                        {
+                            TransferBacToPalette(BacScanner, ContainerScanner);
+                        } else
+                        {
+                            _snackService.Add("Scp scannez un bac !", Severity.Error);
+                        }
+                        
                     } else
                     {
                         _snackService.Add("Scp scannez un bac !", Severity.Error);
@@ -317,7 +364,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                 u.CellID = cellScanner.Id;
             }
 
-            if (Id == 0 || Id == 2 || Id == 3)
+            if (actionId == 0 || actionId == 2 || actionId == 3)
             {
                 u.Operation = 5; //  Transfer : Déplacment contenaire
             }

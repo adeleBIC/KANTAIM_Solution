@@ -82,48 +82,60 @@
     {
         @if (cellScanner != null)
         {
-            @if (cellScanner.IsJail == true)
+            @if(ContainerScanner == null)
             {
-                <div class="display-container">
-
-                    <h3 class="title">
-                        Prison
-                    </h3>
-                    <h3 class="redtitle">
-                        @cellScanner.Name
-                    </h3>
-                    <div class="button-group">
-                        <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>cellScanner=null">Retour</MudButton>
-                        <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="()=>Exit(2)">Valider</MudButton>
-                    </div>
-                </div>
+                <h3 class="title">
+                    Svp Scannez la contenaire
+                </h3>
+                <MudTextField @bind-Value="ContainerValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="ContainerScan"></MudTextField>
             } else
             {
-                <div class="display-container">
+                @if (cellScanner.IsJail == true)
+                {
+                    <div class="display-container">
 
-                    <h3 class="title">
-                        Rack de stockage choisi
-                    </h3>
-                    <h3 class="title">
-                        @cellScanner.Name
-                    </h3>
-                    @if (cellScanner.IsMaintenance)
-                    {
-                        <h3 style="color:red;"> Attention vous choisissez une zone maintenance </h3>
-                    }
-                    <div class="button-group">
-                        <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>cellScanner=null">Return</MudButton>
+                        <h3 class="title">
+                            Prison
+                        </h3>
+                        <h3 class="redtitle">
+                            @cellScanner.Name
+                        </h3>
+                        <div class="button-group">
+                            <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>cellScanner=null">Retour</MudButton>
+                            <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="()=>Exit(2)">Valider</MudButton>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="display-container">
+
+                        <h3 class="title">
+                            Rack de stockage choisi
+                        </h3>
+                        <h3 class="title">
+                            @cellScanner.Name
+                        </h3>
                         @if (cellScanner.IsMaintenance)
                         {
-                            <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="()=>{fillstatus = 1;Exit(2); }">Valider</MudButton>
-                        } else
-                        {
-                            <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="()=>Exit(2)">Valider</MudButton>
+                            <h3 style="color:red;"> Attention vous choisissez une zone maintenance </h3>
                         }
-                        
+                        <div class="button-group">
+                            <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>cellScanner=null">Return</MudButton>
+                            @if (cellScanner.IsMaintenance)
+                            {
+                                <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="()=>{fillstatus = 1;Exit(2); }">Valider</MudButton>
+                            }
+                            else
+                            {
+                                <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="()=>Exit(2)">Valider</MudButton>
+                            }
+
+                        </div>
                     </div>
-                </div>
+                }
             }
+            
          } else
         {
            

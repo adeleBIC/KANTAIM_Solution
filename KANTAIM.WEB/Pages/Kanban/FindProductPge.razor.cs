@@ -1,8 +1,16 @@
 using KANTAIM.DAL.Model;
 using KANTAIM.DAL.Services;
+using KANTAIM.WEB.Ressources;
 using KANTAIM.WEB.Services;
+using KANTAIM.WEB.ViewModels;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
+using System;
+using System.Net.Http.Headers;
+using System.Security.Cryptography;
+using static System.Collections.Specialized.BitVector32;
+
 
 namespace KANTAIM.WEB.Pages.Kanban
 {
@@ -14,9 +22,11 @@ namespace KANTAIM.WEB.Pages.Kanban
         [Inject] public ContenaireService _contenaireService { get; set; }
         [Inject] public ColorProductService _colorProductServiceService { get; set; }
         [Inject] public LogService _logService { get; set; }
+        [Inject] public CellService _cellService { get; set; }
         [Inject] ISnackbar _snackService { get; set; }
-        
-        
+        [Inject] public ScanService _scanService { get; set; }
+
+
         [Parameter] public int Id { get; set; }
         [Parameter] public int Number { get; set; }
 
@@ -27,6 +37,9 @@ namespace KANTAIM.WEB.Pages.Kanban
         //public IEnumerable<Cell> cells { get; set; }
         public List<Cell> cells { get; set; }
         public Log logRescent { get; set; }
+        public Cell? CellScanner { get; set; }
+        public string CellValue { get; set; }
+
 
 
 
@@ -73,6 +86,33 @@ namespace KANTAIM.WEB.Pages.Kanban
             findCells();
         }
 
+        void cellScan(KeyboardEventArgs e)
+        {
+            if (e.Key == "Enter")
+            {
+                string[] parts = _scanService.scanCode(CellValue);
+                if (parts != null)
+                {
+                    int.TryParse(parts[0], out int type);
+                    
+                    if (type == 4)
+                    {
+                        string X = parts[1];
+                        string Y = parts[2];
+                        if (int.TryParse(X, out int x) && int.TryParse(Y, out int y))
+                        {
+                            CellScanner = _cellService.GetByXY(x, y);
+                            NavigationManager.NavigateTo($"/StockagePge/4/{CellScanner.Id}");
+                        }
+                    }
+                    else
+                    {
+                        _snackService.Add("Scp scannez une cellule !", Severity.Error);
+                    }
+                }
+
+            }
+        }
         void GoBack()
         {
             NavigationManager.NavigateTo("/ScannerPge");
