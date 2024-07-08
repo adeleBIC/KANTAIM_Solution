@@ -12,7 +12,7 @@
 
     .tree-view-container {
         padding: 10px; /* Padding inside the tree view */
-        margin-bottom: 60px; /* Add margin to the bottom to prevent overlap with action buttons */
+         /* Add margin to the bottom to prevent overlap with action buttons */
         overflow-y: auto; /* Enable vertical scroll */
         height: 500px; /* Set a specific height */
     }
@@ -56,7 +56,7 @@
     </MudStack>
 </MudPaper>
 
-<div class="content">
+<div class="pa-4 content">
     @if (Editer)
     {
         <MudGrid>
@@ -64,7 +64,7 @@
                 <div class="tree-title sticky-header">
                     <MudText Typo="Typo.h5">Cellules</MudText>
                 </div>
-                <div class="tree-view-container">
+                <div class="tree-view-container" style=" margin-bottom: 60px;">
                     @if (cells != null)
                     {
                         <MudTreeView Items="CellTreeItems" MultiSelection="true" Hover="true" @bind-SelectedValues="CellSelectedValues">
@@ -76,7 +76,7 @@
                 </div>
             </MudItem>
             <MudItem xs="6" Class="bordered-paper">
-                <div class="tree-title sticky-header">
+                <div class="tree-title sticky-header" style=" margin-bottom: 60px;">
                     <MudText Typo="Typo.h5">Produits</MudText>
                 </div>
                 <div class="tree-view-container">
