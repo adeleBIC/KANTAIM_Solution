@@ -1,0 +1,170 @@
+﻿@page "/Consultation/LogPge"
+@using KANTAIM.DAL.Model;
+@using KANTAIM.WEB.ViewModels;
+
+
+
+<style>
+    .wide-column {
+        min-width: 180px;
+    }
+</style>
+
+<div class="pageTitle">
+    <MudText Typo="Typo.h4">Historique action Kanban</MudText>
+</div>
+
+@if (Logs != null)
+{
+    <MudDataGrid T="LogVM" RowClassFunc="RowClassFct" Items="@Logs" Dense=true Hover=true ReadOnly=false EditMode="MudBlazor.DataGridEditMode.Cell"
+                 Virtualize="true" SelectOnRowClick=false MultiSelection=true SelectedItemsChanged="SelectionChanged" Bordered=true
+                 Filterable="true" SortMode="SortMode.Multiple" Hideable="false" QuickFilter="@_quickFilter">
+        <ToolBarContent>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Save" OnClick="SaveAsync" Color="Color.Primary"></MudIconButton>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Delete" OnClick="DeleteAsync" Color="Color.Error"></MudIconButton>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Cancel" OnClick="CancelAsync" Color="Color.Primary"></MudIconButton>
+            <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Placeholder="Recherche Container" Adornment="Adornment.Start" Immediate="true"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+
+        <Columns>
+            <SelectColumn ShowInFooter=false />
+            <PropertyColumn Property="x => x.EventTime" Title="Date" Class="wide-column">
+                <EditTemplate>
+                    <MudTextField @bind-Value="context.Item.EventTime" Format="dd/MM/yyyy HH:mm:ss" />
+                </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.ContainerID" Title="Contenaire">
+                <EditTemplate>
+                    <MudSelect T=int @bind-Value="context.Item.ContainerID">
+                        @foreach (var f in context.Item.Containers.OrderBy(p => p.Number))
+                        {
+                            <MudSelectItem T=int Value="@f.Id">@f.Number</MudSelectItem>
+                        }
+                    </MudSelect>
+                </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.FillStatus" Title="Remplissage">
+                <EditTemplate>
+                    <MudSelect T=int @bind-Value="context.Item.FillStatus">
+                        @foreach (var f in ContainerStatus)
+                        {
+                            <MudSelectItem Value="@f.Key">@f.Value</MudSelectItem>
+                        }
+                    </MudSelect>
+                </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.Operation" Title="Action">
+                <EditTemplate>
+                    <MudSelect T=int @bind-Value="context.Item.Operation">
+                        @foreach (var f in Actions)
+                        {
+                            <MudSelectItem Value="@f.Key">@f.Value</MudSelectItem>
+                        }
+                    </MudSelect>
+                </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.ContainerID" Title="Stocké dans">
+                <EditTemplate>
+                    <MudSelect T=int @bind-Value="context.Item.ContainerID">
+                        @foreach (Container f in context.Item.Containers)
+                        {
+                            <MudSelectItem T=int Value="@f.Id">@f.Number</MudSelectItem>
+                        }
+                    </MudSelect>
+                </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.ProductID" Title="Product">
+                <EditTemplate>
+                    <MudSelect T=int? @bind-Value="context.Item.ProductID">
+                        @foreach (var f in context.Item.Products)
+                        {
+                            <MudSelectItem T=int? Value="@f.Id">@f.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.ColorID" Title="Colors">
+                <EditTemplate>
+                    <MudSelect T=int? @bind-Value="context.Item.ColorID">
+                        @foreach (var f in context.Item.Colors)
+                        {
+                            <MudSelectItem T=int? Value="@f.Id">@f.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.PressID" Title="Press">
+                <EditTemplate>
+                    <MudSelect T=int? @bind-Value="context.Item.PressID">
+                        @foreach (var f in context.Item.Presses.OrderBy(p => p.Number))
+                        {
+                            <MudSelectItem T=int? Value="@f.Id">@f.Number</MudSelectItem>
+                        }
+                    </MudSelect>
+                </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.ShapeID" Title="Shape">
+                <EditTemplate>
+                    <MudSelect T=int? @bind-Value="context.Item.ShapeID">
+                        @foreach (var f in context.Item.Shapes.OrderBy(p => p.Number))
+                        {
+                            <MudSelectItem T=int? Value="@f.Id">@f.Number - @f.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.MachineID" Title="Machine">
+                <EditTemplate>
+                    <MudSelect T=int? @bind-Value="context.Item.MachineID">
+                        @foreach (var f in context.Item.Machines.OrderBy(p => p.Number))
+                        {
+                            <MudSelectItem T=int? Value="@f.Id">@f.Number</MudSelectItem>
+                        }
+                    </MudSelect>
+                </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.CellID" Title="Cellule">
+                <EditTemplate>
+                    <MudSelect T=int? @bind-Value=context.Item.CellID>
+                        @foreach (var f in context.Item.Cells.OrderBy(p => p.Name))
+                        {
+                            <MudSelectItem T=int? Value="@f.Id">@f.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </EditTemplate>
+            </PropertyColumn>
+            @* <PropertyColumn Property="x => x.ActionID" Title="Action Liée" Required=false>
+                <EditTemplate>
+                    <MudSelect T=int @bind-Value=context.Item.ActionID>
+                        @foreach (var f in context.Item.Actions)
+                        {
+                            <MudSelectItem T=int Value="@f.Id">@f.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </EditTemplate>
+            </PropertyColumn> *@
+            <PropertyColumn Property="x => x.Comment" Title="Commentaire" Required=false />
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="LogVM" PageSizeOptions="@(new int[] {10, 30, 50,100})" />
+        </PagerContent>
+    </MudDataGrid>
+}
+else
+{
+    <MudCard>
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px" />
+        <MudCardContent>
+            <MudSkeleton Width="30%" Height="42px;" />
+            <MudSkeleton Width="80%" />
+            <MudSkeleton Width="100%" />
+        </MudCardContent>
+        <MudCardActions>
+            <MudSkeleton Width="64px" Height="40px" Class="ml-2" />
+            <MudSkeleton Width="105px" Height="40px" Class="ml-3" />
+        </MudCardActions>
+        <MudProgressLinear Color="Color.Default" Indeterminate="true" Class="my-7" />
+    </MudCard>
+}

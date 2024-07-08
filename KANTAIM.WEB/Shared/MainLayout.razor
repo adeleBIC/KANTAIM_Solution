@@ -1,0 +1,121 @@
+﻿@inherits LayoutComponentBase
+<style>
+    .mud-main-content {
+        padding-top: 10px;
+    }
+
+    .editButton {
+        margin: 5px;
+    }
+
+    .mud-table-cell {
+        padding: 1px 1px; /* vertical, horizontal */
+    }
+
+    .appBarButton .button .mud-button-label {
+        height: 50px;
+        font-size: 25px;
+        font-weight: bold;
+    }
+
+    .appBarLogo .mud-icon-size-medium {
+        height: 40px;
+        width: 40px;
+    }
+</style>
+<AuthorizeView>
+    <PageTitle>KANTAIM.WEB</PageTitle>
+
+    <MudThemeProvider Theme="BicTheme" />
+    <MudDialogProvider />
+    <MudSnackbarProvider />
+        @if (Users.Contains(context.User.Identity?.Name.ToLower()))
+        {
+        <MudLayout>
+            <MudAppBar Fixed="false" Elevation="0" DisableGutters="true" Class="muudstrap-navbar">
+
+                    @*<MudPaper Height="36px" Width="36px" Elevation="0" Class="pa-1 rounded-lg d-flex justify-center align-center mud-theme-primary logo">
+                        <img src="./css/LogoBic.png" height="40px" />
+                    </MudPaper>*@
+                <MudImage Src="./css/LogoBic.png" Width="120" Style="margin-left:10px;cursor: pointer;" alt="Bouton" @onclick="NavigateToHome" />
+
+                <MudText Typo="Typo.h4" Class="ml-4 mr-12 pt-1 pb-2" Style="font-weight:bold" @onclick="@(()=>NavigateToImg(context.User.Identity?.Name.ToLower().ToString()))">KANTAIM</MudText>
+                @*Home*@
+                <MudButton Color="Color.Inherit" Link="/" StartIcon="@Icons.Material.Filled.Home" Class="appBarButton appBarLogo"
+                         Style="--mud-typography-button-size:25px;--mud-typography-button-weight : bold;">Home</MudButton>
+                @*Scada*@
+                <MudButton Color="Color.Inherit" Link="/Scada/ScadaPge" StartIcon="@Icons.Material.Filled.Computer" Class="appBarButton appBarLogo"
+                           Style="--mud-typography-button-size:25px;--mud-typography-button-weight : bold;">Scada</MudButton>
+                @*Prod*@
+                <MudMenu Color="Color.Inherit" Label="Données de production" StartIcon="@Icons.Material.Filled.Factory" EndIcon="@Icons.Material.Filled.ArrowDropDown" Class="appBarButton appBarLogo"
+                         Style="--mud-typography-button-size:20px;--mud-typography-button-weight : bold;"
+                         AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" FullWidth="true">
+                    <MudMenuItem Link="/Production/DataProdPge">Edition données de production</MudMenuItem>
+                    <MudMenuItem Link="/Production/VisualisationDataProdPge">Visualisation/Commentaire Production</MudMenuItem>
+                </MudMenu>
+                @*Consultation*@
+                <MudMenu Color="Color.Inherit" Label="Consultation" StartIcon="@Icons.Material.Filled.FindInPage" EndIcon="@Icons.Material.Filled.ArrowDropDown" Class="appBarButton appBarLogo"
+                         Style="--mud-typography-button-size:20px;--mud-typography-button-weight : bold;"
+                         AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" FullWidth="true">
+                    <MudMenuItem Link="/Consultation/LogPge">Historique action</MudMenuItem>
+                    <MudMenuItem Link="/Consultation/TabPress/JourPge">Tableau récapitulatif des presses</MudMenuItem>
+                    <MudMenuItem Link="/Consultation/GraphicTRSPress/JourPge">Graphique TRS des presses</MudMenuItem>
+                    <MudMenuItem Link="/Consultation/GraphicTRSProd/JourPge">Graphique TRS des produits</MudMenuItem>
+                    <MudNavGroup Title="Rapport PowerBI" Expanded="true">
+                        <MudNavLink Href="/Consultation/PowerBI/IntegrerPge">Rapport Intégré</MudNavLink>
+                        <MudNavLink Href="https://app.powerbi.com/links/a4oipgvg7d?ctid=c7901014-5560-49ef-a689-3c215c6092ee&pbi_source=linkShare">Lien Externe</MudNavLink>
+                    </MudNavGroup>
+                </MudMenu>
+                @*Administration*@
+                <MudMenu Color="Color.Inherit" Label="Administration" StartIcon="@Icons.Material.Filled.Settings" EndIcon="@Icons.Material.Filled.ArrowDropDown" Class="appBarButton appBarLogo"
+                         Style="--mud-typography-button-size:20px;--mud-typography-button-weight : bold;"
+                         AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" FullWidth="true">
+                    
+                    <MudMenuItem Link="/Administration/CellPge">Cellules</MudMenuItem>
+                    <MudMenuItem Link="/Administration/ShiftPge">Shifts</MudMenuItem>
+                    <MudMenuItem Link="/Administration/ShapePge">Moules</MudMenuItem>
+                    <MudMenuItem Link="/Administration/ActionPge">Actions</MudMenuItem>
+                    <MudMenuItem Link="/Administration/ProductFamilyPge">Produits</MudMenuItem>
+                    <MudMenuItem Link="/Administration/ColorPge">Couleurs</MudMenuItem>
+                    <MudMenuItem Link="/Administration/UserPge">Utilisateurs</MudMenuItem>
+                    <MudMenuItem Link="/Administration/ContainerPge">Contenaires</MudMenuItem>
+                    <MudMenuItem Link="/Administration/CellProductPge">Cellules & Produits</MudMenuItem>
+                    <MudMenuItem Link="/Administration/ColorProductPge">Couleurs & Produits</MudMenuItem>
+                    <MudMenuItem Link="/Administration/WorkshopPge">Ateliers/Presses</MudMenuItem>
+                    <MudMenuItem Link="/Administration/TypeContenairePge">Type de contenaire</MudMenuItem>
+                    <MudMenuItem Link="/Administration/MachineAsemblagePge">Machines Asemblages</MudMenuItem>
+                    
+                </MudMenu>
+
+                <MudSpacer/>
+                <div style=" margin-right:10px; font-size:15px">
+                    <LoginDisplay />
+                </div>
+
+            </MudAppBar>
+            <MudMainContent>
+                @Body
+            </MudMainContent>
+        </MudLayout>
+    }
+    else
+    {
+        <div>
+            <br />
+            <br />
+            <br />
+            <p id="Line1">
+                Vous n'êtes pas autorisé à vous connecter à ce site !
+            </p>
+            <br />
+            <div style="text-align:center">
+                <img id="img" src="./css/Images/SensInterdit.png" height="300" />
+            </div>
+            <br />
+            <p id="Line2">
+                Contactez l'administrateur.
+            </p>
+        </div>
+    }
+</AuthorizeView>
+

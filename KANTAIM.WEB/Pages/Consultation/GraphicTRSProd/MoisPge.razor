@@ -1,0 +1,71 @@
+﻿@page "/Consultation/GraphicTRSProd/MoisPge"
+@using KANTAIM.DAL.Model;
+@using KANTAIM.WEB.ViewModels;
+@using MudBlazor
+@using static MudBlazor.Icons
+
+<MudPaper Height="850px" Style="overflow:hidden; position:relative;">
+    <MudDrawerContainer Class="mud-height-full">
+        <MudDrawer @bind-Open="@open" Fixed="false" Elevation="1" Variant="@DrawerVariant.Mini" OpenMiniOnHover="true">
+            <MudNavMenu>
+                <MudNavLink Href="/Consultation/GraphicTRSProd/JourPge" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Today">Produit TRS / Semaine</MudNavLink>
+                <MudNavLink Href="/Consultation/GraphicTRSProd/MoisPge" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.CalendarViewWeek">Produit TRS / Mois</MudNavLink>
+                <MudNavLink Href="/Consultation/GraphicTRSProd/AnneePge" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.CalendarMonth">Produit TRS / Année</MudNavLink>
+            </MudNavMenu>
+        </MudDrawer>
+        <MudGrid>
+            <MudItem xs="12" Style="display: flex; justify-content: center; align-items: flex-start; margin-top: 20px;">
+                <div style="display: flex; justify-content: space-between;">
+                    <div style="flex: 1; margin-right: 10px;">
+                        <MudSelect T="int" @bind-Value="SelectedProductFamilyId" Label="ProductFamily" Variant="MudBlazor.Variant.Outlined" @onchange="RefreshData">
+                            @foreach (var productfamily in productfamiliesList)
+                            {
+                                <MudSelectItem T="int" Value="@(productfamily.Id)">@productfamily.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </div>
+
+                    <div style="flex: 1; margin-right: 10px;">
+                        <MudSelect T="int" @bind-Value="SelectedProductId" Label="Product" Variant="MudBlazor.Variant.Outlined">
+                            @foreach (var product in productList)
+                            {
+                                <MudSelectItem T="int" Value="@(product.Id)">@product.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </div>
+
+
+                    <div style="flex: 2; margin-right: 10px;">
+                        <MudDatePicker @ref="_picker" Label="Year-Month Picker" @bind-Date="date" OpenTo="OpenTo.Year" FixDay="1" DateFormat="yyyy/MM" OnClick="@(() => {_picker.Close(); RefreshData();})" />
+
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: center; margin-top: 10px;">
+                    <MudButton Variant="MudBlazor.Variant.Filled" Color="Color.Primary" OnClick="RefreshData">Afficher</MudButton>
+                </div>
+
+            </MudItem>
+        </MudGrid>
+
+        <div>
+            <RadzenChart Style="height:600px">
+
+                <RadzenLineSeries Data="@Data" CategoryProperty="Date" Title="TRS" LineType="LineType.Solid" ValueProperty="ValueTRS" Smooth=true>
+                    <RadzenSeriesDataLabels Visible="true" />
+                    <RadzenMarkers MarkerType="MarkerType.Circle" />
+                </RadzenLineSeries>
+                <RadzenLineSeries Data="@Data" CategoryProperty="Date" Title="OBJ" ValueProperty="ValueOBJ" Smooth=true>
+                    <RadzenMarkers MarkerType="MarkerType.Circle" />
+                </RadzenLineSeries>
+                <RadzenValueAxis Min="0" Max="100" Step="5">
+                    <RadzenGridLines Visible="true" />
+                    <RadzenAxisTitle Text="TRS" />
+                </RadzenValueAxis>
+            </RadzenChart>
+
+        </div>
+
+
+    </MudDrawerContainer>
+</MudPaper>

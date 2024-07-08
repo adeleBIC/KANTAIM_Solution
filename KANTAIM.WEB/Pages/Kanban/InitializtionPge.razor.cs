@@ -1,0 +1,272 @@
+using KANTAIM.DAL.Model;
+using KANTAIM.DAL.Services;
+using KANTAIM.WEB.Services;
+using KANTAIM.WEB.ViewModels;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
+using MudBlazor.Charts;
+using MudBlazor;
+using MudBlazor.Services;
+
+namespace KANTAIM.WEB.Pages.Kanban
+{
+    public partial class InitializtionPge
+    {
+        [Inject] public NavigationManager NavigationManager { get; set; }
+        [Inject] public ContenaireService _contenaireService { get; set; }
+        [Inject] public LogService _logService { get; set; }
+        [Inject] public PressService _pressService { get; set; }
+        [Inject] public ColorService _colorService { get; set; }
+        [Inject] public ScanService _scanService { get; set; }
+        [Inject] public ColorProductService _colorProductServiceService { get; set; }
+        [Inject] ISnackbar _snackService { get; set; }
+        [Parameter] public int Id { get; set; }
+        [Parameter] public int Number { get; set; }
+
+        public string? ContainerValue { get; set; }
+        public string? PressValue { get; set; }
+        public string? ColorValue { get; set; }
+        public string ContainerFeedback { get; set; } = string.Empty;
+        public string? PaletteValue { get; set; }
+        public Boolean BacInitialisation { get; set; } = false;
+        private int state;
+        public Container? ContainerScanner { get; set; }
+        public Press? PressScanner { get; set; }
+        public ProdColor? ColorChoose { get; set; }
+        public List<ProdColor> Colors { get; set; }
+        public Container? PaletteScanner { get; set; }
+        public Log logRescent { get; set; }
+        
+        
+        
+
+        public int State
+        {
+            get
+            {
+                state = 0;
+                if(Colors == null && PressScanner != null) // quand on n'a pas la liste de couleurs et on a déjà su le press scanner, on récupére la liste de colors 
+                {
+                    getColors();
+                }
+                if (ColorChoose != null || (ContainerScanner != null && Colors != null && Colors.Count() == 0)) state = 4;
+                else if (ContainerScanner != null && PressScanner != null) state = 3;
+                else if (ContainerScanner != null && BacInitialisation == false) state = 2;
+                else if (ContainerScanner != null && BacInitialisation == true) state = 1;
+                else if (PressScanner != null) state = 0;
+
+                return state; 
+            }
+        }
+
+        protected override void OnInitialized()
+        {
+            switch (Id)
+            {
+                case 0:
+                    ContainerScanner = _contenaireService.GetContainerByNumber(Number).FirstOrDefault();
+                    if(ContainerScanner.ContainerType.TypeNumber == 2) // Quand on scan le bac
+                    {
+                        BacInitialisation = true;
+                    }
+                    break;
+                case 3:
+                    PressScanner = _pressService.GetByNumber(Number);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        void PaletteScan(KeyboardEventArgs e)
+        {
+            if (e.Key == "Enter")
+            {
+                string[] parts = _scanService.scanCode(PaletteValue);
+                if (parts != null)
+                {
+                    int.TryParse(parts[0], out int type);
+                    int.TryParse(parts[1], out int PaletteNumber);
+
+                    if (type == 1)
+                    {
+                        PaletteScanner = _contenaireService.GetContainerByNumber(PaletteNumber).FirstOrDefault();
+                        if(PaletteScanner.ActionID == 0) // On ne peux pas mettre une bac vide dans une palette, on ne peux pas mettre un bac dans une palette qu'il n'as pas été initialisé.
+                        {
+                            _snackService.Add("Svp initialisez palette d'abord!", Severity.Error);
+                            PaletteValue = null;
+                            PaletteScanner = null;
+                        } else
+                        {
+                            TransferBacToPalette(ContainerScanner, PaletteScanner);
+                        }
+                        
+                    }
+                }
+
+            }
+        }
+        void TransferBacToPalette(Container bac, Container palette)
+        {
+            logRescent = _logService.GetByContenaireId(palette.Id);
+
+            bac.CellId = palette.CellId;
+            bac.ActionID = palette.ActionID;
+            bac.FillStatus = palette.FillStatus;
+            bac.Status = palette.Status;
+            bac.InJail = palette.InJail;
+            bac.InMaintenance = palette.InMaintenance;
+            bac.Comment = palette.Comment;
+            bac.ContainerID = palette.Id;
+            _contenaireService.UpSert(bac);
+
+
+            Log bacLog = new Log()
+            {
+                EventTime = DateTime.Now,
+                Operation = 1, // Initialisation pour le bac
+                ProductID = logRescent.ProductID,
+                Press = logRescent.Press,
+                PressID = logRescent.PressID,
+                Shape = logRescent.Shape,
+                ShapeID = logRescent.ShapeID,
+                Container = bac,
+                ContainerID = bac.Id,
+                ProdColor = logRescent.ProdColor,
+                ProdColorID = logRescent.ProdColorID,
+                CellID = logRescent.CellID,
+                FillStatus = logRescent.FillStatus
+            };
+            _logService.UpSert(bacLog);
+            NavigationManager.NavigateTo($"/ScannerPge");
+            _snackService.Add("Réussi !", Severity.Success);
+        }
+        void PressScan(KeyboardEventArgs e)
+        {
+            if (e.Key == "Enter")
+            {
+                string[] parts = _scanService.scanCode(PressValue);
+                if(parts != null)
+                {
+                    int.TryParse(parts[0], out int type);
+                    int.TryParse(parts[1], out int PressNumber);
+
+                    if (type == 3 && PressNumber > 0)
+                    {
+                        PressScanner = _pressService.GetByNumber(PressNumber);
+                        
+                    }
+                }
+                
+            }
+        }
+
+        void getColors()
+        {
+            Colors = new List<ProdColor>();
+            foreach (ColorProduct colorProduct in _colorProductServiceService.GetAllPerProduct(PressScanner.Shape.ProductID))
+            {
+                Colors.Add(_colorService.GetById(colorProduct.ColorID));
+            }
+        }
+        void ContainerScan(KeyboardEventArgs e)
+        {
+            if (e.Key == "Enter")
+            {
+                string[] parts = _scanService.scanCode(ContainerValue);
+
+                int.TryParse(parts[0], out int type);
+                int.TryParse(parts[1], out int ContainerNumber);
+
+                if (type == 1 && ContainerNumber > 0)
+                {
+                    ContainerScanner = _contenaireService.GetContainerByNumber(ContainerNumber).FirstOrDefault();
+                    // Vérifier si le Contenaire que l'on veut initialiser est bien vide
+                    if (ContainerScanner.ActionID != 0)
+                    {
+                        ContainerScanner = null;
+                        ContainerFeedback = "Contenaire n'est pas vide"; // Set feedback message
+                    }
+                    else
+                    {
+                        ContainerFeedback = string.Empty; // Reset feedback message if the condition does not match
+                    }
+                }
+            }
+           
+        }
+
+        void ColorSelected(int colorid)
+        {
+            ColorChoose = _colorService.GetById(colorid);
+        }
+        void noColorProduct()
+        {
+            ColorChoose = new ProdColor()
+            {
+                Id = -1,
+                ColorNumber = string.Empty,
+                Name = string.Empty,
+            };
+
+        }
+
+        void GoBack(int step)
+        {
+            switch(step)
+            {
+                case 1:
+                    if (Id == 0)
+                    {
+                        PressValue = null;
+                        PressScanner = null;
+                    }  
+                    else if (Id == 3)
+                    {
+                        ContainerValue = null;
+                        ContainerScanner = null;
+                    }
+                    break;
+                case 2:
+                    ColorChoose = null;
+                    break;
+                default:
+                    break;
+
+            }
+        }
+
+        void SaveLog()
+        {
+            Log u = new Log()
+            {
+                EventTime = DateTime.Now,
+                Operation = 1,
+                Product = PressScanner.Shape.Product,
+                ProductID = PressScanner.Shape.Product.Id,
+                Press = PressScanner,
+                PressID = PressScanner.Id,
+                Shape = PressScanner.Shape,
+                ShapeID = PressScanner.Shape.Id,
+                Container = ContainerScanner,
+                ContainerID = ContainerScanner.Id,
+                
+            };
+            if (ColorChoose != null)
+            {
+                u.ProdColor = ColorChoose;
+                u.ProdColorID = ColorChoose.Id;
+            }
+            _logService.UpSert(u);
+
+            ContainerScanner.ActionID = 1;
+            ContainerScanner.CellStock = null;
+            ContainerScanner.CellId = null;
+            if(ContainerScanner.ContainerTypeID == 2) // S'il est un bac, on initialise son fillstatue en plein directement
+                ContainerScanner.Status = 3;
+            _contenaireService.UpSert(ContainerScanner);
+
+            NavigationManager.NavigateTo("/ScannerPge");
+        }
+    }
+}

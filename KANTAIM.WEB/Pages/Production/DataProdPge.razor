@@ -1,0 +1,156 @@
+﻿@page "/Production/DataProdPge"
+@using KANTAIM.DAL.Model;
+@using KANTAIM.WEB.ViewModels;
+@using MudBlazor
+@using static MudBlazor.Icons
+
+<style>
+    .mud-shrink ~ label.mud-input-label.mud-input-label-inputcontrol, .mud-input:focus-within ~ label.mud-input-label.mud-input-label-inputcontrol {
+        transform: translate(0,1.5px) scale(1.0);
+    }
+
+    .mud-picker-inline {
+        display: flex;
+        flex: 1 1 auto;
+        position: relative;
+        max-width: 350px;
+    }
+    .mud-picker-inline.mud-picker-input-button .mud-input, .mud-picker-inline.mud-picker-input-button .mud-input .mud-input-root {
+        cursor: pointer;
+        width: auto;
+    }
+
+    .mud-table-container {
+        width: 100%;
+        overflow-y: clip;
+    }
+
+    .custom-disabled-button {
+        pointer-events: none;
+    }
+
+    .mud-table {
+        height: min-content;
+        width: 100%;
+    }
+
+</style>
+
+<div class="pageTitle">
+    <MudText Typo="Typo.h4">Données de production</MudText>
+</div>
+
+
+
+@if (DataProds != null)
+{
+    <MudGrid Style="height:100%; width:100.6%" Justify="Justify.Center">
+        <MudItem xs="2">
+            <MudPaper Elevation="5" Class=" pa-4 d-flex justify-center align-center">
+                <MudDatePicker Style="margin-top:-5px" @ref="_picker" @bind-Date="date" AutoClose="@autoClose">
+                    <PickerActions>
+                        <MudButton Class="mr-auto align-self-start" OnClick="@(() => _picker.Clear())">Clear</MudButton>
+                        <MudButton OnClick="@(() => _picker.Close(false))">Cancel</MudButton>
+                        <MudButton Color="Color.Primary" OnClick="@(() => {_picker.Close(); OnDateChanged();})">Ok</MudButton>
+                    </PickerActions>
+                </MudDatePicker>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" Style="height:95%; margin-left:10px">
+            <MudDataGrid T="DataProdVM" RowClassFunc="RowClassFct" Items="@DataProds" Dense=true Hover=true ReadOnly=false EditMode="MudBlazor.DataGridEditMode.Cell"
+                         Virtualize="true" SelectOnRowClick=false MultiSelection=true SelectedItemsChanged="SelectionChanged" Bordered=true
+                         Filterable="true" SortMode="SortMode.Multiple" Hideable="false" QuickFilter="@_quickFilter">
+
+                <ToolBarContent>
+                    <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Add" OnClick="AddAsync" Color="Color.Primary"></MudIconButton>
+                    <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Save" OnClick="SaveAsync" Color="Color.Primary"></MudIconButton>
+                    <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Delete" OnClick="DeleteAsync" Color="Color.Error"></MudIconButton>
+                    <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Cancel" OnClick="CancelAsync" Color="Color.Primary"></MudIconButton>
+                    <MudSpacer />
+                    <MudTextField @bind-Value="_searchString" Placeholder="Recherche presse" Adornment="Adornment.Start" Immediate="true"
+                                  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                </ToolBarContent>
+                <Columns>
+                    <SelectColumn ShowInFooter=false />
+                    <PropertyColumn Property="x => x.PressID" Title="Numero de presse">
+                        <EditTemplate>
+                            <MudSelect T=int @bind-Value=context.Item.PressID>
+                                @foreach (var f in context.Item.Presses.OrderBy(p => p.Number))
+                                {
+                                    <MudSelectItem T=int Value="@f.Id">@f.Number</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </EditTemplate>
+                    </PropertyColumn>
+
+                    <PropertyColumn Property="x => x.ProduitName" Title="Produit fabriqué">
+                        <EditTemplate>
+                            <MudSelect T=int @bind-Value=context.Item.ProductID>
+                                @foreach (var f in context.Item.Products)
+                                {
+                                    <MudSelectItem T=int Value="@f.Id">@f.Name</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </EditTemplate>
+                    </PropertyColumn>
+
+                    <PropertyColumn Property="x => x.NumDayShift" Title="Equipe">
+                        <EditTemplate>
+                            <MudSelect @bind-Value="context.Item.NumDayShift">
+                                @*                         @if (ShiftValueNonNull((DataProd)context.Item, 1))
+                            { *@
+                                <MudSelectItem Value="1">Matin</MudSelectItem>
+                                @*                         } *@
+
+                                @*                         @if (ShiftValueNonNull((DataProd)context.Item, 2))
+                            { *@
+                                <MudSelectItem Value="2">Après-midi</MudSelectItem>
+                                @*                         } *@
+
+                                @*                         @if (ShiftValueNonNull((DataProd)context.Item, 3))
+                            { *@
+                                <MudSelectItem Value="3">Nuit</MudSelectItem>
+                                @*                         } *@
+
+                            </MudSelect>
+                        </EditTemplate>
+                    </PropertyColumn>
+
+                    <PropertyColumn Property="x => x.Counter" Title="Compteur" />
+                    <PropertyColumn IsEditable="false" Property="x => x.TRS" Title="TRS" />
+                    <PropertyColumn IsEditable="false" Property="x => x.ObjOK" Title="Objectif atteint">
+                        <CellTemplate>
+                            <MudToggleIconButton @bind-Toggled="context.Item.ObjOK" class="custom-disabled-button"
+                                                 Icon="@Icons.Material.Filled.Block" Color="@Color.Error" Title="NOK"
+                                                 ToggledIcon="@Icons.Material.Filled.CheckCircleOutline" ToggledColor="@Color.Success" ToggledTitle="OK" />
+
+                            <span>@(context.Item.ObjOK ? "OK" : "NOK")</span>
+                        </CellTemplate>
+                    </PropertyColumn>
+                    <PropertyColumn Property="x => x.Opentime" Title="Temps d'ouverture(H)" />
+                    <PropertyColumn Property="x => x.Objective" Title="Objectif" />
+                    <PropertyColumn Property="x => x.Comment" Title="Commentaire" Required=false />
+                </Columns>
+                <PagerContent>
+                    <MudDataGridPager T="DataProdVM" PageSizeOptions="@(new int[] {8, 15, 30, 50,100})" />
+                </PagerContent>
+            </MudDataGrid>
+        </MudItem>
+    </MudGrid>
+}
+else
+{
+    <MudCard>
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px" />
+        <MudCardContent>
+            <MudSkeleton Width="30%" Height="42px;" />
+            <MudSkeleton Width="80%" />
+            <MudSkeleton Width="100%" />
+        </MudCardContent>
+        <MudCardActions>
+            <MudSkeleton Width="64px" Height="40px" Class="ml-2" />
+            <MudSkeleton Width="105px" Height="40px" Class="ml-3" />
+        </MudCardActions>
+        <MudProgressLinear Color="Color.Default" Indeterminate="true" Class="my-7" />
+    </MudCard>
+}

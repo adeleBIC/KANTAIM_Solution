@@ -1,0 +1,74 @@
+﻿@page "/Administration/MachineAsemblagePge"
+@using KANTAIM.DAL.Model;
+@using KANTAIM.WEB.Components.ProductfamilyComp
+@using KANTAIM.WEB.ViewModels;
+
+<div class="pageTitle">
+    <MudText Typo="Typo.h4">Machine Assemblage</MudText>
+</div>
+
+@if (Machines != null)
+{
+    <MudDataGrid T="MachineVM" RowClassFunc="RowClassFct" Items="@Machines" Dense=true Hover=true ReadOnly=false EditMode="MudBlazor.DataGridEditMode.Cell"
+                 Virtualize="true" SelectOnRowClick=false MultiSelection=true SelectedItemsChanged="SelectionChanged" Bordered=true
+                 Filterable="true" SortMode="SortMode.Multiple" Hideable="false">
+        <ToolBarContent>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Add" OnClick="AddAsync" Color="Color.Primary"></MudIconButton>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Save" OnClick="SaveAsync" Color="Color.Primary"></MudIconButton>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Delete" OnClick="DeleteAsync" Color="Color.Error"></MudIconButton>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Cancel" OnClick="CancelAsync" Color="Color.Primary"></MudIconButton>
+            <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Placeholder="Recherche Machine assemblage" Adornment="Adornment.Start" Immediate="true"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <Columns>
+            <SelectColumn ShowInFooter=false />
+            <PropertyColumn Property="x => x.Number" Title="Numéro" />
+            <PropertyColumn Property="x => x.Name" Title="Nom" />
+            <PropertyColumn Property="x => x.IPAdress" Title="Adresse IP" />
+            <PropertyColumn Property="x => x.QRCode" Title="QR Code" Required=false />
+            <PropertyColumn Property="x => x.ProductID" Title="Produit">
+                <EditTemplate>
+                    <MudSelect T=int @bind-Value=context.Item.ProductID>
+                        @foreach (var f in context.Item.products)
+                        {
+                            <MudSelectItem T=int Value="@f.Id">@f.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.IsInkjet" Title="INK Jet">
+                <EditTemplate>
+                    <MudCheckBox @bind-Checked=context.Item.IsInkjet />
+                </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.Active" Title="Actif">
+                <EditTemplate>
+                    <MudCheckBox @bind-Checked=context.Item.Active />
+                </EditTemplate>
+            </PropertyColumn>
+           
+
+            <PropertyColumn Property="x => x.Comment" Title="Commentaire" Required=false />
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="UserVM" PageSizeOptions="@(new int[] {15, 30, 50,100})" />
+        </PagerContent>
+    </MudDataGrid>
+}
+else
+{
+    <MudCard>
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px" />
+        <MudCardContent>
+            <MudSkeleton Width="30%" Height="42px;" />
+            <MudSkeleton Width="80%" />
+            <MudSkeleton Width="100%" />
+        </MudCardContent>
+        <MudCardActions>
+            <MudSkeleton Width="64px" Height="40px" Class="ml-2" />
+            <MudSkeleton Width="105px" Height="40px" Class="ml-3" />
+        </MudCardActions>
+        <MudProgressLinear Color="Color.Default" Indeterminate="true" Class="my-7" />
+    </MudCard>
+}

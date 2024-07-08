@@ -1,0 +1,56 @@
+﻿@using KANTAIM.DAL.Model;
+@using KANTAIM.WEB.ViewModels;
+
+<style>
+    .mud-table-container {
+        overflow-y: clip;
+    }
+
+    .mud-table {
+        height: min-content;
+        /*width: min-content;*/
+    }
+</style>
+
+@if (Presses != null)
+{
+    <MudDataGrid T="PressVM" RowClassFunc="RowClassFct" Items="@Presses" Dense=true Hover=true ReadOnly=false EditMode="MudBlazor.DataGridEditMode.Cell"
+             Virtualize="true" SelectOnRowClick=false MultiSelection=true SelectedItemsChanged="SelectionChanged" Bordered=true
+             Filterable="true" SortMode="SortMode.Multiple" Hideable="false" QuickFilter="@_quickFilter">
+        <ToolBarContent>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Add" OnClick="Add" Color="Color.Primary"></MudIconButton>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Save" OnClick="SaveAsync" Color="Color.Primary"></MudIconButton>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Delete" OnClick="DeleteAsync" Color="Color.Error"></MudIconButton>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Cancel" OnClick="CancelAsync" Color="Color.Primary"></MudIconButton>
+            <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Placeholder="Recherche presse" Adornment="Adornment.Start" Immediate="true"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <Columns>
+            <SelectColumn ShowInFooter=false />
+            <PropertyColumn Property="x => x.Number" Title="Numéro de presse" />
+            <PropertyColumn Property="x => x.ShapeName" Title="Moules">
+                <EditTemplate>
+                    <MudSelect T=int @bind-Value=context.Item.ShapeID>
+                        @foreach (var f in context.Item.Shapes.OrderBy(s => s.Number))
+                        {
+                            <MudSelectItem T=int Value="@f.Id">@f.Number - @f.Name - @f.Product.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.QRcode" Title="QRcode" Required=false />
+            <PropertyColumn Property="x => x.ConsignNumber" Title="Numéro consignateur" />
+            <PropertyColumn Property="x => x.IPAdress" Title="Adresse IP" />
+            <PropertyColumn Property="x => x.Active" Title="Actif">
+                <EditTemplate>
+                    <MudCheckBox @bind-Checked=context.Item.Active />
+                </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.Comment" Title="Commentaire" Required=false />
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="PressVM" PageSizeOptions="@(new int[] {11, 30, 50,100})" />
+        </PagerContent>
+    </MudDataGrid>
+}

@@ -1,0 +1,37 @@
+﻿<style>
+    .fullHeightForm {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+    }
+
+    .mud-input {
+        height: 36px;
+    }
+
+</style>
+
+@if (Workshop != null)
+{
+    <EditForm Model="@Workshop" class="fullHeightForm" OnSubmit="Save">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <MudGrid>
+            <MudItem xs="3">
+                <MudTextField Disabled=@(!Workshop.IsEditing) @bind-Value=@Workshop.Name For="@(()=>Workshop.Name)" Margin="Margin.Dense" Variant="MudBlazor.Variant.Outlined" />
+            </MudItem>
+            <MudItem xs="7">
+                <MudTextField Disabled=@(!Workshop.IsEditing) @bind-Value=@Workshop.Comment For="@(()=>Workshop.Comment)" Margin="Margin.Dense" Variant="MudBlazor.Variant.Outlined" />
+            </MudItem>
+            <MudItem xs="1">
+                <MudButton ButtonType="MudBlazor.ButtonType.Submit" Disabled="@(!Workshop.IsEditing)" Variant="MudBlazor.Variant.Filled">Valider</MudButton>
+            </MudItem>
+            <MudItem xs="1">
+                <MudButton Disabled="@(!Workshop.IsEditing)" OnClick="Cancel" Variant="MudBlazor.Variant.Filled">Annuler</MudButton>
+            </MudItem>
+        </MudGrid>
+    </EditForm>
+}

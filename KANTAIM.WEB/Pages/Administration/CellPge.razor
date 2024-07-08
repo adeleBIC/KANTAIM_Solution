@@ -1,0 +1,75 @@
+﻿@page "/Administration/CellPge"
+@using KANTAIM.DAL.Model;
+@using KANTAIM.WEB.ViewModels;
+
+<div class="pageTitle">
+    <MudText Typo="Typo.h4">Liste de cellules</MudText>
+</div>
+
+
+@if (Cells != null)
+{
+    <MudDataGrid T="CellVM" RowClassFunc="RowClassFct" Items="@Cells" Dense=true Hover=true ReadOnly=false EditMode="MudBlazor.DataGridEditMode.Cell"
+                 Virtualize="true" SelectOnRowClick=false MultiSelection=true SelectedItemsChanged="SelectionChanged" Bordered=true
+                 Filterable="true" SortMode="SortMode.Multiple" Hideable="false" QuickFilter="@_quickFilter">
+        <ToolBarContent>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Add" OnClick="AddAsync" Color="Color.Primary"></MudIconButton>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Save" OnClick="SaveAsync" Color="Color.Primary"></MudIconButton>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Delete" OnClick="DeleteAsync" Color="Color.Error"></MudIconButton>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Cancel" OnClick="CancelAsync" Color="Color.Primary"></MudIconButton>
+            <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Placeholder="Recherche cellules" Adornment="Adornment.Start" Immediate="true"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <Columns>
+            <SelectColumn ShowInFooter=false />
+            <PropertyColumn Property="x => x.X" Title="X" />
+            <PropertyColumn Property="x => x.Y" Title="Y" />
+            <PropertyColumn Property="x => x.Name" Title="Nom" />
+            <PropertyColumn Property="x => x.NbMax" Title="Hauteur Max" />
+            <PropertyColumn Property="x => x.DynamicStatus" Title="Statut" />
+            <PropertyColumn Property="x => x.IsJail" Title="Prison">
+                <EditTemplate>
+                    <MudCheckBox @bind-Checked=context.Item.IsJail />
+                </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.IsMaintenance" Title="Maintenance">
+                <EditTemplate>
+                    <MudCheckBox @bind-Checked=context.Item.IsMaintenance />
+                </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.IsPhantom" Title="Fantôme">
+                <EditTemplate>
+                    <MudCheckBox @bind-Checked=context.Item.IsPhantom />
+                </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.ForEmpty" Title="Pour Contenaire Vide">
+                <EditTemplate>
+                    <MudCheckBox @bind-Checked=context.Item.ForEmpty />
+                </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.QRCode" Title="QRCode" Required=false />
+
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="CellVM" PageSizeOptions="@(new int[] {15, 30, 50,100})" />
+        </PagerContent>
+    </MudDataGrid>
+}
+else
+{
+    <MudCard>
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px" />
+        <MudCardContent>
+            <MudSkeleton Width="30%" Height="42px;" />
+            <MudSkeleton Width="80%" />
+            <MudSkeleton Width="100%" />
+        </MudCardContent>
+        <MudCardActions>
+            <MudSkeleton Width="64px" Height="40px" Class="ml-2" />
+            <MudSkeleton Width="105px" Height="40px" Class="ml-3" />
+        </MudCardActions>
+        <MudProgressLinear Color="Color.Default" Indeterminate="true" Class="my-7" />
+    </MudCard>
+}
+

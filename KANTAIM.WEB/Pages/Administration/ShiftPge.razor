@@ -1,0 +1,113 @@
+﻿@page "/Administration/ShiftPge"
+@using KANTAIM.DAL.Model;
+@using KANTAIM.WEB.ViewModels;
+
+<div class="pageTitle">
+    <MudText Typo="Typo.h4">Shifts</MudText>
+</div>
+
+@if (Shifts != null)
+{
+    <MudDataGrid T="ShiftVM" RowClassFunc="RowClassFct" Items="@Shifts" Dense=true Hover=true ReadOnly=false EditMode="MudBlazor.DataGridEditMode.Cell"
+                 Virtualize="true" SelectOnRowClick=false MultiSelection=true SelectedItemsChanged="SelectionChanged" Bordered=true
+                 Filterable="true" SortMode="SortMode.Multiple" Hideable="false" QuickFilter="@_quickFilter">
+        <ToolBarContent>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Add" OnClick="AddAsync" Color="Color.Primary"></MudIconButton>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Save" OnClick="SaveAsync" Color="Color.Primary"></MudIconButton>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Delete" OnClick="DeleteAsync" Color="Color.Error"></MudIconButton>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Cancel" OnClick="CancelAsync" Color="Color.Primary"></MudIconButton>
+            <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Placeholder="Recherche unité" Adornment="Adornment.Start" Immediate="true"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <Columns>
+            <SelectColumn ShowInFooter=false />
+            
+            <PropertyColumn Property="x => x.ShiftNumber" Title="Numéro de shift" />
+
+            <PropertyColumn Property="x => x.Monday" Title="Lundi">
+                <EditTemplate>
+                    <div style="display: flex; align-items: center;">
+                        <MudTimePicker @bind-Time=context.Item.Monday AmPm="false" />
+                        <MudButton OnClick="@(() => context.Item.Monday=null)" Color="Color.Error">Clear</MudButton>
+                    </div>
+                </EditTemplate>
+            </PropertyColumn>
+
+            <PropertyColumn Property="x => x.Tuesday" Title="Mardi">
+                <EditTemplate>
+                    <div style="display: flex; align-items: center;">
+                        <MudTimePicker @bind-Time=context.Item.Tuesday AmPm="false" />
+                        <MudButton OnClick="@(() => context.Item.Tuesday=null)" Color="Color.Error">Clear</MudButton>
+                    </div>
+                </EditTemplate>
+            </PropertyColumn>
+
+
+
+            <PropertyColumn Property="x => x.Wednesday" Title="Mercredi">
+                <EditTemplate>
+                    <div style="display: flex; align-items: center;">
+                        <MudTimePicker @bind-Time=context.Item.Wednesday AmPm="false" />
+                        <MudButton OnClick="@(() => context.Item.Wednesday=null)" Color="Color.Error">Clear</MudButton>
+                    </div>
+                </EditTemplate>
+            </PropertyColumn>
+
+            <PropertyColumn Property="x => x.Thursday" Title="Jeudi">
+                <EditTemplate>
+                    <div style="display: flex; align-items: center;">
+                        <MudTimePicker @bind-Time=context.Item.Thursday AmPm="false" />
+                        <MudButton OnClick="@(() => context.Item.Thursday=null)" Color="Color.Error">Clear</MudButton>
+                    </div>
+                </EditTemplate>
+            </PropertyColumn>
+
+            <PropertyColumn Property="x => x.Friday" Title="Vendredi">
+                <EditTemplate>
+                    <div style="display: flex; align-items: center;">
+                        <MudTimePicker @bind-Time=context.Item.Friday AmPm="false" />
+                        <MudButton OnClick="@(() => context.Item.Friday=null)" Color="Color.Error">Clear</MudButton>
+                    </div>
+                </EditTemplate>
+            </PropertyColumn>
+
+            <PropertyColumn Property="x => x.Saturday" Title="Samedi">
+                <EditTemplate>
+                    <div style="display: flex; align-items: center;">
+                        <MudTimePicker @bind-Time=context.Item.Saturday AmPm="false" />
+                        <MudButton OnClick="@(() => context.Item.Saturday=null)" Color="Color.Error">Clear</MudButton>
+                    </div>
+                </EditTemplate>
+            </PropertyColumn>
+
+            <PropertyColumn Property="x => x.Sunday" Title="Dimanche">
+                <EditTemplate>
+                     <div style="display: flex; align-items: center;">
+                    <MudTimePicker @bind-Time=context.Item.Sunday  AmPm="false" />
+                    <MudButton OnClick="@(() => context.Item.Sunday=null)" Color="Color.Error">Clear</MudButton>
+                    </div>
+                </EditTemplate>
+            </PropertyColumn>
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="ShiftVM" PageSizeOptions="@(new int[] {15, 30, 50,100})" />
+        </PagerContent>
+    </MudDataGrid>
+}
+else
+{
+    <MudCard>
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px" />
+        <MudCardContent>
+            <MudSkeleton Width="30%" Height="42px;" />
+            <MudSkeleton Width="80%" />
+            <MudSkeleton Width="100%" />
+        </MudCardContent>
+        <MudCardActions>
+            <MudSkeleton Width="64px" Height="40px" Class="ml-2" />
+            <MudSkeleton Width="105px" Height="40px" Class="ml-3" />
+        </MudCardActions>
+        <MudProgressLinear Color="Color.Default" Indeterminate="true" Class="my-7" />
+    </MudCard>
+}

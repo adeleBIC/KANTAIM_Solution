@@ -1,0 +1,12 @@
+﻿@using MudBlazor
+<MudPaper Height="850px" Style="overflow:hidden; position:relative;">
+    <MudDrawerContainer Class="mud-height-full">
+        <MudDrawer Fixed="false" Elevation="1" Variant="@DrawerVariant.Mini" OpenMiniOnHover="true">
+            <MudNavMenu>
+                <MudNavLink Href="/Consultation/GraphieTRSpro/JourPge" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Today">Produit TRS / Jour</MudNavLink>
+                <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.CalendarViewWeek">Produit TRS / Semaine</MudNavLink>
+                <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.CalendarMonth">Produit TRS / Année</MudNavLink>
+            </MudNavMenu>
+        </MudDrawer>
+    </MudDrawerContainer>
+</MudPaper>

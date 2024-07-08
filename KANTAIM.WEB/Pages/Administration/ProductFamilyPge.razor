@@ -1,0 +1,61 @@
+﻿@page "/Administration/ProductFamilyPge"
+@using KANTAIM.DAL.Model;
+@using KANTAIM.WEB.Components.ProductfamilyComp
+@using KANTAIM.WEB.ViewModels;
+
+<div class="pageTitle">
+    <MudText Typo="Typo.h4">Produits</MudText>
+</div>
+
+@if (ProductFamilies != null)
+{
+     <div style="height:calc(100vh - 170px);width:calc(100vw - 15px); padding-left:15px; ">
+        <MudGrid Style="height:100%" Spacing="2">
+            <MudItem xs="2" Style="height:100%">
+                <MudToolBar>
+                    <MudIconButton Class="editButton" Disabled=@IsEditing Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Add" OnClick="AddAsync" Color="Color.Primary"></MudIconButton>
+                    <MudIconButton Class="editButton" Disabled=@IsEditing Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Edit" OnClick="EditAsync" Color="Color.Primary"></MudIconButton>
+                    <MudIconButton Class="editButton" Disabled=@IsEditing Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Delete" OnClick="DeleteAsync" Color="Color.Error"></MudIconButton>
+                </MudToolBar>
+                <MudPaper Style="height:100%; overflow:auto;" Elevation="5">
+                    <MudList Clickable=true Style="overflow: auto; height: 100%;" @bind-SelectedItem="selectedItem" @bind-SelectedValue="selectedValue">
+                        @foreach (var productFamily in ProductFamilies)
+                        {
+                            <MudListItem OnClick="@(()=>SelectProductFamily(productFamily))" Value="@productFamily.Id">@productFamily.Name</MudListItem>
+                        }
+                    </MudList>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="10" Style="height:100%;">
+                <MudGrid Style="height:100%" Spacing="1">
+                    <MudItem xs="12" Style="height:12%">
+                        <MudPaper Elevation="5" Style="height:100%">
+                            <ProductFamilyDetail ProductFamily="@SelectedProductFamily" OnSaved="SaveAsync" OnCancel="Cancel" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="12" Style="height:97.8%">
+                        <MudPaper Elevation="5" Style="height:100%;  overflow:auto;">
+                            <ProductDetail ProductFamily="@SelectedProductFamily" Products="@Products" OnSaved="SaveProductAsync" OnCancel="CancelProductAsync" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+            </MudItem>
+        </MudGrid>
+    </div>
+}
+else
+{
+    <MudCard>
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px" />
+        <MudCardContent>
+            <MudSkeleton Width="30%" Height="42px;" />
+            <MudSkeleton Width="80%" />
+            <MudSkeleton Width="100%" />
+        </MudCardContent>
+        <MudCardActions>
+            <MudSkeleton Width="64px" Height="40px" Class="ml-2" />
+            <MudSkeleton Width="105px" Height="40px" Class="ml-3" />
+        </MudCardActions>
+        <MudProgressLinear Color="Color.Default" Indeterminate="true" Class="my-7" />
+    </MudCard>
+}

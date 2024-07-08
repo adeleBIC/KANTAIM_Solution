@@ -1,0 +1,73 @@
+﻿@page "/FindProductPge/{id:int}/{number:int}"
+@layout PhoneLayout
+@using KANTAIM.DAL.Model;
+@using KANTAIM.WEB.ViewModels;
+@using MudBlazor
+@using static MudBlazor.Icons
+@using Microsoft.AspNetCore.Components.Routing
+
+<div class="pageTitle">
+    <MudText Typo="Typo.h4">Recherche le produit dans une cellule</MudText>
+</div>
+<style>
+    .bouton {
+        width: 120px;
+        height: 50px;
+        margin: 10px;
+        font-size: 16px;
+    }
+
+</style>
+<div style="height: calc(100vh - 130px); display: flex; flex-direction: column; justify-content: center; align-items: center;">
+
+    @if(cells != null)
+    {
+        @if (cells.Count() > 0)
+        {
+            @foreach (var c in cells)
+            {
+                <MudButton Class="bouton">
+                    @c.Name
+                </MudButton>
+
+            }
+        }
+        else
+        {
+            <div>Il n'y a pas
+
+                <b>@ProductScanner.Name </b>
+                
+                en 
+                
+                @if(ColorChoose != null)
+                {
+                    <b style="@($"color:{ColorChoose.Name};")">
+                    @ColorChoose.Name</b>
+                }
+                stocké dans la cellule</div>
+        }
+    } else
+    {
+        <div>
+    <br>Produit : @ProductScanner.Name
+    <br>Choisissez la couleur s'il vous plait
+    <br>
+
+    @if (Colors != null)
+    {
+        @foreach (var c in Colors)
+        {
+            <MudButton Class="bouton" Style="@($"background: {c.ColorNumber};")" OnClick="()=>ColorSelected(c.Id)" Variant="MudBlazor.Variant.Filled">
+                @c.Name
+            </MudButton>
+
+        }
+    }
+
+    </div>
+        <MudButton Class="bouton" OnClick="() => GoBack()" Color="Color.Error" Variant="MudBlazor.Variant.Filled">Retour</MudButton>
+
+    }
+</div>
+    

@@ -1,0 +1,89 @@
+﻿@inherits LayoutComponentBase
+    <PageTitle>KANTAIM.WEB</PageTitle>
+    <style>
+    .bottom-tabs {
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+        padding: 0 20px;
+    }
+
+    .logintag {
+        margin-right: 10px;
+        font-size: 15px;
+        position: absolute;
+        top: 10px;
+        right: 10px; 
+    }
+
+
+    </style>
+
+    <AuthorizeView>
+    <MudThemeProvider Theme="BicTheme" />
+    <MudDialogProvider />
+    <MudSnackbarProvider />
+        @if (Users.Contains(context.User.Identity?.Name.ToLower()))
+{
+        <MudLayout>
+             <MudAppBar Bottom="true" Fixed="true" Elevation="0" DisableGutters="true" >
+            <div class="bottom-tabs">
+                    <MudButton Color="Color.Inherit" Style="--mud-typography-button-size:25px;--mud-typography-button-weight : bold;" Href="/ScannerPge" Match="NavLinkMatch.Prefix">Scanner</MudButton>
+                   @*  <MudButton Color="Color.Inherit" Style="--mud-typography-button-size:25px;--mud-typography-button-weight : bold;" Href="/MenuPge" Match="NavLinkMatch.All">Menu</MudButton> *@
+            </div>
+                
+            </MudAppBar>
+
+            <MudAppBar Color="Color.Primary" Fixed="false" Dense="true">
+                <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" @onclick="ToggleDrawer" />
+                <MudSpacer />
+
+                <div class="logintag">
+                    <LoginDisplay />
+                </div>
+            </MudAppBar>
+
+            <MudDrawer @bind-Open="@drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="1">
+                <MudNavMenu>
+                    <MudNavLink Href="/ScannerPge">Initialisation Machine</MudNavLink>
+                    <MudNavLink Href="/ScannerPge">Mise en Rack</MudNavLink>
+                    <MudNavLink Href="/ScannerPge">Sortie de Rack</MudNavLink>
+                    <MudNavLink Href="/ScannerPge">Mise en Machine</MudNavLink>
+                    <MudNavLink Href="/ScannerPge">Déplacement Contenaire</MudNavLink>
+                    <MudNavLink Href="/TransferPge">Mise en Contenaire</MudNavLink>
+             </MudNavMenu>
+         </MudDrawer>
+           
+                <MudMainContent>
+    @*                 <div class="logintag">
+                        <LoginDisplay />
+                    </div> *@
+                 
+                    @Body
+                   
+                    
+                </MudMainContent>
+           
+            
+        </MudLayout>
+}
+else
+{
+    <div>
+        <br />
+            <br />
+            <br />
+            <p id="Line1">
+                Vous n'êtes pas autorisé à vous connecter à ce site !
+            </p>
+            <br />
+            <div style="text-align:center">
+                <img id="img" src="./css/Images/SensInterdit.png" height="300" />
+            </div>
+            <br />
+            <p id="Line2">
+                Contactez l'administrateur.
+            </p>
+        </div>
+    }
+</AuthorizeView>

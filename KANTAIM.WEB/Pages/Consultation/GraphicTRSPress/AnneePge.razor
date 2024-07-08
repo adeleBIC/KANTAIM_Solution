@@ -1,0 +1,56 @@
+﻿@page "/Consultation/GraphicTRSPress/AnneePge"
+@using KANTAIM.DAL.Model;
+@using KANTAIM.WEB.ViewModels;
+@using MudBlazor
+@using static MudBlazor.Icons
+
+<MudPaper Height="850px" Style="overflow:hidden; position:relative;">
+    <MudDrawerContainer Class="mud-height-full">
+        <MudDrawer @bind-Open="@open" Fixed="false" Elevation="1" Variant="@DrawerVariant.Mini" OpenMiniOnHover="true">
+            <MudNavMenu>
+                <MudNavLink Href="/Consultation/GraphicTRSPress/JourPge" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Today">Press TRS / Semaine</MudNavLink>
+                <MudNavLink Href="/Consultation/GraphicTRSPress/MoisPge" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.CalendarViewWeek">Press TRS / Mois</MudNavLink>
+                <MudNavLink Href="/Consultation/GraphicTRSPress/AnneePge" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.CalendarMonth">Press TRS / Année</MudNavLink>
+            </MudNavMenu>
+        </MudDrawer>
+
+        <MudGrid>
+            <MudItem xs="12" Style="display: flex; justify-content: center; align-items: flex-start; margin-top: 20px;">
+                <div style="display: flex; flex-direction: row; align-items: center;">
+                    <MudSelect T="int" @bind-Value="selectedPressId" Label="Press" Variant="MudBlazor.Variant.Outlined" Style="margin-right: 10px;">
+                        @foreach (var press in pressesList.OrderBy(p => p.Number))
+                        {
+                            <MudSelectItem T="int" Value="@(press.Id)">@press.Number</MudSelectItem>
+                        }
+                    </MudSelect>
+
+                    <MudNumericField @bind-Value="selectedYear" Label="Select Year" Variant="MudBlazor.Variant.Outlined" Style="margin-right: 10px;" />
+
+                    <MudButton Variant="MudBlazor.Variant.Filled" Color="Color.Primary" OnClick="RefreshData">Afficher</MudButton>
+
+                </div>
+            </MudItem>
+        </MudGrid>
+
+
+        <div>
+            <RadzenChart Style="height:600px">
+
+                <RadzenLineSeries Data="@Data" CategoryProperty="Date" Title="TRS" LineType="LineType.Solid" ValueProperty="ValueTRS" Smooth=true>
+                    <RadzenSeriesDataLabels Visible="true" />
+                    <RadzenMarkers MarkerType="MarkerType.Circle" />
+                </RadzenLineSeries>
+                <RadzenLineSeries Data="@Data" CategoryProperty="Date" Title="OBJ" ValueProperty="ValueOBJ" Smooth=true>
+                    <RadzenMarkers MarkerType="MarkerType.Circle" />
+                </RadzenLineSeries>
+                <RadzenValueAxis Min="0" Max="100" Step="5">
+                    <RadzenGridLines Visible="true" />
+                    <RadzenAxisTitle Text="TRS" />
+                </RadzenValueAxis>
+            </RadzenChart>
+
+        </div>
+
+    </MudDrawerContainer>
+</MudPaper>
+

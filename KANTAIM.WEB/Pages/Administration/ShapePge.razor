@@ -1,0 +1,73 @@
+﻿@page "/Administration/ShapePge"
+@using KANTAIM.DAL.Model;
+@using KANTAIM.WEB.ViewModels;
+
+<div class="pageTitle">
+    <MudText Typo="Typo.h4">Moule</MudText>
+</div>
+
+@if (Shapes != null)
+{
+    <MudDataGrid T="ShapeVM" RowClassFunc="RowClassFct" Items="@Shapes" Dense=true Hover=true ReadOnly=false EditMode="MudBlazor.DataGridEditMode.Cell"
+             Virtualize="true" SelectOnRowClick=false MultiSelection=true SelectedItemsChanged="SelectionChanged" Bordered=true
+             Filterable="true" SortMode="SortMode.Multiple" Hideable="false" QuickFilter="@_quickFilter">
+        <ToolBarContent>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Add" OnClick="AddAsync" Color="Color.Primary"></MudIconButton>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Save" OnClick="SaveAsync" Color="Color.Primary"></MudIconButton>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Delete" OnClick="DeleteAsync" Color="Color.Error"></MudIconButton>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Cancel" OnClick="CancelAsync" Color="Color.Primary"></MudIconButton>
+            <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Placeholder="Recherche mélangeur" Adornment="Adornment.Start" Immediate="true"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <Columns>
+            <SelectColumn ShowInFooter=false />
+            <PropertyColumn Property="x => x.Number" Title="Matricule" />
+            <PropertyColumn Property="x => x.Name" Title="Lettre" />
+            <PropertyColumn Property="x => x.ProduitName" Title="Produit fabriqué">
+                <EditTemplate>
+                    <MudSelect T=int @bind-Value=context.Item.ProductID>
+                        @foreach (var f in context.Item.Products)
+                        {
+                            <MudSelectItem T=int Value="@f.Id">@f.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.Totalmark" Title="Nombre d'empreintes total" />
+            <PropertyColumn Property="x => x.Usedmark" Title="Nombre d'empreintes utilisées" />
+            <PropertyColumn Property="x => x.Cycle" Title="Temps de cycle">
+                <EditTemplate>
+                    <MudNumericField T="double" @bind-Value="context.Item.Cycle" Required="true"  />
+                </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.Opentime" Title="Temps d'ouverture(H)" />
+            <PropertyColumn Property="x => x.Objective" Title="Objectif"  />
+            <PropertyColumn Property="x => x.Active" Title="Actif">
+                <EditTemplate>
+                    <MudCheckBox @bind-Checked=context.Item.Active />
+                </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.Comment" Title="Commentaire" Required=false />
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="ShapeVM" PageSizeOptions="@(new int[] {10, 30, 50,100})" />
+        </PagerContent>
+    </MudDataGrid>
+}
+else
+{
+    <MudCard>
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px" />
+        <MudCardContent>
+            <MudSkeleton Width="30%" Height="42px;" />
+            <MudSkeleton Width="80%" />
+            <MudSkeleton Width="100%" />
+        </MudCardContent>
+        <MudCardActions>
+            <MudSkeleton Width="64px" Height="40px" Class="ml-2" />
+            <MudSkeleton Width="105px" Height="40px" Class="ml-3" />
+        </MudCardActions>
+        <MudProgressLinear Color="Color.Default" Indeterminate="true" Class="my-7" />
+    </MudCard>
+}

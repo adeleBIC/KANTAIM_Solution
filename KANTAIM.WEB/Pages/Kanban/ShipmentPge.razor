@@ -1,0 +1,92 @@
+﻿@page "/ShipmentPge/{id:int}/{number:int}"
+@layout PhoneLayout
+@using KANTAIM.DAL.Model;
+@using KANTAIM.WEB.ViewModels;
+@using MudBlazor
+@using static MudBlazor.Icons
+@using Microsoft.AspNetCore.Components.Routing
+
+<style>
+
+
+
+    .main-container {
+        padding: 10px;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    .selection-container, .display-container {
+        background-color: #FFFFFF;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .title {
+        color: #333333;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .redtitle {
+        color: red;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .status-display, .status-item {
+        color: #555555;
+        margin: 10px 0;
+        padding: 10px;
+        background-color: #f2f2f2;
+        border-radius: 10px;
+    }
+
+    .button-group {
+        display: flex;
+        justify-content: space-evenly;
+    }
+
+    .fillstatus-container {
+        text-align: center;
+    }
+
+
+    .bouton {
+        margin: 5px;
+    }
+
+</style>
+@if(correct)
+{
+    @if (shipment)
+        {
+            <h3 class="title">Bien Sortie</h3>
+        }
+        else
+        {
+
+        <div class="display-container">
+            <h3 class="title">Sortie de Rack</h3>
+
+                <div class="status-display">
+                    <div class="status-item">Produit: @product.Name</div>
+                @if (colorOfProduct != null)
+                {
+                    <div class="status-item">Couleur: @colorOfProduct.Name</div>
+                }
+                
+                <div class="status-item">Contenaire: @ContainerScanner.Number</div>
+                </div>
+
+                <div class="button-group">
+            <MudButton Color="Color.Secondary" Variant="MudBlazor.Variant.Filled" Href="@($"/StockagePge/2/{ContainerScanner.Number}")" Match="NavLinkMatch.All">Déplacement Contenaire</MudButton>
+                <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="Shipment">Sortie</MudButton>
+            </div>
+        </div>
+        }
+}
+
+
+

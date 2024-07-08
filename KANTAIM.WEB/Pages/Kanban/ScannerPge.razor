@@ -1,0 +1,12 @@
+﻿@page "/ScannerPge"
+
+@layout PhoneLayout
+@using KANTAIM.DAL.Model;
+@using KANTAIM.WEB.ViewModels;
+@using MudBlazor
+@using static MudBlazor.Icons
+
+
+<div style="display: flex; justify-content: center; align-items: center; height: calc(100vh - 130px);">
+    <MudTextField @bind-Value="TextValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="e => TextfieldUserInputDetected(TextValue, e)"></MudTextField>
+</div>

@@ -1,0 +1,57 @@
+﻿@page "/Administration/TypeContenairePge"
+@using KANTAIM.DAL.Model;
+@using KANTAIM.WEB.Components.ProductfamilyComp
+@using KANTAIM.WEB.ViewModels;
+
+<div class="pageTitle">
+    <MudText Typo="Typo.h4">Type de Contenaire</MudText>
+</div>
+
+@if (ContenaireTypes != null)
+{
+    <MudDataGrid T="ContenaireTypeVM" RowClassFunc="RowClassFct" Items="@ContenaireTypes" Dense=true Hover=true ReadOnly=false EditMode="MudBlazor.DataGridEditMode.Cell"
+                 Virtualize="true" SelectOnRowClick=false MultiSelection=true SelectedItemsChanged="SelectionChanged" Bordered=true
+                 Filterable="true" SortMode="SortMode.Multiple" Hideable="false" QuickFilter="@_quickFilter">
+        <ToolBarContent>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Add" OnClick="AddAsync" Color="Color.Primary"></MudIconButton>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Save" OnClick="SaveAsync" Color="Color.Primary"></MudIconButton>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Delete" OnClick="DeleteAsync" Color="Color.Error"></MudIconButton>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Cancel" OnClick="CancelAsync" Color="Color.Primary"></MudIconButton>
+            <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Placeholder="Recherche type de contenaire" Adornment="Adornment.Start" Immediate="true"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <Columns>
+            <SelectColumn ShowInFooter=false />
+            <PropertyColumn Property="x => x.Name" Title="Nom" />
+            <PropertyColumn Property="x => x.TypeNumber" Title="TypeNumber de contenaire" />
+            <PropertyColumn Property="x => x.NbrMaxContainer" Title="Nombre maximal de contenaire" />
+            <PropertyColumn Property="x => x.Ymax" Title="Ymax" />
+            <PropertyColumn Property="x => x.IsContainable" Title="Peut être contenu">
+                <EditTemplate>
+                    <MudCheckBox @bind-Checked=context.Item.IsContainable />
+                </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.Comment" Title="Commentaire" Required=false />
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="UserVM" PageSizeOptions="@(new int[] {15, 30, 50,100})" />
+        </PagerContent>
+    </MudDataGrid>
+}
+else
+{
+    <MudCard>
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px" />
+        <MudCardContent>
+            <MudSkeleton Width="30%" Height="42px;" />
+            <MudSkeleton Width="80%" />
+            <MudSkeleton Width="100%" />
+        </MudCardContent>
+        <MudCardActions>
+            <MudSkeleton Width="64px" Height="40px" Class="ml-2" />
+            <MudSkeleton Width="105px" Height="40px" Class="ml-3" />
+        </MudCardActions>
+        <MudProgressLinear Color="Color.Default" Indeterminate="true" Class="my-7" />
+    </MudCard>
+}
