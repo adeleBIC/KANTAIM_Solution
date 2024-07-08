@@ -11,7 +11,6 @@
     }
 
     .tree-view-container {
-        min-height: 500px; /* Minimum height for the tree view */
         padding: 10px; /* Padding inside the tree view */
         margin-bottom: 60px; /* Add margin to the bottom to prevent overlap with action buttons */
         overflow-y: auto; /* Enable vertical scroll */
@@ -33,11 +32,11 @@
         box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
     }
 
-    .action-buttons .mud-grid-item {
-        display: flex;
-        justify-content: center; /* Center button horizontally */
-        align-items: center; /* Center button vertically */
-    }
+        .action-buttons .mud-grid-item {
+            display: flex;
+            justify-content: center; /* Center button horizontally */
+            align-items: center; /* Center button vertically */
+        }
 
     .sticky-header {
         position: sticky;
@@ -57,96 +56,98 @@
     </MudStack>
 </MudPaper>
 
-@if (Editer)
-{
-    <MudGrid>
-        <MudItem xs="6" Class="bordered-paper">
-            <div class="tree-title sticky-header">
-                <MudText Typo="Typo.h5">Cellules</MudText>
-            </div>
-            <div class="tree-view-container">
-                @if (cells != null)
-                {
-                    <MudTreeView Items="CellTreeItems" MultiSelection="true" Hover="true" @bind-SelectedValues="CellSelectedValues">
-                        <ItemTemplate>
-                            <MudTreeViewItem @bind-Expanded="@context.IsExpanded" Items="@context.TreeItems" Value="@context" Text="@context.Name"></MudTreeViewItem>
-                        </ItemTemplate>
-                    </MudTreeView>
-                }
-            </div>
-        </MudItem>
-        <MudItem xs="6" Class="bordered-paper">
-            <div class="tree-title sticky-header">
-                <MudText Typo="Typo.h5">Produits</MudText>
-            </div>
-            <div class="tree-view-container">
-                @if (ProductFamilies != null)
-                {
-                    <MudTreeView Items="ProductTreeItems" MultiSelection="true" Hover="true" @bind-SelectedValues="ProductSelectedValues">
-                        <ItemTemplate>
-                            <MudTreeViewItem @bind-Expanded="@context.IsExpanded" Items="@context.TreeItems" Value="@context" Text="@context.Name"></MudTreeViewItem>
-                        </ItemTemplate>
-                    </MudTreeView>
-                }
-            </div>
-        </MudItem>
-    </MudGrid>
+<div class="content">
+    @if (Editer)
+    {
+        <MudGrid>
+            <MudItem xs="6" Class="bordered-paper">
+                <div class="tree-title sticky-header">
+                    <MudText Typo="Typo.h5">Cellules</MudText>
+                </div>
+                <div class="tree-view-container">
+                    @if (cells != null)
+                    {
+                        <MudTreeView Items="CellTreeItems" MultiSelection="true" Hover="true" @bind-SelectedValues="CellSelectedValues">
+                            <ItemTemplate>
+                                <MudTreeViewItem @bind-Expanded="@context.IsExpanded" Items="@context.TreeItems" Value="@context" Text="@context.Name"></MudTreeViewItem>
+                            </ItemTemplate>
+                        </MudTreeView>
+                    }
+                </div>
+            </MudItem>
+            <MudItem xs="6" Class="bordered-paper">
+                <div class="tree-title sticky-header">
+                    <MudText Typo="Typo.h5">Produits</MudText>
+                </div>
+                <div class="tree-view-container">
+                    @if (ProductFamilies != null)
+                    {
+                        <MudTreeView Items="ProductTreeItems" MultiSelection="true" Hover="true" @bind-SelectedValues="ProductSelectedValues">
+                            <ItemTemplate>
+                                <MudTreeViewItem @bind-Expanded="@context.IsExpanded" Items="@context.TreeItems" Value="@context" Text="@context.Name"></MudTreeViewItem>
+                            </ItemTemplate>
+                        </MudTreeView>
+                    }
+                </div>
+            </MudItem>
+        </MudGrid>
 
-    <MudGrid Class="action-buttons" Justify="Justify.Center" AlignItems="AlignItems.Center">
-        <MudItem xs="6">
-            <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" FullWidth OnClick="CancelLink">Enlever</MudButton>
-         </MudItem>
-         <MudItem xs="6">
-             <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" FullWidth OnClick="VerifyAsync">Lier</MudButton>
-         </MudItem>
-     </MudGrid>
-}
-else
-{
-    <MudGrid>
-        <MudItem xs="6" Class="bordered-paper">
-            <div class="tree-title sticky-header">
-                <MudText Typo="Typo.h5">Cellules</MudText>
-            </div>
-            <div class="tree-view-container">
-                @if (cells != null)
-                {
-                    <MudTreeView Items="CellTreeItems" Hover="true" @bind-ActivatedValue="CellActivatedValue" @bind-SelectedValues="CellSelectedValues">
-                        <ItemTemplate>
-                            @if (@context.IsSelected)
-                            {
-                                <MudTreeViewItem Icon="@Icons.Material.Filled.Label" IconColor="Color.Success" ActivatedChanged="@(() => ActiveAsync(context, 0))" @bind-Expanded="@context.IsExpanded" Items="@context.TreeItems" Value="@context" Text="@context.Name"></MudTreeViewItem>
-                            }
-                            else
-                            {
-                                <MudTreeViewItem Icon="@Icons.Material.Filled.Label" ActivatedChanged="@(() => ActiveAsync(context, 0))" @bind-Expanded="@context.IsExpanded" Items="@context.TreeItems" Value="@context" Text="@context.Name"></MudTreeViewItem>
-                            }
-                        </ItemTemplate>
-                    </MudTreeView>
-                }
-            </div>
-        </MudItem>
-        <MudItem xs="6" Class="bordered-paper">
-            <div class="tree-title sticky-header">
-                <MudText Typo="Typo.h5">Produits</MudText>
-            </div>
-            <div class="tree-view-container">
-                @if (ProductFamilies != null)
-                {
-                    <MudTreeView Items="ProductTreeItems" Hover="true" @bind-ActivatedValue="ProductActivatedValue" @bind-SelectedValues="ProductSelectedValues">
-                        <ItemTemplate>
-                            @if (@context.IsSelected)
-                            {
-                                <MudTreeViewItem Icon="@Icons.Material.Filled.Label" IconColor="Color.Success" ActivatedChanged="@(() => ActiveAsync(context, 1))" @bind-Expanded="@context.IsExpanded" Items="@context.TreeItems" Value="@context" Text="@context.Name"></MudTreeViewItem>
-                            }
-                            else
-                            {
-                                <MudTreeViewItem Icon="@Icons.Material.Filled.Label" ActivatedChanged="@(() => ActiveAsync(context, 1))" @bind-Expanded="@context.IsExpanded" Items="@context.TreeItems" Value="@context" Text="@context.Name"></MudTreeViewItem>
-                            }
-                        </ItemTemplate>
-                    </MudTreeView>
-                }
-            </div>
-        </MudItem>
-    </MudGrid>
-}
+        <MudGrid Class="action-buttons" Justify="Justify.Center" AlignItems="AlignItems.Center">
+            <MudItem xs="6">
+                <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" FullWidth OnClick="CancelLink">Enlever</MudButton>
+             </MudItem>
+             <MudItem xs="6">
+                 <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" FullWidth OnClick="VerifyAsync">Lier</MudButton>
+             </MudItem>
+         </MudGrid>
+    }
+    else
+    {
+        <MudGrid>
+            <MudItem xs="6" Class="bordered-paper">
+                <div class="tree-title sticky-header">
+                    <MudText Typo="Typo.h5">Cellules</MudText>
+                </div>
+                <div class="tree-view-container">
+                    @if (cells != null)
+                    {
+                        <MudTreeView Items="CellTreeItems" Hover="true" @bind-ActivatedValue="CellActivatedValue" @bind-SelectedValues="CellSelectedValues">
+                            <ItemTemplate>
+                                @if (@context.IsSelected)
+                                {
+                                    <MudTreeViewItem Icon="@Icons.Material.Filled.Label" IconColor="Color.Success" ActivatedChanged="@(() => ActiveAsync(context, 0))" @bind-Expanded="@context.IsExpanded" Items="@context.TreeItems" Value="@context" Text="@context.Name"></MudTreeViewItem>
+                                }
+                                else
+                                {
+                                    <MudTreeViewItem Icon="@Icons.Material.Filled.Label" ActivatedChanged="@(() => ActiveAsync(context, 0))" @bind-Expanded="@context.IsExpanded" Items="@context.TreeItems" Value="@context" Text="@context.Name"></MudTreeViewItem>
+                                }
+                            </ItemTemplate>
+                        </MudTreeView>
+                    }
+                </div>
+            </MudItem>
+            <MudItem xs="6" Class="bordered-paper">
+                <div class="tree-title sticky-header">
+                    <MudText Typo="Typo.h5">Produits</MudText>
+                </div>
+                <div class="tree-view-container">
+                    @if (ProductFamilies != null)
+                    {
+                        <MudTreeView Items="ProductTreeItems" Hover="true" @bind-ActivatedValue="ProductActivatedValue" @bind-SelectedValues="ProductSelectedValues">
+                            <ItemTemplate>
+                                @if (@context.IsSelected)
+                                {
+                                    <MudTreeViewItem Icon="@Icons.Material.Filled.Label" IconColor="Color.Success" ActivatedChanged="@(() => ActiveAsync(context, 1))" @bind-Expanded="@context.IsExpanded" Items="@context.TreeItems" Value="@context" Text="@context.Name"></MudTreeViewItem>
+                                }
+                                else
+                                {
+                                    <MudTreeViewItem Icon="@Icons.Material.Filled.Label" ActivatedChanged="@(() => ActiveAsync(context, 1))" @bind-Expanded="@context.IsExpanded" Items="@context.TreeItems" Value="@context" Text="@context.Name"></MudTreeViewItem>
+                                }
+                            </ItemTemplate>
+                        </MudTreeView>
+                    }
+                </div>
+            </MudItem>
+        </MudGrid>
+    }
+</div>
