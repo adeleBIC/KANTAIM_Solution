@@ -32,10 +32,50 @@ namespace KANTAIM.WEB.Pages.Kanban
 
         protected override void OnInitialized()
         {
-            ContainerScanner = _contenaireService.GetContainerByNumber(Number).FirstOrDefault();
-            logRescent = _logService.GetByContenaireId(ContainerScanner.Id);
-            product = _productService.GetById(logRescent.ProductID.Value);
-            prodColor = _colorService.GetById(logRescent.ProdColorID);
+            switch(Id)
+            {
+                //Scanner le contenaire
+                case 1:
+                    ContainerScanner = _contenaireService.GetContainerByNumber(Number).FirstOrDefault();
+                    logRescent = _logService.GetByContenaireId(ContainerScanner.Id);
+                    product = _productService.GetById(logRescent.ProductID.Value);
+                    prodColor = _colorService.GetById(logRescent.ProdColorID);
+                    break;
+                //Scanner la machine
+                case 2:
+                    MachineScanner = _machineService.GetByNumber(Number);
+                    break;
+            }
+            
+        }
+        void contenaireScan(KeyboardEventArgs e)
+        {
+            if (e.Key == "Enter")
+            {
+                string[] parts = _scanService.scanCode(ContainerValue);
+
+                int.TryParse(parts[0], out int type);
+                if (type != 1)
+                {
+                    _snackService.Add("Svp scanner le QR code de la contenaire.", Severity.Error);
+                }
+                else
+                {
+                    int.TryParse(parts[1], out int Container);
+                    ContainerScanner = _contenaireService.GetContainerByNumber(Container).FirstOrDefault();
+                    if(ContainerScanner.ActionID != 3)
+                    {
+                        _snackService.Add("Svp scanner le QR code de la contenaire qui a sortie de rack avec produits.", Severity.Error);
+                        ContainerScanner = null;
+                    } else
+                    {
+                        logRescent = _logService.GetByContenaireId(ContainerScanner.Id);
+                        product = _productService.GetById(logRescent.ProductID.Value);
+                        prodColor = _colorService.GetById(logRescent.ProdColorID);
+                    }
+                    
+                }
+            }
         }
         void machineScan(KeyboardEventArgs e)
         {
@@ -63,6 +103,21 @@ namespace KANTAIM.WEB.Pages.Kanban
                 }
             }
 
+        }
+
+        void returnAction()
+        {
+            switch (Id)
+            {
+                //Scanner le contenaire first, so the last step is scan machine
+                case 1:
+                    MachineScanner = null;
+                    break;
+                //Scanner la machine first, so the last step is scan contenaire
+                case 2:
+                    ContainerScanner = null;
+                    break;
+            }
         }
 
         void Inject()

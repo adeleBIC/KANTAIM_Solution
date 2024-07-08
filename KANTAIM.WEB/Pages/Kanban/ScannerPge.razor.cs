@@ -85,7 +85,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                                                 break;
                                             case 3:
                                                 /*Après sortie le contenaire avec produit, on vas le mise en Machine*/
-                                                NavigationManager.NavigateTo($"/InjectPge/3/{containerNumber}");
+                                                NavigationManager.NavigateTo($"/InjectPge/1/{containerNumber}");
                                                 break;
                                             case 4:
                                                 /*Apres vidange le contenaire est vide, on Mise en rack.*/

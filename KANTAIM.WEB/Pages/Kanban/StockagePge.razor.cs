@@ -167,13 +167,13 @@ namespace KANTAIM.WEB.Pages.Kanban
                 }
             } else // plein ou semi-plein
             {
-                /*
+                
                 if (logRescent != null)
                 {
                     product = _productService.GetById((int)logRescent.ProductID);
                     colorOfProduct = _colorService.GetById(logRescent.ProdColorID);
                 }
-                */
+                
                 if(isPalette && _contenaireService.CountBac(ContainerScanner.Id) < 24 )
                 {
                     _snackService.Add("Le nombre de bac doit être superieur que 24 !", Severity.Error);
@@ -218,11 +218,11 @@ namespace KANTAIM.WEB.Pages.Kanban
                     }
                     int.TryParse(parts[1], out int X);
                     int.TryParse(parts[2], out int Y);
-                    int.TryParse(parts[3], out int typeCell);
-
-                    if(maintenance)
+                    // int.TryParse(parts[3], out int typeCell);
+                    cellScanner = _cellService.GetAll().Where(u => u.X == X && u.Y == Y).FirstOrDefault();
+                    if (maintenance)
                     {
-                        if (typeCell == 3)
+                        if (cellScanner.IsMaintenance == true)
                         {
                             Exit(2);
                             bienStock = true;
@@ -232,7 +232,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                         }
 
                     }
-                    cellScanner = _cellService.GetAll().Where(u => u.X == X && u.Y == Y).FirstOrDefault();
+                    
 
                     if (cellScanner == cellPropose)
                     {

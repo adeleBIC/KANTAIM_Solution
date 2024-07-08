@@ -86,25 +86,38 @@ else
         </div>
     } else
     {
-        <div class="display-container">
-            <h3 class="title">Vérifier informations</h3>
+        @if (ContainerScanner == null )
+        {
+            <div class="display-container">
+                <h3 class="title">Scannez la contenaire svp</h3>
+                <div>
+                    <MudTextField @bind-Value="ContainerValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="contenaireScan"></MudTextField>
+                </div>
+            </div>
+        } else
+        {
+            <div class="display-container">
+                <h3 class="title">Vérifier informations</h3>
 
-        <div class="status-display">
-                <div class="status-item">Produit: @product.Name</div>
-                @if(prodColor != null)
-                {
-                    <div class="status-item">Couleur: @prodColor.Name</div>
-                }
-                
-                <div class="status-item">Contenaire: @ContainerScanner.Number</div>
-                <div class="status-item">Machine: @MachineScanner.Number</div>
-        </div>
+                <div class="status-display">
+                    <div class="status-item">Produit: @product.Name</div>
+                    @if (prodColor != null)
+                    {
+                        <div class="status-item">Couleur: @prodColor.Name</div>
+                        <MudIcon Icon="@Icons.Material.Filled.Circle" Style="@($"color:{prodColor.ColorNumber};")" />
+                    }
 
-        <div class="button-group">
-                <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="() => MachineScanner=null">Retour</MudButton>
-                <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="Inject">Valider</MudButton>
-        </div>
-    </div>
+                    <div class="status-item">Contenaire: @ContainerScanner.Number</div>
+                    <div class="status-item">Machine: @MachineScanner.Name</div>
+                </div>
+
+                <div class="button-group">
+                    <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="returnAction">Retour</MudButton>
+                    <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="Inject">Valider</MudButton>
+                </div>
+            </div>
+        }
+        
     }
     
 }

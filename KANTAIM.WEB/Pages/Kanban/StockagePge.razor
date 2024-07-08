@@ -107,6 +107,10 @@
                     <h3 class="title">
                         @cellScanner.Name
                     </h3>
+                    @if (cellScanner.IsMaintenance)
+                    {
+                        <h3 style="color:red;"> Attention vous choisissez une zone maintenance </h3>
+                    }
                     <div class="button-group">
                         <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>cellScanner=null">Return</MudButton>
                         @if (cellScanner.IsMaintenance)
