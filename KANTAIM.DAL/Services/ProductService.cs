@@ -31,7 +31,7 @@ namespace KANTAIM.DAL.Services
         public IEnumerable<Product> GetAll() => Cache;
         public Product? GetByNumber(int Number) => Cache.SingleOrDefault(c => c.Number == Number);
         public IEnumerable<Product> GetAllPerProductFamily(int id) => Cache.Where(p => p.ProductFamilyID == id);
-        public Product? GetById(int id) => Cache.SingleOrDefault(c => c.Id == id);
+        public Product? GetById(int? id) => id == null ? null : Cache.SingleOrDefault(c => c.Id == id);
         public void ResetCache() => cache = null;
 
         public void UpSert(Product item)

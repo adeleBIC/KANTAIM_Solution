@@ -36,7 +36,7 @@ namespace KANTAIM.DAL.Services
         }
 
         public IEnumerable<Cell> GetAll() => Cache;
-        public Cell? GetById(int id) => Cache.SingleOrDefault(x => x.Id == id);
+        public Cell? GetById(int? id) => id == null ? null : Cache.SingleOrDefault(x => x.Id == id);
         public Cell? GetByNumber(string n) => Cache.SingleOrDefault(x => x.Name == n);
         public Cell? GetByXY(int X, int Y) => Cache.SingleOrDefault(x => x.X == X && x.Y == Y);
 

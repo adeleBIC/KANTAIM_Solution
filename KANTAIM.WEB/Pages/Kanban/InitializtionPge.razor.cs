@@ -200,16 +200,6 @@ namespace KANTAIM.WEB.Pages.Kanban
         {
             ColorChoose = _colorService.GetById(colorid);
         }
-        void noColorProduct()
-        {
-            ColorChoose = new ProdColor()
-            {
-                Id = -1,
-                ColorNumber = string.Empty,
-                Name = string.Empty,
-            };
-
-        }
 
         void GoBack(int step)
         {

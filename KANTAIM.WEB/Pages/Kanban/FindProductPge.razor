@@ -19,61 +19,59 @@
 
 </style>
 <div style="height: calc(100vh - 130px); display: flex; flex-direction: column; justify-content: center; align-items: center;">
-
-    @if(cells != null)
+    @if (cellPropose != null)
     {
-        @if (cells.Count() > 0)
-        {
-            
-            @foreach (var c in cells)
-            {
-
-                <h3 class="title">@c.Name</h3>
-                    
-            
-
-            }
-                <h3 class="title">
-                Svp scannez la cellule qui est proposée
-            </h3>
-            <MudTextField @bind-Value="CellValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="cellScan"></MudTextField>
-        }
-        else
-        {
-            <div>Il n'y a pas
-
-                <b>@ProductScanner.Name </b>
-                
-                en 
-                
-                @if(ColorChoose != null)
-                {
-                    <b style="@($"color:{ColorChoose.Name};")">
-                    @ColorChoose.Name</b>
-                }
-                stocké dans la cellule</div>
-        }
-    } else
+        <h3 class="title">Cellule proposée: @cellPropose.Name</h3>
+        <div>
+            <MudTextField @bind-Value="ContainerValue" AutoFocus="true" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="ContainerScan"></MudTextField>
+        <MudButton Class="bouton" OnClick="ToggleCellList" Variant="MudBlazor.Variant.Filled" Style="margin-top: 20px;">
+            @(ShowAllCells ? "Masquer" : "Afficher")
+        </MudButton>
+        </div>
+    }
+    else if (cells != null && cells.Count == 0)
     {
         <div>
-    <br>Produit : @ProductScanner.Name
-    <br>Choisissez la couleur s'il vous plait
-    <br>
+            Il n'y a pas <b>@ProductScanner.Name</b> en
+            @if (ColorChoose != null)
+            {
+                <b style="@($"color:{ColorChoose.Name};")">@ColorChoose.Name</b>
+            }
+            stocké dans la cellule
+        </div>
+    }
 
-    @if (Colors != null)
+    @if (cells != null && cells.Count > 0)
     {
-        @foreach (var c in Colors)
+        @if (ShowAllCells)
         {
-            <MudButton Class="bouton" Style="@($"background: {c.ColorNumber};")" OnClick="()=>ColorSelected(c.Id)" Variant="MudBlazor.Variant.Filled">
-                @c.Name
-            </MudButton>
-
+            <div>
+                @foreach (var cellLog in cells)
+                {
+                    <h3 class="title">Cellule: @cellLog.Cell.Name (Stockée le: @cellLog.EventTime)</h3>
+                }
+            </div>
         }
     }
 
-    </div>
-        <MudButton Class="bouton" OnClick="() => GoBack()" Color="Color.Error" Variant="MudBlazor.Variant.Filled">Retour</MudButton>
-
+    @if (cells == null)
+    {
+        <div>
+            <p>DEBUG: Cells are null.</p>
+            <br>Produit : @ProductScanner.Name
+            <br>Choisissez la couleur s'il vous plait
+            <br>
+            @if (Colors != null)
+            {
+                @foreach (var color in Colors)
+                {
+                    <MudButton Class="bouton" Style="@($"background: {color.ColorNumber};")" OnClick="() => ColorSelected(color.Id)" Variant="MudBlazor.Variant.Filled">
+                        @color.Name
+                    </MudButton>
+                }
+            }
+        </div>
+        <MudButton Class="bouton" OnClick="GoBack" Color="Color.Error" Variant="MudBlazor.Variant.Filled">Retour</MudButton>
     }
 </div>
-    
+

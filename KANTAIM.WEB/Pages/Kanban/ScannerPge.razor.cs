@@ -122,7 +122,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                                 if (int.TryParse(X, out int x) && int.TryParse(Y, out int y))
                                 {
                                         CellScanner = _cellService.GetByXY(x, y);
-                                        NavigationManager.NavigateTo($"/StockagePge/4/{CellScanner.Id}");
+                                        //NavigationManager.NavigateTo($"/StockagePge/4/{CellScanner.Id}");
                                 }
                                 break;
                             case '5':

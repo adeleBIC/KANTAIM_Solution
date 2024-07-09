@@ -9,6 +9,7 @@ using MudBlazor;
 using System;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
+using static KANTAIM.WEB.Pages.Kanban.FindProductPge;
 using static System.Collections.Specialized.BitVector32;
 
 
@@ -58,6 +59,8 @@ namespace KANTAIM.WEB.Pages.Kanban
         public string? BacValue { get; set; }
         public string ContainerFeedback { get; set; } = string.Empty;
         public int actionId;
+        public List<CellLog> cellList { get; set; }
+        public Log? cellLog { get; set; }
 
         protected override void OnInitialized()
         {
@@ -203,6 +206,9 @@ namespace KANTAIM.WEB.Pages.Kanban
                 if(ContainerScanner.ContainerType.IsContainable == true)
                 {
                     cells = cells.FindAll(u => u.IsPhantom == true); // if it is a bac empty, we stock it in the cell phantom and empty
+                } else
+                {
+                    cells = cells.FindAll(u => u.IsPhantom != true);// if it isn't a bac empty, we stock it in the cell empty
                 }
                 foreach (Cell cell in cells)
                 {
@@ -227,17 +233,53 @@ namespace KANTAIM.WEB.Pages.Kanban
                     //stock = false;
                     //return;
                 }
-                cells = _cellService.GetAll().Where(u => u.IsJail != true && u.IsMaintenance != true && u.ForEmpty != true && u.Status != 2).ToList();
+                findCells();
+
+            }
+           
+        }
+
+        void findCells()
+        {
+            cellList = new List<CellLog>();
+            foreach (Container container in _contenaireService.Cache.Where(c => c.CellStock != null)) // recherche tous les contenaire qui est stockés dans la cellule, find all the contenaire who in currutly in the cell
+            {
+                cellLog = _logService.GetByContenaireByActionId(container.Id, 2);
+                Cell? cellAct = _cellService.GetById(cellLog.CellID);
+                if(cellAct != null && cellAct.IsJail != true && cellAct.IsMaintenance != true && cellAct.ForEmpty != true && cellAct.Status != 2 && _cellProductService.FindLink(cellAct.Id, product.Id) && cellAct.Id != ContainerScanner.CellId) { 
+                    if (cellLog != null && cellLog.ProductID == product.Id )
+                    {
+                        if (colorOfProduct == null || logRescent.ProdColorID == colorOfProduct.Id)
+                        {
+                            if (!cellList.Any(c => c.Cell.Id == container.CellStock.Id) )
+                            {
+                                cellList.Add(new CellLog { Cell = container.CellStock, EventTime = logRescent.EventTime });
+                            }
+                        }
+                    }
+                }
+                
+            }
+            if (cellList != null && cellList.Count > 0)
+            {
+                var oldestCellLog = cellList.OrderBy(c => c.EventTime).FirstOrDefault();
+                if (oldestCellLog != null)
+                {
+                    cellPropose = oldestCellLog.Cell;
+                }
+            } else {
+                List<Cell> cells = new List<Cell>();
+                cells = _cellService.GetAll().Where(u => u.IsJail != true && u.IsMaintenance != true && u.ForEmpty != true && u.Status == 0).ToList();
                 foreach (Cell cell in cells)
                 {
                     if (_cellProductService.FindLink(cell.Id, product.Id) && cell.Id != ContainerScanner.CellId)
                     {
-                         cellPropose = cell;
-                         return;
+
+                        cellPropose = cell;
+                        return;
                     }
                 }
             }
-           
         }
 
         void Maintenance()

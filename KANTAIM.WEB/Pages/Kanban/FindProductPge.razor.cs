@@ -34,13 +34,26 @@ namespace KANTAIM.WEB.Pages.Kanban
         public Product? ProductScanner { get; set; }
         public ProdColor? ColorChoose { get; set; }
         public List<ProdColor> Colors { get; set; }
-        //public IEnumerable<Cell> cells { get; set; }
-        public List<Cell> cells { get; set; }
+
+        public List<CellLog> cells { get; set; }
         public Log logRescent { get; set; }
-        public Cell? CellScanner { get; set; }
-        public string CellValue { get; set; }
+        public Container? ContainerScanner { get; set; }
+        public Cell? cellPropose { get; set; }
+        public Product? containerProduct { get; set; }
+        public ProdColor? containerProdColor { get; set; }
+        public string ContainerValue { get; set; }
+        public bool ShowAllCells { get; set; }
 
+        void ToggleCellList()
+        {
+            ShowAllCells = !ShowAllCells;
+        }
 
+        public class CellLog
+        {
+            public Cell Cell { get; set; }
+            public DateTime EventTime { get; set; }
+        }
 
 
         protected override void OnInitialized()
@@ -62,28 +75,31 @@ namespace KANTAIM.WEB.Pages.Kanban
 
         void findCells()
         {
-            cells = new List<Cell>();
+            cells = new List<CellLog>();
             foreach (Container container in _contenaireService.Cache.Where(c => c.CellStock != null))
             {
-                logRescent = _logService.GetByContenaireByActionId(container.Id,2);
-                if (logRescent != null && logRescent.ProductID == ProductScanner.Id )
+                logRescent = _logService.GetByContenaireByActionId(container.Id, 2);
+                if (logRescent != null && logRescent.ProductID == ProductScanner.Id)
                 {
-                    if(ColorChoose == null || logRescent.ProdColorID == ColorChoose.Id)
+                    if (ColorChoose == null || logRescent.ProdColorID == ColorChoose.Id)
                     {
-                        if (!cells.Any(c => c.Id == container.CellStock.Id)) // Assurez-vous de comparer avec une propriété unique
+                        if (!cells.Any(c => c.Cell.Id == container.CellStock.Id))
                         {
-                            cells.Add(container.CellStock);
+                            cells.Add(new CellLog { Cell = container.CellStock, EventTime = logRescent.EventTime });
                         }
-                    } 
-                    //cells.Append(container.CellStock);
+                    }
+                }
+            }
+            if (cells != null && cells.Count > 0)
+            {
+                var oldestCellLog = cells.OrderBy(c => c.EventTime).FirstOrDefault();
+                if (oldestCellLog != null)
+                {
+                    cellPropose = oldestCellLog.Cell;
                 }
             }
         }
 
-        void CellPropose()
-        {
-
-        }
 
         void ColorSelected(int colorid)
         {
@@ -91,28 +107,60 @@ namespace KANTAIM.WEB.Pages.Kanban
             findCells();
         }
 
-        void cellScan(KeyboardEventArgs e)
+        void ContainerScan(KeyboardEventArgs e)
         {
             if (e.Key == "Enter")
             {
-                string[] parts = _scanService.scanCode(CellValue);
+                string[] parts = _scanService.scanCode(ContainerValue);
                 if (parts != null)
                 {
                     int.TryParse(parts[0], out int type);
-                    
-                    if (type == 4)
+                    if (type == 1)
                     {
-                        string X = parts[1];
-                        string Y = parts[2];
-                        if (int.TryParse(X, out int x) && int.TryParse(Y, out int y))
+                        if (int.TryParse(parts[1], out int containerNumber))
                         {
-                            CellScanner = _cellService.GetByXY(x, y);
-                            NavigationManager.NavigateTo($"/StockagePge/4/{CellScanner.Id}");
+
+                            ContainerScanner = _contenaireService.GetContainerByNumber(containerNumber).FirstOrDefault();
+                            logRescent = _logService.GetByContenaireId(ContainerScanner.Id);
+                            containerProduct = _productService.GetById(logRescent.ProductID);
+                            containerProdColor = _colorService.GetById(logRescent.ProdColorID);
+                            if(containerProduct != ProductScanner || containerProdColor != ColorChoose)
+                            {
+                                _snackService.Add("Scp vérifiez le produit dans le contenaire et le produit que vous voulez rechercher !", Severity.Error);
+                            } else
+                            {
+                                if (ContainerScanner != null)
+                                {
+                                    switch (ContainerScanner.ActionID)
+                                    {
+                                        case 0:
+                                            /*Quand on scan un contenaire vide, on l'initialise sur press.*/
+                                            NavigationManager.NavigateTo($"/InitialisationPge/0/{containerNumber}");
+                                            break;
+                                        case 1:
+                                            /*Après initialisation, on choisie son fillstatus, et après on le mise en rack.*/
+                                            NavigationManager.NavigateTo($"/StockagePge/1/{containerNumber}");
+                                            break;
+                                        case 2:
+                                            /*Traite un contenaire qui stock avec produit, on peut sortir stock ou le déplacer.*/
+                                            NavigationManager.NavigateTo($"/ShipmentPge/1/{containerNumber}");
+                                            break;
+                                        case 3:
+                                            /*Après sortie le contenaire avec produit, on vas le mise en Machine*/
+                                            NavigationManager.NavigateTo($"/InjectPge/1/{containerNumber}");
+                                            break;
+                                        case 4:
+                                            /*Apres vidange le contenaire est vide, on Mise en rack.*/
+                                            NavigationManager.NavigateTo($"/StockagePge/1/{containerNumber}");
+                                            break;
+                                    }
+                                }
+                            }
                         }
                     }
                     else
                     {
-                        _snackService.Add("Scp scannez une cellule !", Severity.Error);
+                        _snackService.Add("Scp scannez une contenaire !", Severity.Error);
                     }
                 }
 
