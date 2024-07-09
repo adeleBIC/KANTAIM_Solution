@@ -80,6 +80,11 @@ namespace KANTAIM.WEB.Pages.Kanban
             }
         }
 
+        void CellPropose()
+        {
+
+        }
+
         void ColorSelected(int colorid)
         {
             ColorChoose = _colorService.GetById(colorid);
