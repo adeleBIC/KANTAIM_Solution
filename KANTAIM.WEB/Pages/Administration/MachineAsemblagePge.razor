@@ -29,10 +29,11 @@
             <PropertyColumn Property="x => x.QRCode" Title="QR Code" Required=false />
             <PropertyColumn Property="x => x.ProductID" Title="Produit">
                 <EditTemplate>
-                    <MudSelect T=int @bind-Value=context.Item.ProductID>
+                    <MudSelect T=int? @bind-Value=context.Item.ProductID>
+                        <MudSelectItem T=int? Value="null">None</MudSelectItem>
                         @foreach (var f in context.Item.Products)
                         {
-                            <MudSelectItem T=int Value="@f.Id">@f.Name</MudSelectItem>
+                            <MudSelectItem T=int? Value="@f.Id">@f.Name</MudSelectItem>
                         }
                     </MudSelect>
                 </EditTemplate>

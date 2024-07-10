@@ -79,8 +79,8 @@ namespace KANTAIM.WEB.ViewModels
         
         [Required]
         [Label("Niveau dFKTProductIDaccès")]
-        private int productID;
-        public int ProductID
+        private int? productID;
+        public int? ProductID
         {
             get { return productID; }
             set { productID = value; IsEditing = true; }
@@ -88,7 +88,7 @@ namespace KANTAIM.WEB.ViewModels
 
         
         [Label("FKTProductID")]
-        public string ProductName { get => model.Product.Name; }
+        public string? ProductName { get => model.Product == null ? null : model.Product.Name; }
 
         [Required]
         [Label("IsInkjet")]

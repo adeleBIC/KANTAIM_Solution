@@ -65,10 +65,18 @@ namespace KANTAIM.WEB.Pages.Administration
 
                 if (validationResults.Count == 0)
                 {
-                    Shift u = (Shift)vm;
-                    _shiftService.UpSert(u);
-                    vm.IsEditing = false;
-                    _snackService.Add("Données sauvgardées !", Severity.Success);
+                    try
+                    {
+                        Shift u = (Shift)vm;
+                        _shiftService.UpSert(u);
+                        vm.IsEditing = false;
+                        _snackService.Add("Données sauvgardées !", Severity.Success);
+                    }
+                    catch (Exception ex)
+                    {
+
+                        _snackService.Add($"{ex.Message}{ex.InnerException.Message}", Severity.Error);
+                    }
                 }
                 else
                 {

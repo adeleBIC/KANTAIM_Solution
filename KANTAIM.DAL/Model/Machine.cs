@@ -34,9 +34,8 @@ namespace KANTAIM.DAL.Model
 
         public string? Comment { get; set; }
 
-        [Required]
         [Column("FKTProductID")]
-        public int ProductID { get; set; }
+        public int? ProductID { get; set; }
         [ForeignKey(nameof(ProductID))]
         public virtual Product? Product { get; set; }
     }

@@ -95,10 +95,20 @@ namespace KANTAIM.WEB.Pages.Administration
 
         void AddAsync()
         {
-            WorkshopVM vm = new WorkshopVM() { Name = "Nouvel Atelier", IsEditing = true };
-            Workshops.Insert(0,vm);
-            SelectedWorkshop = vm;
-            selectedValue = vm.Id;
+           
+            try
+            {
+                WorkshopVM vm = new WorkshopVM() { Name = "Nouvel Atelier", IsEditing = true };
+                Workshops.Insert(0, vm);
+                SelectedWorkshop = vm;
+                selectedValue = vm.Id;
+            }
+            catch (Exception ex)
+            {
+
+                _snackService.Add($"{ex.Message}{ex.InnerException.Message}", Severity.Error);
+            }
+            
             //await InvokeAsync(StateHasChanged);
         }
 

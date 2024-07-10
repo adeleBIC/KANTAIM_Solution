@@ -53,11 +53,21 @@ namespace KANTAIM.WEB.Pages.Administration
 
                 if (validationResults.Count == 0)
                 {
-                    ProdColor u = (ProdColor)vm;
-                    _colorService.Upsert(u);
-                    vm.IsEditing = false;
 
-                    _snackService.Add("Données sauvgardées !", Severity.Success);
+                    try
+                    {
+                        ProdColor u = (ProdColor)vm;
+                        _colorService.Upsert(u);
+                        vm.IsEditing = false;
+
+                        _snackService.Add("Données sauvgardées !", Severity.Success);
+                    }
+                    catch (Exception ex)
+                    {
+
+                        _snackService.Add($"{ex.Message}{ex.InnerException.Message}", Severity.Error);
+                    }
+                    
                 }
                 else
                 {

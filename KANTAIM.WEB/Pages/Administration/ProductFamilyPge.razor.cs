@@ -3,6 +3,7 @@ using MudBlazor;
 using KANTAIM.DAL.Services;
 using KANTAIM.WEB.ViewModels;
 using static MudBlazor.CategoryTypes;
+using KANTAIM.DAL.Model;
 
 namespace KANTAIM.WEB.Pages.Administration
 {
@@ -84,10 +85,21 @@ namespace KANTAIM.WEB.Pages.Administration
 
         void AddAsync()
         {
-            ProductFamilyVM vm = new ProductFamilyVM() { Name = "Nouvelle famille de produit", IsEditing = true };
-            ProductFamilies.Insert(0, vm);
-            SelectedProductFamily = vm;
-            selectedValue = vm.Id;
+            
+
+            try
+            {
+                ProductFamilyVM vm = new ProductFamilyVM() { Name = "Nouvelle famille de produit", IsEditing = true };
+                ProductFamilies.Insert(0, vm);
+                SelectedProductFamily = vm;
+                selectedValue = vm.Id;
+            }
+            catch (Exception ex)
+            {
+
+                _snackService.Add($"{ex.Message}{ex.InnerException.Message}", Severity.Error);
+            }
+            
             //await InvokeAsync(StateHasChanged);
         }
 
