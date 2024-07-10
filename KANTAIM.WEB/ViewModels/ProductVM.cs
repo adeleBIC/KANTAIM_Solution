@@ -20,7 +20,7 @@ namespace KANTAIM.WEB.ViewModels
             productFamilyID = model.ProductFamilyID;
             jDECode = model.JDECode;
             quantityPerContainer = model.QuantityPerContainer;
-            //qRCode = model.QRCode;
+            qRCode = model.QRCode;
             active = model.Active;
             comment = model.Comment;
         }
@@ -65,15 +65,15 @@ namespace KANTAIM.WEB.ViewModels
         [Required]
         [Label("QRCode")]
         [StringLength(15)]
-        //private string qRCode;
-        public string QRCode { get => $"5#{model.Number}$"; }
-        /*
+        private string qRCode;
+        //public string QRCode { get => $"5#{model.Number}$"; }
+        
         public string QRCode
         {
             get { return qRCode; }
             set { qRCode = value; IsEditing = true; }
         }
-        */
+        
         [Label("Code JDE")]
         [StringLength(15)]
         private string? jDECode;
@@ -116,7 +116,8 @@ namespace KANTAIM.WEB.ViewModels
                 model.ProductFamilyID = productFamilyID;
                 model.JDECode = jDECode;
                 model.QuantityPerContainer = quantityPerContainer;
-                //model.QRCode = "5#" + number + "$";
+                //model.QRCode = QRCode;
+                model.QRCode = "5#" + number + "$";
                 model.Active = active;
                 model.Comment = comment;
             }
