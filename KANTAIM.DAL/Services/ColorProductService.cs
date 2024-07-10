@@ -37,7 +37,7 @@ namespace KANTAIM.DAL.Services
 
             public IEnumerable<ColorProduct> GetAllPerColor(int id) => Cache.Where(c => c.ColorID == id);
 
-            public IEnumerable<ColorProduct> GetAllPerProduct(int id) => Cache.Where(c => c.ProductID == id);
+            public IEnumerable<ColorProduct> GetAllPerProduct(int? id) => id == null ? null : Cache.Where(c => c.ProductID == id);
 
 
             public ColorProduct? GetByColorId(int id)

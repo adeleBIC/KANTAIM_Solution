@@ -80,9 +80,21 @@
         case 4: // Validation
             <h1>En cours de remplissage...</h1>
             <div>
-                Presse : @PressScanner.Number
-                <br>Moule : @PressScanner.Shape.Name
-                <br>Produit : @PressScanner.Shape.Product.Name
+                @if(PressScanner != null)
+                { <div>
+                        Presse: @PressScanner.Number
+                        <br>
+                         Moule : @PressScanner.Shape.Name
+                        <br>Produit : @PressScanner.Shape.Product.Name
+                </div>
+                }
+                @if(MachineScanner != null)
+                {
+                    <div>
+                        Machine : @MachineScanner.Name
+                        <br>Produit : @MachineScanner.Product.Name
+                    </div>
+                }
                 @if(ColorChoose != null)
                 {
                     <div>

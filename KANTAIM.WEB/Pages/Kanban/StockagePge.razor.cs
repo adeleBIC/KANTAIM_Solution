@@ -246,7 +246,7 @@ namespace KANTAIM.WEB.Pages.Kanban
             {
                 cellLog = _logService.GetByContenaireByActionId(container.Id, 2);
                 Cell? cellAct = _cellService.GetById(cellLog.CellID);
-                if(cellAct != null && cellAct.IsJail != true && cellAct.IsMaintenance != true && cellAct.ForEmpty != true && cellAct.Status != 2 && _cellProductService.FindLink(cellAct.Id, product.Id) && cellAct.Id != ContainerScanner.CellId) { 
+                if(cellAct != null && cellAct.IsJail != true && cellAct.IsMaintenance != true && cellAct.ForEmpty != true && cellAct.IsPhantom != true && cellAct.Status != 2 && _cellProductService.FindLink(cellAct.Id, product.Id) && cellAct.Id != ContainerScanner.CellId) { 
                     if (cellLog != null && cellLog.ProductID == product.Id )
                     {
                         if (colorOfProduct == null || logRescent.ProdColorID == colorOfProduct.Id)
@@ -269,7 +269,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                 }
             } else {
                 List<Cell> cells = new List<Cell>();
-                cells = _cellService.GetAll().Where(u => u.IsJail != true && u.IsMaintenance != true && u.ForEmpty != true && u.Status == 0).ToList();
+                cells = _cellService.GetAll().Where(u => u.IsJail != true && u.IsMaintenance != true && u.ForEmpty != true && u.IsPhantom != true && u.Status == 0).ToList();
                 foreach (Cell cell in cells)
                 {
                     if (_cellProductService.FindLink(cell.Id, product.Id) && cell.Id != ContainerScanner.CellId)

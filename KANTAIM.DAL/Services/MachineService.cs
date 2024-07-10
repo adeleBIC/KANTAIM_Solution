@@ -12,6 +12,7 @@ namespace KANTAIM.DAL.Services
         private List<Machine> cache;
         Repository<Machine> _repo;
         Repository<Product> _products;
+        ProductService _productService;
         public IEnumerable<Machine> Cache
         {
             get
@@ -19,27 +20,32 @@ namespace KANTAIM.DAL.Services
                 if (cache == null)
                 {
                     cache = _repo.GetAll().ToList();
-                    /*
+  
                     foreach (Machine item in cache)
                     {
-                        if()
-                        item.ProductID = _products.GetById(item.ProductID.Value).Id;
+                        if(item.ProductID != null)
+                        {
+                            item.Product = _productService.GetById(item.ProductID);
+                        }
+                        
                     }
-                    */
+     
                 }
                 return cache;
             }
         }
 
         
-        public MachineService(Repository<Machine> repo, Repository<Product> repoProductId)
+        public MachineService(Repository<Machine> repo, Repository<Product> repoProductId, ProductService productService)
         {
             _repo = repo;
+            _productService = productService;
             _products = repoProductId;
         }
 
         public IEnumerable<Machine> GetAll() => Cache;
         public IEnumerable<Machine> GetByProdId(int prodId) => Cache.Where(u => u.ProductID == prodId);
+        public IEnumerable<Product> GetAllProducts() => _productService.GetAll();
         public Machine? GetById(int id) => Cache.SingleOrDefault(c => c.Id == id);
         public Machine? GetByNumber(int n) => Cache.SingleOrDefault(c => c.Number == n);
 

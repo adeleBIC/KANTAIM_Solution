@@ -18,6 +18,7 @@ namespace KANTAIM.WEB.Pages.Kanban
         [Inject] public PressService _pressService { get; set; }
         [Inject] public ColorService _colorService { get; set; }
         [Inject] public ScanService _scanService { get; set; }
+        [Inject] public MachineService _machineService { get; set; }
         [Inject] public ColorProductService _colorProductServiceService { get; set; }
         [Inject] ISnackbar _snackService { get; set; }
         [Parameter] public int Id { get; set; }
@@ -35,9 +36,10 @@ namespace KANTAIM.WEB.Pages.Kanban
         public ProdColor? ColorChoose { get; set; }
         public List<ProdColor> Colors { get; set; }
         public Container? PaletteScanner { get; set; }
+        public Machine? MachineScanner { get; set; }
         public Log logRescent { get; set; }
         
-        
+        public Product? product { get; set; }
         
 
         public int State
@@ -45,15 +47,15 @@ namespace KANTAIM.WEB.Pages.Kanban
             get
             {
                 state = 0;
-                if(Colors == null && PressScanner != null) // quand on n'a pas la liste de couleurs et on a déjà su le press scanner, on récupére la liste de colors 
+                if(Colors == null && (PressScanner != null || MachineScanner != null)) // quand on n'a pas la liste de couleurs et on a déjà su le press scanner, on récupére la liste de colors 
                 {
                     getColors();
                 }
                 if (ColorChoose != null || (ContainerScanner != null && Colors != null && Colors.Count() == 0)) state = 4;
-                else if (ContainerScanner != null && PressScanner != null) state = 3;
+                else if (ContainerScanner != null && (PressScanner != null || MachineScanner != null)) state = 3;
                 else if (ContainerScanner != null && BacInitialisation == false) state = 2;
                 else if (ContainerScanner != null && BacInitialisation == true) state = 1;
-                else if (PressScanner != null) state = 0;
+                else if (PressScanner != null || MachineScanner != null) state = 0;
 
                 return state; 
             }
@@ -65,7 +67,7 @@ namespace KANTAIM.WEB.Pages.Kanban
             {
                 case 0:
                     ContainerScanner = _contenaireService.GetContainerByNumber(Number).FirstOrDefault();
-                    if(ContainerScanner.ContainerType.TypeNumber == 2) // Quand on scan le bac
+                    if(ContainerScanner.ContainerType.IsContainable) // Quand on scan le bac
                     {
                         BacInitialisation = true;
                     }
@@ -149,12 +151,14 @@ namespace KANTAIM.WEB.Pages.Kanban
                 if(parts != null)
                 {
                     int.TryParse(parts[0], out int type);
-                    int.TryParse(parts[1], out int PressNumber);
+                    int.TryParse(parts[1], out int Number);
 
-                    if (type == 3 && PressNumber > 0)
+                    if (type == 3 && Number > 0) // scanner une press
                     {
-                        PressScanner = _pressService.GetByNumber(PressNumber);
-                        
+                        PressScanner = _pressService.GetByNumber(Number);   
+                    } else if (type == 2 && Number > 0) // scanner un machine inject pour initialiser
+                    {
+                        MachineScanner = _machineService.GetById(Number);
                     }
                 }
                 
@@ -164,10 +168,21 @@ namespace KANTAIM.WEB.Pages.Kanban
         void getColors()
         {
             Colors = new List<ProdColor>();
-            foreach (ColorProduct colorProduct in _colorProductServiceService.GetAllPerProduct(PressScanner.Shape.ProductID))
+            if(PressScanner != null)
             {
-                Colors.Add(_colorService.GetById(colorProduct.ColorID));
+                foreach (ColorProduct colorProduct in _colorProductServiceService.GetAllPerProduct(PressScanner.Shape.ProductID))
+                {
+                    Colors.Add(_colorService.GetById(colorProduct.ColorID));
+                }
             }
+            if(MachineScanner != null)
+            {
+                foreach (ColorProduct colorProduct in _colorProductServiceService.GetAllPerProduct(MachineScanner.ProductID))
+                {
+                    Colors.Add(_colorService.GetById(colorProduct.ColorID));
+                }
+            }
+            
         }
         void ContainerScan(KeyboardEventArgs e)
         {
@@ -210,6 +225,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                     {
                         PressValue = null;
                         PressScanner = null;
+                        MachineScanner = null;
                     }  
                     else if (Id == 3)
                     {
@@ -232,16 +248,26 @@ namespace KANTAIM.WEB.Pages.Kanban
             {
                 EventTime = DateTime.Now,
                 Operation = 1,
-                Product = PressScanner.Shape.Product,
-                ProductID = PressScanner.Shape.Product.Id,
-                Press = PressScanner,
-                PressID = PressScanner.Id,
-                Shape = PressScanner.Shape,
-                ShapeID = PressScanner.Shape.Id,
                 Container = ContainerScanner,
                 ContainerID = ContainerScanner.Id,
                 
             };
+            if(PressScanner != null)
+            {
+                u.Product = PressScanner.Shape.Product;
+                u.ProductID = PressScanner.Shape.Product.Id;
+                u.Press = PressScanner;
+                u.PressID = PressScanner.Id;
+                u.Shape = PressScanner.Shape;
+                u.ShapeID = PressScanner.Shape.Id;
+            }
+            if(MachineScanner != null)
+            {
+                u.Product = MachineScanner.Product;
+                u.ProductID = MachineScanner.ProductID;
+                u.Machine = MachineScanner;
+                u.MachineID = MachineScanner.Id;
+            }
             if (ColorChoose != null)
             {
                 u.ProdColor = ColorChoose;
