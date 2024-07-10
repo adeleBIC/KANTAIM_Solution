@@ -19,10 +19,13 @@ namespace KANTAIM.DAL.Services
                 if (cache == null)
                 {
                     cache = _repo.GetAll().ToList();
+                    /*
                     foreach (Machine item in cache)
                     {
+                        if()
                         item.ProductID = _products.GetById(item.ProductID.Value).Id;
                     }
+                    */
                 }
                 return cache;
             }
