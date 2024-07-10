@@ -23,14 +23,14 @@
         </ToolBarContent>
         <Columns>
             <SelectColumn ShowInFooter=false />
-            <PropertyColumn Property="x => x.Number" Title="Numéro" />
             <PropertyColumn Property="x => x.Name" Title="Nom" />
+            <PropertyColumn Property="x => x.Number" Title="Numéro" />
             <PropertyColumn Property="x => x.IPAdress" Title="Adresse IP" />
             <PropertyColumn Property="x => x.QRCode" Title="QR Code" Required=false />
             <PropertyColumn Property="x => x.ProductID" Title="Produit">
                 <EditTemplate>
                     <MudSelect T=int @bind-Value=context.Item.ProductID>
-                        @foreach (var f in context.Item.products)
+                        @foreach (var f in context.Item.Products)
                         {
                             <MudSelectItem T=int Value="@f.Id">@f.Name</MudSelectItem>
                         }

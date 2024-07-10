@@ -116,8 +116,8 @@ namespace KANTAIM.WEB.ViewModels
                 model.ProductFamilyID = productFamilyID;
                 model.JDECode = jDECode;
                 model.QuantityPerContainer = quantityPerContainer;
-                //model.QRCode = QRCode;
-                model.QRCode = "5#" + number + "$";
+                model.QRCode = QRCode;
+                //model.QRCode = "5#" + number + "$";
                 model.Active = active;
                 model.Comment = comment;
             }

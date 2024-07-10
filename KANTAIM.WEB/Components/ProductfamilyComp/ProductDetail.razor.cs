@@ -52,6 +52,7 @@ namespace KANTAIM.WEB.Components.ProductfamilyComp
             foreach (ProductVM vm in Products.Where(vm => vm.IsEditing))
             {
                 vm.ProductFamilyID = ProductFamily.Id;
+                vm.QRCode = "5#" + vm.Number + "$";
                 ValidationContext validationContext = new ValidationContext(vm);
                 var validationResults = vm.Validate(validationContext).ToList();
 

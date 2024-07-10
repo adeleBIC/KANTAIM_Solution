@@ -64,11 +64,13 @@ namespace KANTAIM.WEB.Pages.Administration
         {
             foreach (ContainerVM vm in Containers.Where(vm => vm.IsEditing))
             {
+                vm.QRCode = "1#" + vm.Number + "#" + vm.ContainerTypeID + "$";
                 ValidationContext validationContext = new ValidationContext(vm);
                 var validationResults = vm.Validate(validationContext).ToList();
 
                 if (validationResults.Count == 0)
                 {
+                    
                     Container u = (Container)vm;
                     _contenaireService.UpSert(u);
                     vm.IsEditing = false;

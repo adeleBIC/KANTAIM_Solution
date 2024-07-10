@@ -144,7 +144,7 @@ namespace KANTAIM.WEB.ViewModels
             if (Number == 0) list.Add(new ValidationResult("Number obligatoire", new string[] { "Number" }));
             if (Containers.Any(c => c.Number == Number && c.Id != Id))
             {
-                list.Add(new ValidationResult("Le combination de numéro de conteneur doit être unique.", new string[] { "Number" }));
+                list.Add(new ValidationResult("Le numéro de conteneur doit être unique.", new string[] { "Number" }));
             }
             if (list.Count <= 0)
             {
@@ -152,12 +152,11 @@ namespace KANTAIM.WEB.ViewModels
                 model.ContainerID = containerID;
                 model.ContainerTypeID = containerTypeID;
                 model.CellId = cellID;
-                
                 model.ActionID = actionID;
                 model.FillStatus = fillStatus;
                 model.Status = status;
                 model.InJail = inJail;
-                model.QRcode = "1#" + number + "#" + containerTypeID + "$";
+                model.QRcode = qRCode;
                 model.InMaintenance = inMaintenance;
                 model.Comment = comment;
             }

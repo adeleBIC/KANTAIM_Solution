@@ -86,7 +86,7 @@ namespace KANTAIM.WEB.Pages.Administration
         {
             ColorTreeItems.Clear();
             ProductTreeItems.Clear();
-            Colors = _ColorService.GetAll().Select(u => new ColorVM(u)).ToList();
+            Colors = _ColorService.GetAll().OrderBy(c=>c.Name).Select(u => new ColorVM(u)).ToList();
             foreach (var Color in Colors)
             {
                 if (ProductActivatedValue != null && _ColorProductService.FindLink(Color.Id, ProductActivatedValue.Id))
@@ -98,7 +98,7 @@ namespace KANTAIM.WEB.Pages.Administration
                     ColorTreeItems.Add(new TreeItemData(Color.Id, Color.Name, false));
                 }
             }
-            ProductFamilies = _productFamilyService.GetAll().Select(u => new ProductFamilyVM(u)).ToList();
+            ProductFamilies = _productFamilyService.GetAll().OrderBy(p=>p.Name).Select(u => new ProductFamilyVM(u)).ToList();
             foreach (var family in ProductFamilies)
             {
                 var familyNode = new TreeItemData(family.Id, family.Name, false)
@@ -107,7 +107,7 @@ namespace KANTAIM.WEB.Pages.Administration
                 };
 
                 // Fetch products for each family
-                var products = _productService.GetAllPerProductFamily(family.Id).Select(u => new ProductVM(u)).ToList();
+                var products = _productService.GetAllPerProductFamily(family.Id).OrderBy(p => p.Name).Select(u => new ProductVM(u)).ToList();
 
                 if (products.Count > 0)
                     familyNode.IsExpanded = true;

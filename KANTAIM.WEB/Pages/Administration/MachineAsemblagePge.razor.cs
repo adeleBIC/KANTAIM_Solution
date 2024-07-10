@@ -36,7 +36,7 @@ namespace KANTAIM.WEB.Pages.Administration
 
         void AddAsync()
         {
-            MachineVM item = new MachineVM(_machineService.GetAllProd()) { IsEditing = true, ProductID = _machineService.GetFirstProdId().Id };
+            MachineVM item = new MachineVM(_machineService.GetAllProd(), _machineService.GetAll()) { IsEditing = true, ProductID = _machineService.GetFirstProdId().Id };
             Machines.Insert(0, item);
             //await InvokeAsync(StateHasChanged);
         }
@@ -45,16 +45,25 @@ namespace KANTAIM.WEB.Pages.Administration
         {
             foreach (MachineVM vm in Machines.Where(vm => vm.IsEditing))
             {
+                vm.QRCode = "2#" + vm.Number + "$";
                 ValidationContext validationContext = new ValidationContext(vm);
                 var validationResults = vm.Validate(validationContext).ToList();
 
                 if (validationResults.Count == 0)
                 {
-                    Machine u = (Machine)vm;
-                    _machineService.UpSert(u);
-                    vm.IsEditing = false;
+                    try
+                    {
+                        Machine u = (Machine)vm;
+                        _machineService.UpSert(u);
+                        vm.IsEditing = false;
+                        _snackService.Add("Données sauvgardées !", Severity.Success);
+                    }
+                    catch (Exception ex)
+                    {
 
-                    _snackService.Add("Données sauvgardées !", Severity.Success);
+                        _snackService.Add($"{ex.Message}{ex.InnerException.Message}", Severity.Error);
+                    }
+
                 }
                 else
                 {
@@ -104,7 +113,7 @@ namespace KANTAIM.WEB.Pages.Administration
 
         void RefreshData()
         {
-            Machines = _machineService.GetAll().Select(u => new MachineVM(u, _machineService.GetAllProd())).ToList();
+            Machines = _machineService.GetAll().Select(u => new MachineVM(u, _machineService.GetAllProd(), _machineService.GetAll())).ToList();
         }
         void SelectionChanged(HashSet<MachineVM> changes)
         {

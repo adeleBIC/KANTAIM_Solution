@@ -123,7 +123,7 @@ namespace KANTAIM.WEB.ViewModels
                 model.Number = number;
                 model.ConsignNumber = consignNumber;
                 model.IPAdress = IPAdress;
-                model.QRcode = "3#" + number + "$"; ;
+                model.QRcode = qRcode;
                 model.ShapeID = shapeID;
                 model.WorkshopID = workshopID;
                 model.Active = active.Value;

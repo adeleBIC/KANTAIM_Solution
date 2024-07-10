@@ -62,6 +62,7 @@ namespace KANTAIM.WEB.Pages.Administration
         {
             foreach (CellVM vm in Cells.Where(vm => vm.IsEditing))
             {
+                vm.QRCode = "4#" + vm.X + "#" + vm.Y + "$";
                 ValidationContext validationContext = new ValidationContext(vm);
                 var validationResults = vm.Validate(validationContext).ToList();
 

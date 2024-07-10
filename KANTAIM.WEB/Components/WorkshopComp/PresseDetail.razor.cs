@@ -66,6 +66,7 @@ namespace KANTAIM.WEB.Components.WorkshopComp
             foreach (PressVM vm in Presses.Where(vm => vm.IsEditing))
             {
                 vm.WorkshopID = Workshop.Id;
+                vm.QRcode = "3#" + vm.Number + "$";
 
                 ValidationContext validationContext = new ValidationContext(vm);
                 var validationResults = vm.Validate(validationContext).ToList();

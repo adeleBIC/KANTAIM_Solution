@@ -9,11 +9,12 @@ namespace KANTAIM.WEB.ViewModels
         public static explicit operator Machine(MachineVM vm) => vm.model;
         private Machine model;
 
-        public MachineVM(IEnumerable<Product> products) : this(new Machine(), products) { }
-        public MachineVM(Machine model, IEnumerable<Product> products)
+        public MachineVM(IEnumerable<Product> products, IEnumerable<Machine> machines) : this(new Machine(), products, machines) { }
+        public MachineVM(Machine model, IEnumerable<Product> products, IEnumerable<Machine> machines)
         {
             this.model = model;
-            this.products = products.ToList();
+            this.Products = products.ToList();
+            this.machines = machines.ToList();
 
             number = model.Number;
             name = model.Name;
@@ -25,7 +26,8 @@ namespace KANTAIM.WEB.ViewModels
             comment = model.Comment;
         }
 
-        public List<Product> products { get; set; }
+        public List<Product> Products { get; set; }
+        private List<Machine> machines { get; set; }
 
         public bool IsEditing { get; set; }
         public bool IsChecked { get; set; }
@@ -111,6 +113,10 @@ namespace KANTAIM.WEB.ViewModels
 
             if (productID == 0) list.Add(new ValidationResult("Le nom est obligatoire", new string[] { "fKTProductID" }));
             if (Number == 0) list.Add(new ValidationResult("Niveau obligatoire", new string[] { "Number" }));
+            if (machines.Any(c => c.Number == Number && c.Id != Id))
+            {
+                list.Add(new ValidationResult("Le numéro de machine doit être unique.", new string[] { "Number" }));
+            }
             if (Name == null) list.Add(new ValidationResult("Name obligatoire", new string[] { "Name" }));
 
             if (list.Count <= 0)
@@ -119,7 +125,7 @@ namespace KANTAIM.WEB.ViewModels
                 model.Name = name;
                 model.Active = active;
                 model.IPAdress = iPAdress;
-                model.QRcode = "2#" + number + "$"; ;
+                model.QRcode = qRCode;
                 model.ProductID = productID;
                 model.IsInkjet = isInkjet;
                 model.Comment = comment;

@@ -153,7 +153,7 @@ namespace KANTAIM.WEB.ViewModels
                 model.NbMax = nbMax;
                 model.Status = Status;
                 model.IsJail = isJail;
-                model.QRcode = "4#" + x + "#" + y + "$";
+                model.QRcode = qRCode;
                 model.ForEmpty = forEmpty;
                 model.IsPhantom = isPhantom;
                 model.IsMaintenance = isMaintenance;

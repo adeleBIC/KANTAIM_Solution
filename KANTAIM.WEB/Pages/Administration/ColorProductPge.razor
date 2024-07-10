@@ -13,7 +13,14 @@
         padding: 10px; /* Padding inside the tree view */
         /* Add margin to the bottom to prevent overlap with action buttons */
         overflow-y: auto; /* Enable vertical scroll */
-        height: calc(100vh - 240px);
+        height: calc(100vh - 275px);
+    }
+
+    .tree-view-container-edit {
+        padding: 10px; /* Padding inside the tree view */
+        /* Add margin to the bottom to prevent overlap with action buttons */
+        overflow-y: auto; /* Enable vertical scroll */
+        height: calc(100vh - 335px);
     }
 
     .tree-title {
@@ -63,7 +70,7 @@
                 <div class="tree-title sticky-header">
                     <MudText Typo="Typo.h5">Couleurs</MudText>
                 </div>
-                <div class="tree-view-container" style=" margin-bottom: 60px;">
+                <div class="tree-view-container-edit" style=" margin-bottom: 60px;">
                     @if (Colors != null)
                     {
                         <MudTreeView Items="ColorTreeItems" MultiSelection="true" Hover="true" @bind-SelectedValues="ColorSelectedValues">
@@ -78,7 +85,7 @@
                 <div class="tree-title sticky-header">
                     <MudText Typo="Typo.h5">Produits</MudText>
                 </div>
-                <div class="tree-view-container" style=" margin-bottom: 60px;">
+                <div class="tree-view-container-edit" style=" margin-bottom: 60px;">
                     @if (ProductFamilies != null)
                     {
                         <MudTreeView Items="ProductTreeItems" MultiSelection="true" Hover="true" @bind-SelectedValues="ProductSelectedValues">
