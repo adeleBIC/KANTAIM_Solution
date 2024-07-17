@@ -44,13 +44,27 @@ window.initializeKeyListener = function () {
     document.addEventListener('keydown', function (event) {
 
         if (event.key === '$') {
-            capturing = false;
+            DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInput', event.key);
+            //capturing = false;
         } else if (event.key === '!') {
             DotNet.invokeMethodAsync('KANTAIM.WEB', 'OnSpecialKeyPressed');
             capturing = true;
             event.preventDefault();
         } else if (capturing) {
-            DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInput', event.key);
+            /*
+            if (event.key === 'Enter') {
+                console.log("Enter !");
+                event.preventDefault();
+                // Invoke the .NET method to handle Enter key press
+                DotNet.invokeMethodAsync('KANTAIM.WEB', 'TextfieldUserInputDetected');
+            } else {
+            */
+                if (event.key === 'AltGraph' || event.key === 'Shift' || event.key === 'Control') {
+                    return; // Ignore AltGr key or shift key itself
+                }
+                DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInput', event.key);
+            //}
+            
         } 
 
     });
