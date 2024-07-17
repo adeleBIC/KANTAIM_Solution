@@ -23,7 +23,6 @@ namespace KANTAIM.WEB.Pages.Kanban
         public string? PressValue { get; set; }
         public string? ColorValue { get; set; }
 
-
         Container? ContainerScanner;
         
         [Inject] public ContenaireService _contenaireService { get; set; }
@@ -34,8 +33,6 @@ namespace KANTAIM.WEB.Pages.Kanban
         List<string> list = new List<string>() { "Contenaire", "Bac", "Pallete"};
 
         string? CellName;
-
-
         string? PressName;
         string? MouleName;
         string? ColorName;
@@ -43,15 +40,39 @@ namespace KANTAIM.WEB.Pages.Kanban
         string? ProduitName;
         string? MachineName;
 
-        private ElementReference myInputElement;
+        private static ScannerPge _instance;
+
+        //private ElementReference myInputElement;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
+                _instance = this;
                 await JS.InvokeVoidAsync("preventKeyboardOnTouch", "myInput");
+                //await JS.InvokeVoidAsync("eval", "document.addEventListener('keydown', function (event) {if (event.key === '§') {DotNet.invokeMethodAsync('KANTAIM.WEB', 'OnSpecialKeyPressed');}});");
+                await JS.InvokeVoidAsync("initializeKeyListener");
             }
         }
+
+        [JSInvokable]
+        public static void OnSpecialKeyPressed()
+        {
+            Console.WriteLine("La touche § a été pressée!");
+            // Ici, vous pouvez appeler une méthode ou exécuter toute autre logique nécessaire
+        }
+
+        [JSInvokable]
+        public static void CaptureInput(string input)
+        {
+            _instance?.HandleInput(input);
+        }
+        private void HandleInput(string input)
+        {
+            TextValue += input;
+            StateHasChanged();
+        }
+
 
         public void TextfieldUserInputDetected(string p, KeyboardEventArgs e)
         {

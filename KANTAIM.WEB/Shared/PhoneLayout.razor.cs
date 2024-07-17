@@ -55,6 +55,7 @@ namespace KANTAIM.WEB.Shared
 
         }
 
+
         MudTheme BicTheme = new MudTheme()
         {
             Palette = new Palette()
