@@ -245,7 +245,7 @@ namespace KANTAIM.WEB.Pages.Kanban
             foreach (Container container in _contenaireService.Cache.Where(c => c.CellStock != null)) // recherche tous les contenaire qui est stockés dans la cellule, find all the contenaire who in currutly in the cell
             {
                 cellLog = _logService.GetByContenaireByActionId(container.Id, 2);
-                Cell? cellAct = _cellService.GetById(cellLog.CellID);
+                Cell? cellAct = _cellService.GetById(cellLog?.CellID ?? 0);
                 if(cellAct != null && cellAct.IsJail != true && cellAct.IsMaintenance != true && cellAct.ForEmpty != true && cellAct.IsPhantom != true && cellAct.Status != 2 && _cellProductService.FindLink(cellAct.Id, product.Id) && cellAct.Id != ContainerScanner.CellId) { 
                     if (cellLog != null && cellLog.ProductID == product.Id )
                     {

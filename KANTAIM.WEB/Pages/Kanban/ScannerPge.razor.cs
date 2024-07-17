@@ -5,6 +5,7 @@ using KANTAIM.WEB.ViewModels;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.JSInterop;
 using MudBlazor;
 using System.ComponentModel.DataAnnotations;
 
@@ -14,6 +15,8 @@ namespace KANTAIM.WEB.Pages.Kanban
     {
         [Inject] public ScanService _scanService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
+        [Inject] IJSRuntime JS { get; set; }
+
         public Cell CellScanner { get; set; }
         public string? TextValue { get; set; }
         public string? ContainerValue { get; set; }
@@ -39,6 +42,17 @@ namespace KANTAIM.WEB.Pages.Kanban
         string? ContenaireName;
         string? ProduitName;
         string? MachineName;
+
+        private ElementReference myInputElement;
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                await JS.InvokeVoidAsync("preventKeyboardOnTouch", "myInput");
+            }
+        }
+
         public void TextfieldUserInputDetected(string p, KeyboardEventArgs e)
         {
             if (e.Key == "Enter")
