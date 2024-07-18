@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Components.Web;
 using MudBlazor.Charts;
 using MudBlazor;
 using MudBlazor.Services;
+using Microsoft.JSInterop;
 
 namespace KANTAIM.WEB.Pages.Kanban
 {
@@ -21,6 +22,7 @@ namespace KANTAIM.WEB.Pages.Kanban
         [Inject] public MachineService _machineService { get; set; }
         [Inject] public ColorProductService _colorProductServiceService { get; set; }
         [Inject] ISnackbar _snackService { get; set; }
+        [Inject] IJSRuntime JS { get; set; }
         [Parameter] public int Id { get; set; }
         [Parameter] public int Number { get; set; }
 
@@ -38,10 +40,22 @@ namespace KANTAIM.WEB.Pages.Kanban
         public Container? PaletteScanner { get; set; }
         public Machine? MachineScanner { get; set; }
         public Log logRescent { get; set; }
-        
-        public Product? product { get; set; }
-        
+        public string? TextValue { get; set; }
 
+        public Product? product { get; set; }
+        private static ScannerPge _instance;
+        /*
+        [JSInvokable]
+        public static void CaptureInput(string input)
+        {
+            _instance?.HandleInput(input);
+        }
+        private void HandleInput(string input)
+        {
+            TextValue += input;
+            StateHasChanged();
+        }
+        */
         public int State
         {
             get
@@ -60,6 +74,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                 return state; 
             }
         }
+
 
         protected override void OnInitialized()
         {

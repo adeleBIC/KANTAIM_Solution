@@ -47,7 +47,7 @@ window.initializeKeyListener = function () {
             DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInput', event.key);
             //capturing = false;
         } else if (event.key === '!') {
-            DotNet.invokeMethodAsync('KANTAIM.WEB', 'OnSpecialKeyPressed');
+            //DotNet.invokeMethodAsync('KANTAIM.WEB', 'OnSpecialKeyPressed');
             capturing = true;
             event.preventDefault();
         } else if (capturing) {
