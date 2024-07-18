@@ -4,6 +4,8 @@ using KANTAIM.WEB.Services;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using Microsoft.JSInterop;
+using Microsoft.AspNetCore.Components.Routing;
 
 namespace KANTAIM.WEB.Pages.Kanban
 {
@@ -20,58 +22,130 @@ namespace KANTAIM.WEB.Pages.Kanban
         public Container? AutreScanner { get; set; }
         public Log logRescent { get; set; }
         public bool bienTransfer { get; set; } = false;
+        public string? TextValue { get; set; }
+        private int state;
+        private static TransferPge _instance;
+        private string currentUrl;
+        private string pageUrl;
 
-
-
-        void containerScan(KeyboardEventArgs e)
+        [JSInvokable]
+        public static void CaptureInputTransfer(string input)
         {
-            if (e.Key == "Enter")
+            _instance?.HandleInput(input);
+        }
+        private void OnLocationChanged(object sender, LocationChangedEventArgs e)
+        {
+            // Mettre à jour l'URL actuelle lorsque l'URL change
+            currentUrl = e.Location;
+            // Vous pouvez ajouter ici toute logique que vous souhaitez exécuter lorsque l'URL change
+        }
+
+        public void Dispose()
+        {
+            // Se désabonner de l'événement pour éviter les fuites de mémoire
+            NavigationManager.LocationChanged -= OnLocationChanged;
+        }
+
+        public int State
+        {
+            get
             {
-                string[] parts = _scanService.scanCode(ContainerValue);
-                if (parts != null)
+                state = 0;
+                if (bienTransfer) state = 3;
+                else if (ContainerScanner != null && AutreScanner != null) state = 1;
+                else if (ContainerScanner != null) state = 2;
+                else state = 0;
+
+                return state;
+            }
+        }
+        protected override async Task OnInitializedAsync()
+        {
+            //RefreshData();
+            currentUrl = NavigationManager.Uri;
+            pageUrl = NavigationManager.Uri;
+            _instance = this;
+
+            NavigationManager.LocationChanged += OnLocationChanged;
+        }
+
+
+        private async void HandleInput(string input)
+        {
+            if (currentUrl == pageUrl)
+            {
+                if (input == "Enter")
                 {
-                    int.TryParse(parts[0], out int type);
-                    if (type != 1)
+                    switch (state)
                     {
-                        _snackService.Add("Svp scanner le QR code de la Contenaire.", Severity.Error);
+                        case 0:
+                            containerScan(TextValue);
+                            break;
+                        case 2:
+                            autreScan(TextValue);
+                            break;
                     }
-                    else
+                    TextValue = null;
+                    state = State;
+                    await InvokeAsync(StateHasChanged);
+                    
+
+                }
+                else
+                {
+                    TextValue += input;
+                    state = State;
+                    await InvokeAsync(StateHasChanged);
+
+                }
+            }
+            
+        }
+
+        void containerScan(string code)
+        {
+            string[] parts = _scanService.scanCode(code);
+            if (parts != null)
+            {
+                int.TryParse(parts[0], out int type);
+                if (type != 1)
+                {
+                    _snackService.Add("Svp scanner le QR code de la Contenaire.", Severity.Error);
+                }
+                else
+                {
+                    int.TryParse(parts[1], out int Number);
+                    ContainerScanner = _contenaireService.GetContainerByNumber(Number).FirstOrDefault();
+                    logRescent = _logService.GetByContenaireId(ContainerScanner.Id);
+                }
+            }
+        }
+
+        void autreScan(string code)
+
+        {
+            string[] parts = _scanService.scanCode(code);
+            if (parts != null)
+            {
+                int.TryParse(parts[0], out int type);
+                if (type != 1)
+                {
+                    _snackService.Add("Svp scanner le QR code de la Contenaire.", Severity.Error);
+                }
+                else
+                {
+                    int.TryParse(parts[1], out int Number);
+                    AutreScanner = _contenaireService.GetContainerByNumber(Number).FirstOrDefault();
+                    if (AutreScanner.FillStatus != 1)
                     {
-                        int.TryParse(parts[1], out int Number);
-                        ContainerScanner = _contenaireService.GetContainerByNumber(Number).FirstOrDefault();
-                        logRescent = _logService.GetByContenaireId(Number);
+                        _snackService.Add("Svp vérifier la Contenaire est vide.", Severity.Error);
+                        AutreScanner = null;
                     }
                 }
             }
         }
 
-        void autreScan(KeyboardEventArgs e)
-        {
-            if (e.Key == "Enter")
-            {
-                string[] parts = _scanService.scanCode(autreValue);
-                if (parts != null)
-                {
-                    int.TryParse(parts[0], out int type);
-                    if (type != 1)
-                    {
-                        _snackService.Add("Svp scanner le QR code de la Contenaire.", Severity.Error);
-                    }
-                    else
-                    {
-                        int.TryParse(parts[1], out int Number);
-                        AutreScanner = _contenaireService.GetContainerByNumber(Number).FirstOrDefault();
-                        if(AutreScanner.FillStatus != 1)
-                        {
-                            _snackService.Add("Svp vérifier la Contenaire est vide.", Severity.Error);
-                            AutreScanner = null;
-                        }
-                    }
-                }
-            }
-        }
-
-        void transferInformation()
+        async void transferInformation()
         {
             AutreScanner.CellId = ContainerScanner.CellId;
             AutreScanner.ActionID = ContainerScanner.ActionID;
@@ -85,8 +159,6 @@ namespace KANTAIM.WEB.Pages.Kanban
             ContainerScanner.FillStatus = 1; // vide
             ContainerScanner.ActionID = 0;
             _contenaireService.UpSert(ContainerScanner);
-
-
 
             Log u_autre = new Log()
             {
@@ -117,6 +189,8 @@ namespace KANTAIM.WEB.Pages.Kanban
             _logService.UpSert(u_contenaire);
 
             bienTransfer = true;
+            state = State;
+            await InvokeAsync(StateHasChanged);
         }
     }
 }

@@ -17,6 +17,7 @@ function Pages() {
     DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInputInit', event.key);
     DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInputFindProd', event.key);
     DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInputInject', event.key);
+    DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInputTransfer', event.key);
 }
 window.initializeKeyListener = function () {
     let capturing = false;
@@ -24,30 +25,15 @@ window.initializeKeyListener = function () {
 
         if (event.key === 'Enter') {
             Pages();
-            //DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInput', event.key);
-            //DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInputInit', event.key);
             capturing = false;
         } else if (event.key === '!') {
-            //DotNet.invokeMethodAsync('KANTAIM.WEB', 'OnSpecialKeyPressed');
             capturing = true;
             event.preventDefault();
         } else if (capturing) {
-            /*
-            if (event.key === 'Enter') {
-                console.log("Enter !");
-                event.preventDefault();
-                // Invoke the .NET method to handle Enter key press
-                DotNet.invokeMethodAsync('KANTAIM.WEB', 'TextfieldUserInputDetected');
-            } else {
-            */
             if (event.key === 'AltGraph' || event.key === 'Shift' || event.key === 'Control' || event.key === 'Unidentified') {
                 return; // Ignore AltGr key or shift key itself
             }
-            Pages();
-            //DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInput', event.key);
-            //DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInputInit', event.key);
-            //}
-            
+            Pages(); 
         } 
 
     });

@@ -67,7 +67,7 @@ namespace KANTAIM.WEB.Pages.Kanban
         {
             _instance?.HandleInput(input);
         }
-        private void HandleInput(string input)
+        private async void HandleInput(string input)
         {
             
             if (input == "Enter" && currentUrl == pageUrl)
@@ -178,8 +178,8 @@ namespace KANTAIM.WEB.Pages.Kanban
             else
             {
                 TextValue += input;
-                StateHasChanged();
-
+                //StateHasChanged();
+                await InvokeAsync(StateHasChanged);
             }
         }
 

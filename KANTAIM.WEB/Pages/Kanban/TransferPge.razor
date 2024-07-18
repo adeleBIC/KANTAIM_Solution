@@ -60,47 +60,48 @@
 
 <h3>Page de transfert</h3>
 
-@if(bienTransfer)
+@switch(state)
 {
-    <div class="display-container">
+    case 3:
+        <div class="display-container">
 
-        <h3 class="title">
-            Bien Transfer
-        </h3>
-    </div>
-
-} else
-{
-    @if(ContainerScanner != null && AutreScanner != null) {
-     <div class="display-container">
-            <h3 class="title">Transfer @ContainerScanner.Number to @AutreScanner.Number</h3>
-     </div>
-     <div class="button-group">
-            <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>AutreScanner=null">Return</MudButton>
-            <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="()=>transferInformation()">Valider</MudButton>
-     </div>
-} else {
-    @if (ContainerScanner != null)
-    {
+            <h3 class="title">
+                Bien Transfer
+            </h3>
+        </div>
+        break;
+    
+    case 2:
         <div class="display-container">
             <h3 class="title">Svp Scannez une autre contenaire que vous voulez transfer</h3>
-            <div>
-                <MudTextField @bind-Value="autreValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="autreScan"></MudTextField>
-            </div>
+            <MudText> @TextValue</MudText>
+            @* <div>
+                <MudTextField @bind-Value="autreValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" ></MudTextField>
+            </div> *@
         </div>
-         <div class="button-group">
-                    <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>ContainerScanner=null">Return</MudButton>
-            </div>
-    } else
-    {
+        <div class="button-group">
+            <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>ContainerScanner=null">Return</MudButton>
+        </div>
+        break;
+    case 1 :
+        <div class="display-container">
+            <h3 class="title">Transfer @ContainerScanner.Number to @AutreScanner.Number</h3>
+        </div>
+        <div class="button-group">
+            <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>AutreScanner=null">Return</MudButton>
+            <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="()=>transferInformation()">Valider</MudButton>
+        </div>
+        break;
+    case 0 :
         <div class="display-container">
             <h3 class="title">Svp Scannez la contenaire que vous voulez transfer</h3>
-            <div>
-                <MudTextField @bind-Value="ContainerValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="containerScan"></MudTextField>
-            </div>
+            <MudText> @TextValue</MudText>
+            @* <div>
+                <MudTextField @bind-Value="ContainerValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true"></MudTextField>
+            </div> *@
         </div>
-    }
-}
+        break;
+
 }
 
 
