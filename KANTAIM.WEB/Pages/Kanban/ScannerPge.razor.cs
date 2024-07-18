@@ -3,8 +3,10 @@ using KANTAIM.DAL.Services;
 using KANTAIM.WEB.Services;
 using KANTAIM.WEB.ViewModels;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.JSInterop;
 using MudBlazor;
 using System.ComponentModel.DataAnnotations;
@@ -15,7 +17,7 @@ namespace KANTAIM.WEB.Pages.Kanban
     {
         [Inject] public ScanService _scanService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
-        [Inject] IJSRuntime JS { get; set; }
+        [Inject] ISnackbar _snackService { get; set; }
 
         public Cell CellScanner { get; set; }
         public string? TextValue { get; set; }
@@ -30,36 +32,34 @@ namespace KANTAIM.WEB.Pages.Kanban
         [Inject] public CellService _cellService { get; set; }
         [Inject] public PressService _pressService { get; set; }
 
-        List<string> list = new List<string>() { "Contenaire", "Bac", "Pallete"};
-
-        string? CellName;
+        private string currentUrl;
+        private string pageUrl;
         string? PressName;
-        string? MouleName;
-        string? ColorName;
-        string? ContenaireName;
         string? ProduitName;
         string? MachineName;
 
         private static ScannerPge _instance;
 
-        //private ElementReference myInputElement;
-
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+        protected override async Task OnInitializedAsync()
         {
-            if (firstRender)
-            {
-                _instance = this;
-                await JS.InvokeVoidAsync("preventKeyboardOnTouch", "myInput");
-                //await JS.InvokeVoidAsync("eval", "document.addEventListener('keydown', function (event) {if (event.key === '§') {DotNet.invokeMethodAsync('KANTAIM.WEB', 'OnSpecialKeyPressed');}});");
-                await JS.InvokeVoidAsync("initializeKeyListener");
-            }
+            //RefreshData();
+            currentUrl = NavigationManager.Uri;
+            pageUrl = NavigationManager.Uri;
+            _instance = this;
+            NavigationManager.LocationChanged += OnLocationChanged;
         }
 
-        [JSInvokable]
-        public static void OnSpecialKeyPressed()
+        private void OnLocationChanged(object sender, LocationChangedEventArgs e)
         {
-            Console.WriteLine("La touche § a été pressée!");
-            // Ici, vous pouvez appeler une méthode ou exécuter toute autre logique nécessaire
+            // Mettre à jour l'URL actuelle lorsque l'URL change
+            currentUrl = e.Location;
+            // Vous pouvez ajouter ici toute logique que vous souhaitez exécuter lorsque l'URL change
+        }
+
+        public void Dispose()
+        {
+            // Se désabonner de l'événement pour éviter les fuites de mémoire
+            NavigationManager.LocationChanged -= OnLocationChanged;
         }
 
         [JSInvokable]
@@ -70,7 +70,7 @@ namespace KANTAIM.WEB.Pages.Kanban
         private void HandleInput(string input)
         {
             
-            if (input == "Enter")
+            if (input == "Enter" && currentUrl == pageUrl)
             {
                 string p = TextValue;
                 if (!string.IsNullOrEmpty(p))
@@ -171,6 +171,9 @@ namespace KANTAIM.WEB.Pages.Kanban
                     }
 
                 }
+
+                TextValue = null;
+                //_snackService.Add("Mauvais QRCode scanné !",MudBlazor.Severity.Error);
             }
             else
             {

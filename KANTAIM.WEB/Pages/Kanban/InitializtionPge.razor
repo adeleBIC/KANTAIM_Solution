@@ -40,17 +40,20 @@
     {
         case 0: //Scan du contenaire
             <h2>Scanner le contenaire s'il vous plait</h2>
-            <MudTextField @bind-Value="ContainerValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="ContainerScan"></MudTextField>
+            <MudText> @TextValue</MudText>
+            @* <MudTextField @bind-Value="ContainerValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="ContainerScan"></MudTextField> *@
             break;
 
         case 1: //Scan la palette
             <h2>Scanner la palette s'il vous plait</h2>
-            <MudTextField @bind-Value="PaletteValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="PaletteScan"></MudTextField>
+            <MudText> @TextValue</MudText>
+            //<MudTextField @bind-Value="PaletteValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="PaletteScan"></MudTextField>
             break;
 
         case 2: //Scan de la presse
             <h2>Scanner la presse s'il vous plait</h2>
-            <MudTextField @bind-Value="PressValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="PressScan"></MudTextField>
+            <MudText> @TextValue</MudText>
+            @* <MudTextField @bind-Value="PressValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="PressScan"></MudTextField> *@
             break;
 
         case 3: //Selection de la couleur

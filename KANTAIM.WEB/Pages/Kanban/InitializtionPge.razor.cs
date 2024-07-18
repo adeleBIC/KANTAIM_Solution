@@ -8,6 +8,7 @@ using MudBlazor.Charts;
 using MudBlazor;
 using MudBlazor.Services;
 using Microsoft.JSInterop;
+using Microsoft.AspNetCore.Components.Routing;
 
 namespace KANTAIM.WEB.Pages.Kanban
 {
@@ -43,19 +44,17 @@ namespace KANTAIM.WEB.Pages.Kanban
         public string? TextValue { get; set; }
 
         public Product? product { get; set; }
-        private static ScannerPge _instance;
-        /*
+
+        private static InitializtionPge _instance;
+        private string currentUrl;
+        private string pageUrl;
+
         [JSInvokable]
-        public static void CaptureInput(string input)
+        public static void CaptureInputInit(string input)
         {
             _instance?.HandleInput(input);
         }
-        private void HandleInput(string input)
-        {
-            TextValue += input;
-            StateHasChanged();
-        }
-        */
+
         public int State
         {
             get
@@ -75,14 +74,17 @@ namespace KANTAIM.WEB.Pages.Kanban
             }
         }
 
-
-        protected override void OnInitialized()
+        protected override async Task OnInitializedAsync()
         {
+            //RefreshData();
+            currentUrl = NavigationManager.Uri;
+            pageUrl = NavigationManager.Uri;
+            _instance = this;
             switch (Id)
             {
                 case 0:
                     ContainerScanner = _contenaireService.GetContainerByNumber(Number).FirstOrDefault();
-                    if(ContainerScanner.ContainerType.IsContainable) // Quand on scan le bac
+                    if (ContainerScanner.ContainerType.IsContainable) // Quand on scan le bac
                     {
                         BacInitialisation = true;
                     }
@@ -93,34 +95,76 @@ namespace KANTAIM.WEB.Pages.Kanban
                 default:
                     break;
             }
+            NavigationManager.LocationChanged += OnLocationChanged;
         }
 
-        void PaletteScan(KeyboardEventArgs e)
+        private void OnLocationChanged(object sender, LocationChangedEventArgs e)
         {
-            if (e.Key == "Enter")
-            {
-                string[] parts = _scanService.scanCode(PaletteValue);
-                if (parts != null)
-                {
-                    int.TryParse(parts[0], out int type);
-                    int.TryParse(parts[1], out int PaletteNumber);
+            // Mettre à jour l'URL actuelle lorsque l'URL change
+            currentUrl = e.Location;
+            // Vous pouvez ajouter ici toute logique que vous souhaitez exécuter lorsque l'URL change
+        }
 
-                    if (type == 1)
-                    {
-                        PaletteScanner = _contenaireService.GetContainerByNumber(PaletteNumber).FirstOrDefault();
-                        if(PaletteScanner.ActionID == 0) // On ne peux pas mettre une bac vide dans une palette, on ne peux pas mettre un bac dans une palette qu'il n'as pas été initialisé.
-                        {
-                            _snackService.Add("Svp initialisez palette d'abord!", Severity.Error);
-                            PaletteValue = null;
-                            PaletteScanner = null;
-                        } else
-                        {
-                            TransferBacToPalette(ContainerScanner, PaletteScanner);
-                        }
-                        
-                    }
+        public void Dispose()
+        {
+            // Se désabonner de l'événement pour éviter les fuites de mémoire
+            NavigationManager.LocationChanged -= OnLocationChanged;
+        }
+
+
+        private void HandleInput(string input)
+        {
+
+            if (input == "Enter" && currentUrl == pageUrl)
+            {
+                switch (state)
+                {
+                    case 0:
+                        ContainerScan(TextValue);
+                        break;
+                    case 1:
+                        PaletteScan(TextValue);
+                        break;
+                    case 2:
+                        PressScan(TextValue);
+                        break;
                 }
 
+                StateHasChanged();
+                TextValue = null;
+
+            }
+            else
+            {
+                TextValue += input;
+                StateHasChanged();
+
+            }
+        }
+
+        void PaletteScan(string code)
+        {
+            string[] parts = _scanService.scanCode(code);
+            if (parts != null)
+            {
+                int.TryParse(parts[0], out int type);
+                int.TryParse(parts[1], out int PaletteNumber);
+
+                if (type == 1)
+                {
+                    PaletteScanner = _contenaireService.GetContainerByNumber(PaletteNumber).FirstOrDefault();
+                    if (PaletteScanner.ActionID == 0) // On ne peux pas mettre une bac vide dans une palette, on ne peux pas mettre un bac dans une palette qu'il n'as pas été initialisé.
+                    {
+                        _snackService.Add("Svp initialisez palette d'abord!", Severity.Error);
+                        PaletteValue = null;
+                        PaletteScanner = null;
+                    }
+                    else
+                    {
+                        TransferBacToPalette(ContainerScanner, PaletteScanner);
+                    }
+
+                }
             }
         }
         void TransferBacToPalette(Container bac, Container palette)
@@ -158,25 +202,22 @@ namespace KANTAIM.WEB.Pages.Kanban
             NavigationManager.NavigateTo($"/ScannerPge");
             _snackService.Add("Réussi !", Severity.Success);
         }
-        void PressScan(KeyboardEventArgs e)
+        void PressScan(string code)
         {
-            if (e.Key == "Enter")
+            string[] parts = _scanService.scanCode(code);
+            if (parts != null)
             {
-                string[] parts = _scanService.scanCode(PressValue);
-                if(parts != null)
-                {
-                    int.TryParse(parts[0], out int type);
-                    int.TryParse(parts[1], out int Number);
+                int.TryParse(parts[0], out int type);
+                int.TryParse(parts[1], out int Number);
 
-                    if (type == 3 && Number > 0) // scanner une press
-                    {
-                        PressScanner = _pressService.GetByNumber(Number);   
-                    } else if (type == 2 && Number > 0) // scanner un machine inject pour initialiser
-                    {
-                        MachineScanner = _machineService.GetById(Number);
-                    }
+                if (type == 3 && Number > 0) // scanner une press
+                {
+                    PressScanner = _pressService.GetByNumber(Number);
                 }
-                
+                else if (type == 2 && Number > 0) // scanner un machine inject pour initialiser
+                {
+                    MachineScanner = _machineService.GetById(Number);
+                }
             }
         }
 
@@ -199,31 +240,28 @@ namespace KANTAIM.WEB.Pages.Kanban
             }
             
         }
-        void ContainerScan(KeyboardEventArgs e)
+        void ContainerScan(string code)
         {
-            if (e.Key == "Enter")
+            string[] parts = _scanService.scanCode(code);
+
+            int.TryParse(parts[0], out int type);
+            int.TryParse(parts[1], out int ContainerNumber);
+
+            if (type == 1 && ContainerNumber > 0)
             {
-                string[] parts = _scanService.scanCode(ContainerValue);
-
-                int.TryParse(parts[0], out int type);
-                int.TryParse(parts[1], out int ContainerNumber);
-
-                if (type == 1 && ContainerNumber > 0)
+                ContainerScanner = _contenaireService.GetContainerByNumber(ContainerNumber).FirstOrDefault();
+                // Vérifier si le Contenaire que l'on veut initialiser est bien vide
+                if (ContainerScanner.ActionID != 0)
                 {
-                    ContainerScanner = _contenaireService.GetContainerByNumber(ContainerNumber).FirstOrDefault();
-                    // Vérifier si le Contenaire que l'on veut initialiser est bien vide
-                    if (ContainerScanner.ActionID != 0)
-                    {
-                        ContainerScanner = null;
-                        ContainerFeedback = "Contenaire n'est pas vide"; // Set feedback message
-                    }
-                    else
-                    {
-                        ContainerFeedback = string.Empty; // Reset feedback message if the condition does not match
-                    }
+                    ContainerScanner = null;
+                    ContainerFeedback = "Contenaire n'est pas vide"; // Set feedback message
+                }
+                else
+                {
+                    ContainerFeedback = string.Empty; // Reset feedback message if the condition does not match
                 }
             }
-           
+
         }
 
         void ColorSelected(int colorid)
@@ -255,6 +293,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                     break;
 
             }
+            StateHasChanged();
         }
 
         void SaveLog()

@@ -1,51 +1,25 @@
-﻿// wwwroot/js/preventKeyboard.js
-//window.preventKeyboard = function (elementId) {
+﻿//window.preventKeyboardOnTouch = function (elementId) {
 //    var element = document.getElementById(elementId);
 //    if (element) {
-//        element.addEventListener('touchstart', function (event) {
-//            event.preventDefault();
-//            element.blur();
-//        });
+//        // Remove existing event listener if it exists to avoid multiple listeners
+//        element.removeEventListener('focus', preventFocus);
+//        element.addEventListener('focus', preventFocus);
 //    }
 //};
 
-
-// wwwroot/js/preventKeyboard.js
-window.preventKeyboardOnTouch = function (elementId) {
-    var element = document.getElementById(elementId);
-    if (element) {
-        // Remove existing event listener if it exists to avoid multiple listeners
-        element.removeEventListener('focus', preventFocus);
-        element.addEventListener('focus', preventFocus);
-    }
-};
-
-function preventFocus(event) {
-    event.preventDefault();
-    event.target.blur();
-}
-
-//document.addEventListener('keydown', function (event) {
-//    if (event.key === '§') {
-//        DotNet.invokeMethodAsync('KANTAIM.WEB', 'OnSpecialKeyPressed');
-//    }
-//});
-
-//window.initializeKeyListener = function () {
-//    document.addEventListener('keydown', function (event) {
-//        if (event.key === '§') {
-//            DotNet.invokeMethodAsync('KANTAIM.WEB', 'OnSpecialKeyPressed');
-//        }
-//    });
-//};
+//function preventFocus(event) {
+//    event.preventDefault();
+//    event.target.blur();
+//}
 
 window.initializeKeyListener = function () {
     let capturing = false;
     document.addEventListener('keydown', function (event) {
 
-        if (event.key === '$') {
+        if (event.key === 'Enter') {
             DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInput', event.key);
-            //capturing = false;
+            DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInputInit', event.key);
+            capturing = false;
         } else if (event.key === '!') {
             //DotNet.invokeMethodAsync('KANTAIM.WEB', 'OnSpecialKeyPressed');
             capturing = true;
@@ -59,10 +33,11 @@ window.initializeKeyListener = function () {
                 DotNet.invokeMethodAsync('KANTAIM.WEB', 'TextfieldUserInputDetected');
             } else {
             */
-                if (event.key === 'AltGraph' || event.key === 'Shift' || event.key === 'Control') {
-                    return; // Ignore AltGr key or shift key itself
-                }
-                DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInput', event.key);
+            if (event.key === 'AltGraph' || event.key === 'Shift' || event.key === 'Control' || event.key === 'Unidentified') {
+                return; // Ignore AltGr key or shift key itself
+            }
+            DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInput', event.key);
+            DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInputInit', event.key);
             //}
             
         } 

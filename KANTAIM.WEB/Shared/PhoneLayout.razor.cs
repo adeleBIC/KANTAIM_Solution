@@ -15,6 +15,7 @@ using KANTAIM.WEB;
 using KANTAIM.WEB.Shared;
 using MudBlazor;
 using KANTAIM.DAL.Services;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace KANTAIM.WEB.Shared
 {
@@ -22,6 +23,7 @@ namespace KANTAIM.WEB.Shared
     {
         [Inject] public UserService _userService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
+        [Inject] IJSRuntime JS { get; set; }
 
         public List<string> Users { get; set; }
 
@@ -32,6 +34,16 @@ namespace KANTAIM.WEB.Shared
         {
             drawerOpen = !drawerOpen;
         }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                await JS.InvokeVoidAsync("initializeKeyListener");
+                firstRender = false;
+            }
+        }
+
 
         protected override async Task OnInitializedAsync()
         {
