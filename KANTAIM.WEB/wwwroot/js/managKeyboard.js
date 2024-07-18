@@ -12,13 +12,19 @@
 //    event.target.blur();
 //}
 
+function Pages() {
+    DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInput', event.key);
+    DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInputInit', event.key);
+    DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInputFindProd', event.key);
+}
 window.initializeKeyListener = function () {
     let capturing = false;
     document.addEventListener('keydown', function (event) {
 
         if (event.key === 'Enter') {
-            DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInput', event.key);
-            DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInputInit', event.key);
+            Pages();
+            //DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInput', event.key);
+            //DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInputInit', event.key);
             capturing = false;
         } else if (event.key === '!') {
             //DotNet.invokeMethodAsync('KANTAIM.WEB', 'OnSpecialKeyPressed');
@@ -36,8 +42,9 @@ window.initializeKeyListener = function () {
             if (event.key === 'AltGraph' || event.key === 'Shift' || event.key === 'Control' || event.key === 'Unidentified') {
                 return; // Ignore AltGr key or shift key itself
             }
-            DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInput', event.key);
-            DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInputInit', event.key);
+            Pages();
+            //DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInput', event.key);
+            //DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInputInit', event.key);
             //}
             
         } 

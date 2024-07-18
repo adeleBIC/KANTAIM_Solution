@@ -4,7 +4,9 @@ using KANTAIM.WEB.Ressources;
 using KANTAIM.WEB.Services;
 using KANTAIM.WEB.ViewModels;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using MudBlazor;
 using System;
 using System.Net.Http.Headers;
@@ -44,6 +46,43 @@ namespace KANTAIM.WEB.Pages.Kanban
         public string ContainerValue { get; set; }
         public bool ShowAllCells { get; set; }
 
+        private static FindProductPge _instance;
+        private string currentUrl;
+        private string pageUrl;
+        public string? TextValue { get; set; }
+
+        private void OnLocationChanged(object sender, LocationChangedEventArgs e)
+        {
+            // Mettre à jour l'URL actuelle lorsque l'URL change
+            currentUrl = e.Location;
+            // Vous pouvez ajouter ici toute logique que vous souhaitez exécuter lorsque l'URL change
+        }
+
+        public void Dispose()
+        {
+            // Se désabonner de l'événement pour éviter les fuites de mémoire
+            NavigationManager.LocationChanged -= OnLocationChanged;
+        }
+        [JSInvokable]
+        public static void CaptureInputFindProd(string input)
+        {
+            _instance?.HandleInput(input);
+        }
+        private void HandleInput(string input)
+        {
+
+            if (input == "Enter" && currentUrl == pageUrl)
+            {
+                ContainerScan(TextValue);
+                StateHasChanged();
+            }
+            else
+            {
+                TextValue += input;
+                StateHasChanged();
+
+            }
+        }
         void ToggleCellList()
         {
             ShowAllCells = !ShowAllCells;
@@ -58,6 +97,9 @@ namespace KANTAIM.WEB.Pages.Kanban
 
         protected override void OnInitialized()
         {
+            currentUrl = NavigationManager.Uri;
+            pageUrl = NavigationManager.Uri;
+            _instance = this;
             ProductScanner = _productService.GetByNumber(Number);
             Colors = new List<ProdColor>();
             
@@ -70,7 +112,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                 findCells();
             }
             //base.OnInitialized();
-
+            NavigationManager.LocationChanged += OnLocationChanged;
         }
 
         void findCells()
@@ -107,63 +149,60 @@ namespace KANTAIM.WEB.Pages.Kanban
             findCells();
         }
 
-        void ContainerScan(KeyboardEventArgs e)
+        void ContainerScan(string code)
         {
-            if (e.Key == "Enter")
+            string[] parts = _scanService.scanCode(code);
+            if (parts != null)
             {
-                string[] parts = _scanService.scanCode(ContainerValue);
-                if (parts != null)
+                int.TryParse(parts[0], out int type);
+                if (type == 1)
                 {
-                    int.TryParse(parts[0], out int type);
-                    if (type == 1)
+                    if (int.TryParse(parts[1], out int containerNumber))
                     {
-                        if (int.TryParse(parts[1], out int containerNumber))
-                        {
 
-                            ContainerScanner = _contenaireService.GetContainerByNumber(containerNumber).FirstOrDefault();
-                            logRescent = _logService.GetByContenaireId(ContainerScanner.Id);
-                            containerProduct = _productService.GetById(logRescent.ProductID);
-                            containerProdColor = _colorService.GetById(logRescent.ProdColorID);
-                            if(containerProduct != ProductScanner || containerProdColor != ColorChoose)
+                        ContainerScanner = _contenaireService.GetContainerByNumber(containerNumber).FirstOrDefault();
+                        logRescent = _logService.GetByContenaireId(ContainerScanner.Id);
+                        containerProduct = _productService.GetById(logRescent.ProductID);
+                        containerProdColor = _colorService.GetById(logRescent.ProdColorID);
+                        if (containerProduct != ProductScanner || containerProdColor != ColorChoose)
+                        {
+                            _snackService.Add("Scp vérifiez le produit dans le contenaire et le produit que vous voulez rechercher !", Severity.Error);
+                        }
+                        else
+                        {
+                            if (ContainerScanner != null)
                             {
-                                _snackService.Add("Scp vérifiez le produit dans le contenaire et le produit que vous voulez rechercher !", Severity.Error);
-                            } else
-                            {
-                                if (ContainerScanner != null)
+                                switch (ContainerScanner.ActionID)
                                 {
-                                    switch (ContainerScanner.ActionID)
-                                    {
-                                        case 0:
-                                            /*Quand on scan un contenaire vide, on l'initialise sur press.*/
-                                            NavigationManager.NavigateTo($"/InitialisationPge/0/{containerNumber}");
-                                            break;
-                                        case 1:
-                                            /*Après initialisation, on choisie son fillstatus, et après on le mise en rack.*/
-                                            NavigationManager.NavigateTo($"/StockagePge/1/{containerNumber}");
-                                            break;
-                                        case 2:
-                                            /*Traite un contenaire qui stock avec produit, on peut sortir stock ou le déplacer.*/
-                                            NavigationManager.NavigateTo($"/ShipmentPge/1/{containerNumber}");
-                                            break;
-                                        case 3:
-                                            /*Après sortie le contenaire avec produit, on vas le mise en Machine*/
-                                            NavigationManager.NavigateTo($"/InjectPge/1/{containerNumber}");
-                                            break;
-                                        case 4:
-                                            /*Apres vidange le contenaire est vide, on Mise en rack.*/
-                                            NavigationManager.NavigateTo($"/StockagePge/1/{containerNumber}");
-                                            break;
-                                    }
+                                    case 0:
+                                        /*Quand on scan un contenaire vide, on l'initialise sur press.*/
+                                        NavigationManager.NavigateTo($"/InitialisationPge/0/{containerNumber}");
+                                        break;
+                                    case 1:
+                                        /*Après initialisation, on choisie son fillstatus, et après on le mise en rack.*/
+                                        NavigationManager.NavigateTo($"/StockagePge/1/{containerNumber}");
+                                        break;
+                                    case 2:
+                                        /*Traite un contenaire qui stock avec produit, on peut sortir stock ou le déplacer.*/
+                                        NavigationManager.NavigateTo($"/ShipmentPge/1/{containerNumber}");
+                                        break;
+                                    case 3:
+                                        /*Après sortie le contenaire avec produit, on vas le mise en Machine*/
+                                        NavigationManager.NavigateTo($"/InjectPge/1/{containerNumber}");
+                                        break;
+                                    case 4:
+                                        /*Apres vidange le contenaire est vide, on Mise en rack.*/
+                                        NavigationManager.NavigateTo($"/StockagePge/1/{containerNumber}");
+                                        break;
                                 }
                             }
                         }
                     }
-                    else
-                    {
-                        _snackService.Add("Scp scannez une contenaire !", Severity.Error);
-                    }
                 }
-
+                else
+                {
+                    _snackService.Add("Scp scannez une contenaire !", Severity.Error);
+                }
             }
         }
         void GoBack()

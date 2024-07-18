@@ -22,12 +22,15 @@
     @if (cellPropose != null)
     {
         <h3 class="title">Cellule proposée: @cellPropose.Name</h3>
-        <div>
-            <MudTextField @bind-Value="ContainerValue" AutoFocus="true" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="ContainerScan"></MudTextField>
+        <div>!
+            @* <MudTextField @bind-Value="ContainerValue" AutoFocus="true" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="ContainerScan"></MudTextField> *@
         <MudButton Class="bouton" OnClick="ToggleCellList" Variant="MudBlazor.Variant.Filled" Style="margin-top: 20px;">
             @(ShowAllCells ? "Masquer" : "Afficher")
         </MudButton>
+            
         </div>
+        <h3 class="title">Scannez la contenaire s'il vous plaît</h3>
+        <MudText> @TextValue</MudText>
     }
     else if (cells != null && cells.Count == 0)
     {
@@ -57,7 +60,7 @@
     @if (cells == null)
     {
         <div>
-            <p>DEBUG: Cells are null.</p>
+           @*  <p>DEBUG: Cells are null.</p> *@
             <br>Produit : @ProductScanner.Name
             <br>Choisissez la couleur s'il vous plait
             <br>
