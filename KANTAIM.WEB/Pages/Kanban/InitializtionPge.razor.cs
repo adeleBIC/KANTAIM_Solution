@@ -335,8 +335,9 @@ namespace KANTAIM.WEB.Pages.Kanban
             if(ContainerScanner.ContainerTypeID == 2) // S'il est un bac, on initialise son fillstatue en plein directement
                 ContainerScanner.Status = 3;
             _contenaireService.UpSert(ContainerScanner);
-
+            
             NavigationManager.NavigateTo("/ScannerPge");
+            _snackService.Add("Bien initialisé !", Severity.Success);
         }
     }
 }

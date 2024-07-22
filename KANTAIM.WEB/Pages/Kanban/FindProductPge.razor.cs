@@ -201,7 +201,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                 }
                 else
                 {
-                    _snackService.Add("Scp scannez une contenaire !", Severity.Error);
+                    _snackService.Add("Scannez une contenaire s'il vous plaît  !", Severity.Error);
                 }
             }
         }

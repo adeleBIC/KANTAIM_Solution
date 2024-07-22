@@ -4,7 +4,9 @@ using KANTAIM.WEB.Ressources;
 using KANTAIM.WEB.Services;
 using KANTAIM.WEB.ViewModels;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using MudBlazor;
 using System;
 using System.Net.Http.Headers;
@@ -62,9 +64,90 @@ namespace KANTAIM.WEB.Pages.Kanban
         public List<CellLog> cellList { get; set; }
         public Log? cellLog { get; set; }
 
+        public string? TextValue { get; set; }
+
+        private static StockagePge _instance;
+        private string currentUrl;
+        private string pageUrl;
+        private int state;
+
+        [JSInvokable]
+        public static void CaptureInputStock(string input)
+        {
+            _instance?.HandleInput(input);
+        }
+        private async void HandleInput(string input)
+        {
+            if(currentUrl == pageUrl)
+            {
+                if (input == "Enter" )
+                {
+                    switch (state)
+                    {
+                        case 0: 
+                            if(isPalette)
+                            {
+                                BacScan(TextValue);
+                            }
+                            break;
+                        case 2:
+                            cellScan(TextValue);
+                            break;
+                        case 3:
+                            ContainerScan(TextValue);
+                            break;
+                        case 4:
+                            cellScan(TextValue);
+                            break;
+                    }
+
+                    await InvokeAsync(StateHasChanged);
+                    TextValue = null;
+
+                }
+                else
+                {
+                    TextValue += input;
+                    await InvokeAsync(StateHasChanged);
+
+                }
+            }
+            
+        }
+
+        public int State
+        {
+            get
+            {
+                state = 0;
+                if (bienStock) state = 1;
+                else if (maintenance) state = 2;
+                else if (cellScanner != null) state = 3;
+                else if (stock) state = 4;
+                else if (shipment) state = 5;
+                else state = 0;
+
+                return state;
+            }
+        }
+        private void OnLocationChanged(object sender, LocationChangedEventArgs e)
+        {
+            // Mettre à jour l'URL actuelle lorsque l'URL change
+            currentUrl = e.Location;
+            // Vous pouvez ajouter ici toute logique que vous souhaitez exécuter lorsque l'URL change
+        }
+
+        public void Dispose()
+        {
+            // Se désabonner de l'événement pour éviter les fuites de mémoire
+            NavigationManager.LocationChanged -= OnLocationChanged;
+        }
         protected override void OnInitialized()
         {
-            switch(Id)
+            currentUrl = NavigationManager.Uri;
+            pageUrl = NavigationManager.Uri;
+            _instance = this;
+            switch (Id)
             {
                 //Scanner le contenaire
                 case 1:
@@ -74,28 +157,25 @@ namespace KANTAIM.WEB.Pages.Kanban
                 case 4:
                     cellScanner = _cellService.GetById(Number);
                     break;
-            }    
+            }
+            NavigationManager.LocationChanged += OnLocationChanged;
         }
-        void ContainerScan(KeyboardEventArgs e)
+        void ContainerScan(string code)
         {
-            if (e.Key == "Enter")
+            string[] parts = _scanService.scanCode(code);
+            if (parts != null)
             {
-                string[] parts = _scanService.scanCode(ContainerValue);
-                if (parts != null)
+                int.TryParse(parts[0], out int type);
+                int.TryParse(parts[1], out int containerNumber);
+                //int.TryParse(parts[2], out int ContenaireType);
+                if (type == 1)
                 {
-                    int.TryParse(parts[0], out int type);
-                    int.TryParse(parts[1], out int containerNumber);
-                    //int.TryParse(parts[2], out int ContenaireType);
-                    if (type == 1)
-                    {
-                        ContainerManage(containerNumber);
-                    }
-                    else
-                    {
-                        _snackService.Add("Scp scannez un bac !", Severity.Error);
-                    }
+                    ContainerManage(containerNumber);
                 }
-
+                else
+                {
+                    _snackService.Add("Scp scannez un bac !", Severity.Error);
+                }
             }
         }
         void ContainerManage(int containerNumber)
@@ -130,35 +210,32 @@ namespace KANTAIM.WEB.Pages.Kanban
             }
         }
 
-        void BacScan(KeyboardEventArgs e)
+        void BacScan(string code)
         {
-            if (e.Key == "Enter")
+            string[] parts = _scanService.scanCode(code);
+            if (parts != null)
             {
-                string[] parts = _scanService.scanCode(BacValue);
-                if (parts != null)
+                int.TryParse(parts[0], out int type);
+                int.TryParse(parts[1], out int BacNumber);
+                //int.TryParse(parts[2], out int ContenaireType);
+                if (type == 1)
                 {
-                    int.TryParse(parts[0], out int type);
-                    int.TryParse(parts[1], out int BacNumber);
-                    //int.TryParse(parts[2], out int ContenaireType);
-                    if (type == 1 )
+                    BacScanner = _contenaireService.GetContainerByNumber(BacNumber).FirstOrDefault();
+                    if (BacScanner.ContainerType.IsContainable)
                     {
-                        BacScanner = _contenaireService.GetContainerByNumber(BacNumber).FirstOrDefault();
-                        if(BacScanner.ContainerType.IsContainable)
-                        {
-                            TransferBacToPalette(BacScanner, ContainerScanner);
-                        } else
-                        {
-                            _snackService.Add("Scp scannez un bac !", Severity.Error);
-                        }
-                        
-                    } else
+                        TransferBacToPalette(BacScanner, ContainerScanner);
+                    }
+                    else
                     {
                         _snackService.Add("Scp scannez un bac !", Severity.Error);
                     }
-                }
 
+                }
+                else
+                {
+                    _snackService.Add("Scp scannez un bac !", Severity.Error);
+                }
             }
-            //_snackService.Add("Bien enregistrés !", Severity.Success);
         }
 
         void TransferBacToPalette(Container bac, Container palette)
@@ -287,66 +364,64 @@ namespace KANTAIM.WEB.Pages.Kanban
             maintenance = true;
         }
 
-        void cellScan(KeyboardEventArgs e)
+        void cellScan(string code)
         {
-            if (e.Key == "Enter")
+            string[] parts = _scanService.scanCode(code);
+
+            int.TryParse(parts[0], out int type);
+
+            if (type != 4)
             {
-                string[] parts = _scanService.scanCode(CellValue);
-
-                int.TryParse(parts[0], out int type);
+                _snackService.Add("Svp scanner le QR code de la cellule.", Severity.Error);
+            }
+            else
+            {
+                int.TryParse(parts[1], out int X);
+                int.TryParse(parts[2], out int Y);
+                // int.TryParse(parts[3], out int typeCell);
+                cellScanner = _cellService.GetAll().Where(u => u.X == X && u.Y == Y).FirstOrDefault();
                 
-                if (type != 4)
-                {
-                    _snackService.Add("Svp scanner le QR code de la cellule.", Severity.Error);
-                } else
-                {
-                    if (ContainerScanner != null && ContainerScanner.ContainerType.TypeNumber == 2)
-                    {
-                        _snackService.Add("Operation interdit !", Severity.Error);
-                        return;
-                    }
-                    int.TryParse(parts[1], out int X);
-                    int.TryParse(parts[2], out int Y);
-                    // int.TryParse(parts[3], out int typeCell);
-                    cellScanner = _cellService.GetAll().Where(u => u.X == X && u.Y == Y).FirstOrDefault();
-                    if (maintenance)
-                    {
-                        if (cellScanner.IsMaintenance == true)
-                        {
-                            Exit(2);
-                            bienStock = true;
-                        } else
-                        {
-                            _snackService.Add("Svp scanner le QR code de la maintenance.", Severity.Error);
-                        }
 
-                    }
-                    
-
-                    if (cellScanner == cellPropose)
+                if (maintenance)
+                {
+                    if (cellScanner.IsMaintenance == true)
                     {
                         Exit(2);
-                    } else
+                        bienStock = true;
+                    }
+                    else
                     {
-                        if(cellScanner.IsMaintenance)
-                        {
-                            _snackService.Add("Attention vous avez scanné le QR code de la maintenance.", Severity.Success);
-                        } else
-                        {
-                            if (cellScanner.Status == 2)
-                            {
-                                _snackService.Add("Attention la cellule est pleine.", Severity.Error);
-                                cellScanner = null;
-                            } 
-                            if(cellPropose == null)
-                            {
-                                if(!cellScanner.IsPhantom)
-                                {
-                                    _snackService.Add("Attention c'est pas une zone Fantôme.", Severity.Error);
-                                    cellScanner = null;
-                                }
+                        _snackService.Add("Svp scanner le QR code de la maintenance.", Severity.Error);
+                    }
 
+                }
+
+
+                if (cellScanner == cellPropose)
+                {
+                    Exit(2);
+                }
+                else
+                {
+                    if (cellScanner.IsMaintenance)
+                    {
+                        _snackService.Add("Attention vous avez scanné le QR code de la maintenance.", Severity.Success);
+                    }
+                    else
+                    {
+                        if (cellScanner.Status == 2)
+                        {
+                            _snackService.Add("Attention la cellule est pleine.", Severity.Error);
+                            cellScanner = null;
+                        }
+                        if (cellPropose == null)
+                        {
+                            if (!cellScanner.IsPhantom)
+                            {
+                                _snackService.Add("Attention c'est pas une zone Fantôme.", Severity.Error);
+                                cellScanner = null;
                             }
+
                         }
                     }
                 }
@@ -362,6 +437,12 @@ namespace KANTAIM.WEB.Pages.Kanban
             Log u;
             if (fillstatus != 1)
             {//if container is not empty
+                if (ContainerScanner != null && ContainerScanner.ContainerType.TypeNumber == 2)
+                {
+                    _snackService.Add("Non vide bac stock dans une cellule est interdit !", Severity.Error);
+                    cellScanner = null;
+                    return;
+                }
                 u = new Log()
                 {
                     EventTime = DateTime.Now,

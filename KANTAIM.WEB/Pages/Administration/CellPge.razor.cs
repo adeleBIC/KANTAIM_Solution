@@ -35,6 +35,7 @@ namespace KANTAIM.WEB.Pages.Administration
                 {
                     item.Status = 2;
                 }
+                _cellService.Upsert(item);
             }
             await Task.Run(RefreshData);
         }

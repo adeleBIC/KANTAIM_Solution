@@ -188,7 +188,7 @@ namespace KANTAIM.WEB.Pages.Kanban
         }
 
         void Inject()
-            {
+        {
             Log u = new Log()
             {
                 EventTime = DateTime.Now,

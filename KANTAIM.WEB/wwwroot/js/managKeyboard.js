@@ -18,6 +18,7 @@ function Pages() {
     DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInputFindProd', event.key);
     DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInputInject', event.key);
     DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInputTransfer', event.key);
+    DotNet.invokeMethodAsync('KANTAIM.WEB', 'CaptureInputStock', event.key);
 }
 window.initializeKeyListener = function () {
     let capturing = false;
