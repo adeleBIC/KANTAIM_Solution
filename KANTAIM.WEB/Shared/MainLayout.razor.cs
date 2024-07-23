@@ -15,6 +15,7 @@ using KANTAIM.WEB;
 using KANTAIM.WEB.Shared;
 using MudBlazor;
 using KANTAIM.DAL.Services;
+using KANTAIM.DAL.Model;
 
 namespace KANTAIM.WEB.Shared
 {
@@ -22,16 +23,30 @@ namespace KANTAIM.WEB.Shared
     {
         [Inject] public UserService _userService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
+        [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+        [Inject] ISnackbar _snackService { get; set; }
 
-        public List<string> Users { get; set; }
-
-        public string test { get; set; }
+        public int UserLvl { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
-            Users = _userService.GetAll().Where(u=>u.UserAccessLvlId > 0).Select(n => n.LoginADUser.ToLower()).ToList();
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+            User user = _userService.GetByName(authState.User.Identity.Name ?? "");
+
+            UserLvl = user?.UserAccessLvl.AccesLvL ?? 0;
 
             await InvokeAsync(StateHasChanged);
+        }
+
+        private void NavigateToAuthorizedPage(string page, int lvl)
+        {
+            if (UserLvl < lvl)
+            {
+                _snackService.Add("Niveau d'autorisation insuffisant", Severity.Error);
+                return;
+            }
+            NavigationManager.NavigateTo(page);
         }
 
         private void NavigateToHome()

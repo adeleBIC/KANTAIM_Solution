@@ -29,8 +29,8 @@
     <MudThemeProvider Theme="BicTheme" />
     <MudDialogProvider />
     <MudSnackbarProvider />
-        @if (Users.Contains(context.User.Identity?.Name.ToLower()))
-        {
+    @if (UserLvl > 0)
+    {
         <MudLayout>
             <MudAppBar Fixed="false" Elevation="0" DisableGutters="true" Class="muudstrap-navbar">
 
@@ -70,9 +70,9 @@
                 <MudMenu Color="Color.Inherit" Label="Administration" StartIcon="@Icons.Material.Filled.Settings" EndIcon="@Icons.Material.Filled.ArrowDropDown" Class="appBarButton appBarLogo"
                          Style="--mud-typography-button-size:20px;--mud-typography-button-weight : bold;"
                          AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" FullWidth="true">
-                    
-                    <MudMenuItem Link="/Administration/CellPge">Cellules</MudMenuItem>
-                    <MudMenuItem Link="/Administration/ShiftPge">Shifts</MudMenuItem>
+
+                    <MudMenuItem @onclick="@(()=>NavigateToAuthorizedPage("/Administration/CellPge",20))">Cellules</MudMenuItem>
+                    <MudMenuItem @onclick="@(()=>NavigateToAuthorizedPage("/Administration/ShiftPge",20))">Shifts</MudMenuItem>
                     <MudMenuItem Link="/Administration/ShapePge">Moules</MudMenuItem>
                     <MudMenuItem Link="/Administration/ActionPge">Actions</MudMenuItem>
                     <MudMenuItem Link="/Administration/ProductFamilyPge">Produits</MudMenuItem>

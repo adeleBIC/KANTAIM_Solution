@@ -36,6 +36,7 @@ namespace KANTAIM.DAL.Services
 
         public IEnumerable<User> GetAll() => Cache;
         public IEnumerable<User> GetByLvl(int lvlId) => Cache.Where(u=>u.UserAccessLvlId == lvlId);
+        public User? GetByName(string name) => Cache.SingleOrDefault(u => u.LoginADUser.ToLower() == name.ToLower());
         public User? GetById(int id) => Cache.SingleOrDefault(c => c.Id == id);
 
         public void ResetCache() => cache = null;
