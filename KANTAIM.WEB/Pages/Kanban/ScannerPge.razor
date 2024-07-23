@@ -6,8 +6,20 @@
 @using MudBlazor
 @using static MudBlazor.Icons
 
+<style>
 
-<div style="display: flex; justify-content: center; align-items: center; height: calc(100vh - 130px);">
-    @* <MudTextField Disabled=true id="myInput" @bind-Value="TextValue" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true"></MudTextField> *@
-    <MudText > @TextValue</MudText>
-</div>
+    .title {
+        color: #333333;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+
+</style>
+
+<h3 class="title">
+    Scannez une QR Code svp
+</h3>
+
+@* <MudTextField Disabled=true id="myInput" @bind-Value="TextValue" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true"></MudTextField> *@
+<MudText > @TextValue</MudText>

@@ -71,12 +71,12 @@
         break;
 
     case 2 : 
-        @if (ContainerScanner.ContainerType.Name == "bac")
+@*         @if (ContainerScanner.ContainerType.IsContainable == true) // if we scan a bac.
         {
             <div class="button-group">
-                <MudButton Color="Color.Secondary" Variant="MudBlazor.Variant.Filled" Href="@($"/StockagePge/3/{ContainerScanner.Number}")" Match="NavLinkMatch.All">Déplacement contenaire</MudButton>
+                <MudButton Color="Color.Secondary" Variant="MudBlazor.Variant.Filled" Href="@($"/StockagePge/1/{ContainerScanner.Number}")" Match="NavLinkMatch.All">Déplacement contenaire</MudButton>
             </div>
-        }
+        } *@
 
         <div class="display-container">
             <h3 class="title">Scannez la machine svp</h3>
@@ -84,6 +84,9 @@
             @* <div>
                 <MudTextField @bind-Value="MachineValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" ></MudTextField>
             </div> *@
+        </div>
+        <div class="button-group">
+        <MudButton Color="Color.Secondary" Variant="MudBlazor.Variant.Filled" Href="@($"/StockagePge/1/{ContainerScanner.Number}")" Match="NavLinkMatch.All">Déplacement Contenaire</MudButton>
         </div>
         break;
     case 3 :

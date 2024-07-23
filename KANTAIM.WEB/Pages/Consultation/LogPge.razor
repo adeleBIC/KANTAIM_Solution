@@ -16,6 +16,7 @@
 
 @if (Logs != null)
 {
+    /* ReadOnly=true si on voudrais log ne peux pas etre modifié */
     <MudDataGrid T="LogVM" RowClassFunc="RowClassFct" Items="@Logs" Dense=true Hover=true ReadOnly=false EditMode="MudBlazor.DataGridEditMode.Cell"
                  Virtualize="true" SelectOnRowClick=false MultiSelection=true SelectedItemsChanged="SelectionChanged" Bordered=true
                  Filterable="true" SortMode="SortMode.Multiple" Hideable="false" QuickFilter="@_quickFilter">
