@@ -51,18 +51,21 @@
 
 
     .bouton {
-        margin: 5px;
+        width: 120px;
+        height: 50px;
+        margin: 10px;
+        font-size: 16px;
     }
 
 </style>
 @if(correct)
 {
-    @if (shipment)
+@*     @if (shipment)
         {
             <h3 class="title">Bien Sortie</h3>
         }
         else
-        {
+        { *@
 
         <div class="display-container">
             <h3 class="title">Sortie de Rack</h3>
@@ -71,18 +74,21 @@
                     <div class="status-item">Produit: @product.Name</div>
                 @if (colorOfProduct != null)
                 {
-                    <div class="status-item">Couleur: @colorOfProduct.Name</div>
+                    <div class="status-item">Couleur: @colorOfProduct.Name
+                    <MudIcon Icon="@Icons.Material.Filled.Circle" Style="@($"color:{colorOfProduct.ColorNumber};")" />
+                    </div>
+                
                 }
                 
                 <div class="status-item">Contenaire: @ContainerScanner.Number</div>
                 </div>
 
                 <div class="button-group">
-            <MudButton Color="Color.Secondary" Variant="MudBlazor.Variant.Filled" Href="@($"/StockagePge/1/{ContainerScanner.Number}")" Match="NavLinkMatch.All">Déplacement Contenaire</MudButton>
-                <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="Shipment">Sortie</MudButton>
+            <MudButton Class="bouton"  Color="Color.Secondary" Variant="MudBlazor.Variant.Filled" Href="@($"/StockagePge/1/{ContainerScanner.Number}")" Match="NavLinkMatch.All">Déplacement Contenaire</MudButton>
+                <MudButton Class="bouton" Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="Shipment">Sortie</MudButton>
             </div>
         </div>
-        }
+@*         } *@
 }
 
 

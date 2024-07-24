@@ -64,11 +64,11 @@
 
 @switch (State)
 {
-    case 1 :
+@*     case 1 :
         <div class="display-container">
             <h3 class="title">Produit bien mis en machine</h3>
         </div>
-        break;
+        break; *@
 
     case 2 : 
 @*         @if (ContainerScanner.ContainerType.IsContainable == true) // if we scan a bac.
@@ -84,6 +84,21 @@
             @* <div>
                 <MudTextField @bind-Value="MachineValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" ></MudTextField>
             </div> *@
+        
+        <div class="status-display">
+            <div class="status-item">Produit: @product.Name</div>
+            @if (prodColor != null)
+            {
+
+                <div class="status-item">
+                    Couleur: @prodColor.Name
+                    <MudIcon Icon="@Icons.Material.Filled.Circle" Style="@($"color:{prodColor.ColorNumber};")" />
+                </div>
+                
+            }
+
+            <div class="status-item">Contenaire: @ContainerScanner.Number</div>
+        </div>
         </div>
         <div class="button-group">
         <MudButton Color="Color.Secondary" Variant="MudBlazor.Variant.Filled" Href="@($"/StockagePge/1/{ContainerScanner.Number}")" Match="NavLinkMatch.All">Déplacement Contenaire</MudButton>
@@ -107,19 +122,21 @@
                 <div class="status-item">Produit: @product.Name</div>
                 @if (prodColor != null)
                 {
-                    <div class="status-item">Couleur: @prodColor.Name</div>
-                    <MudIcon Icon="@Icons.Material.Filled.Circle" Style="@($"color:{prodColor.ColorNumber};")" />
+                    <div class="status-item">
+                        Couleur: @prodColor.Name
+                        <MudIcon Icon="@Icons.Material.Filled.Circle" Style="@($"color:{prodColor.ColorNumber};")" />
+                    </div>
                 }
 
                 <div class="status-item">Contenaire: @ContainerScanner.Number</div>
                 <div class="status-item">Machine: @MachineScanner.Name</div>
             </div>
-
+        </div>
             <div class="button-group">
                 <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="returnAction">Retour</MudButton>
                 <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="Inject">Valider</MudButton>
             </div>
-        </div>
+      
         break;
 }
 @* @if (inject)

@@ -50,7 +50,9 @@ namespace KANTAIM.WEB.Pages.Kanban
             {
                 if (inject) // quand on n'a pas la liste de couleurs et on a déjà su le press scanner, on récupére la liste de colors 
                 {
-                    state = 1;
+                    //state = 1;
+                    NavigationManager.NavigateTo($"/ScannerPge");
+                    _snackService.Add("Réussi !", Severity.Success);
                 }
                 else if (MachineScanner == null) state = 2;
                 else if (ContainerScanner == null) state = 3;

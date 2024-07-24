@@ -169,38 +169,44 @@ namespace KANTAIM.WEB.Pages.Kanban
         }
         void TransferBacToPalette(Container bac, Container palette)
         {
-            logRescent = _logService.GetByContenaireId(palette.Id);
-
-            bac.CellId = palette.CellId;
-            bac.ActionID = palette.ActionID;
-            bac.FillStatus = palette.FillStatus;
-            bac.Status = palette.Status;
-            bac.InJail = palette.InJail;
-            bac.InMaintenance = palette.InMaintenance;
-            bac.Comment = palette.Comment;
-            bac.ContainerID = palette.Id;
-            _contenaireService.UpSert(bac);
-
-
-            Log bacLog = new Log()
+            if(bac.ContainerID == palette.Id)
             {
-                EventTime = DateTime.Now,
-                Operation = 1, // Initialisation pour le bac
-                ProductID = logRescent.ProductID,
-                Press = logRescent.Press,
-                PressID = logRescent.PressID,
-                Shape = logRescent.Shape,
-                ShapeID = logRescent.ShapeID,
-                Container = bac,
-                ContainerID = bac.Id,
-                ProdColor = logRescent.ProdColor,
-                ProdColorID = logRescent.ProdColorID,
-                CellID = logRescent.CellID,
-                FillStatus = logRescent.FillStatus
-            };
-            _logService.UpSert(bacLog);
-            NavigationManager.NavigateTo($"/ScannerPge");
-            _snackService.Add("Réussi !", Severity.Success);
+                _snackService.Add("Déjà ajouté !", Severity.Error);
+            } else
+            {
+                logRescent = _logService.GetByContenaireId(palette.Id);
+                bac.CellId = palette.CellId;
+                bac.ActionID = palette.ActionID;
+                bac.FillStatus = palette.FillStatus;
+                bac.Status = palette.Status;
+                bac.InJail = palette.InJail;
+                bac.InMaintenance = palette.InMaintenance;
+                bac.Comment = palette.Comment;
+                bac.ContainerID = palette.Id;
+                _contenaireService.UpSert(bac);
+
+
+                Log bacLog = new Log()
+                {
+                    EventTime = DateTime.Now,
+                    Operation = 1, // Initialisation pour le bac
+                    ProductID = logRescent.ProductID,
+                    Press = logRescent.Press,
+                    PressID = logRescent.PressID,
+                    Shape = logRescent.Shape,
+                    ShapeID = logRescent.ShapeID,
+                    Container = bac,
+                    ContainerID = bac.Id,
+                    ProdColor = logRescent.ProdColor,
+                    ProdColorID = logRescent.ProdColorID,
+                    CellID = logRescent.CellID,
+                    FillStatus = logRescent.FillStatus
+                };
+                _logService.UpSert(bacLog);
+                NavigationManager.NavigateTo($"/ScannerPge");
+                _snackService.Add("Réussi !", Severity.Success);
+            }
+            
         }
         void PressScan(string code)
         {
@@ -217,6 +223,11 @@ namespace KANTAIM.WEB.Pages.Kanban
                 else if (type == 2 && Number > 0) // scanner un machine inject pour initialiser
                 {
                     MachineScanner = _machineService.GetById(Number);
+                    if(MachineScanner.IsInkjet == false)
+                    {
+                        _snackService.Add("Ce n'est pas une machine INK JET !", Severity.Error);
+                        MachineScanner = null;
+                    }
                 }
             }
         }

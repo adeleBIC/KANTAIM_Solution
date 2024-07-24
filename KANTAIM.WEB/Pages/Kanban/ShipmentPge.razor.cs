@@ -13,7 +13,7 @@ namespace KANTAIM.WEB.Pages.Kanban
         [Inject] public LogService _logService { get; set; }
         [Inject] public ColorService _colorService { get; set; }
         [Inject] public ProductService _productService { get; set; }
-
+        [Inject] public CellService _cellService { get; set; }
         [Parameter]
         public int Id { get; set; }
         [Parameter]
@@ -21,6 +21,7 @@ namespace KANTAIM.WEB.Pages.Kanban
 
 
         public Product? product { get; set; }
+        public Cell? cellStock { get; set; }
         //public Product? productModified { get; set; }
         public ProdColor? colorOfProduct { get; set; }
         public bool shipment { get; set; } = false;
@@ -52,13 +53,14 @@ namespace KANTAIM.WEB.Pages.Kanban
             {
                 product = _productService.GetById((int)logRescent.ProductID);
                 colorOfProduct = _colorService.GetById(logRescent.ProdColorID);
+                cellStock = _cellService.GetById(logRescent.CellID);
             }
         }
 
         void VerifyPalette(int paletteNumber)
         {
             PaletteScanner = _contenaireService.GetContainerByNumber(paletteNumber).FirstOrDefault();
-            if(_contenaireService.CountBac(paletteNumber) == 0) // s'il n'y a plus de bac sur la palette
+            if(_contenaireService.CountBac(PaletteScanner.Id) == 0) // s'il n'y a plus de bac sur la palette
             {
                 PaletteScanner.ActionID = 0; // Stocké Vide
                 PaletteScanner.FillStatus = 1;//Pelette statu change à vide
@@ -99,7 +101,7 @@ namespace KANTAIM.WEB.Pages.Kanban
 
             ContainerScanner.ActionID = 3; // Sortie stock
             ContainerScanner.CellId = null;
-            if (ContainerScanner.ContainerTypeID == 2) //s'il est un bac 
+            if (ContainerScanner.ContainerType.IsContainable == true) //s'il est un bac 
             {
                 int paletteNumber = ContainerScanner.BigContainer.Number;
                 ContainerScanner.BigContainer = null;
@@ -110,8 +112,10 @@ namespace KANTAIM.WEB.Pages.Kanban
             {
                 _contenaireService.UpSert(ContainerScanner);
             }
-            
-            shipment = true;
+
+            //shipment = true;
+            NavigationManager.NavigateTo($"/ScannerPge");
+            _snackService.Add("Bien sortie !", Severity.Success);
         }
 
     }

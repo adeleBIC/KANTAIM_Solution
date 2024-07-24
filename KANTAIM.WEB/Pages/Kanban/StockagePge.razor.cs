@@ -120,11 +120,11 @@ namespace KANTAIM.WEB.Pages.Kanban
             get
             {
                 state = 0;
-                if (bienStock) state = 1;
+                if (bienStock) /*state = 1;*/{ _snackService.Add("Bien Stocké !", Severity.Success); NavigationManager.NavigateTo($"/ScannerPge"); }
                 else if (maintenance) state = 2;
                 else if (cellScanner != null) state = 3;
                 else if (stock) state = 4;
-                else if (shipment) state = 5;
+                else if (shipment) /*state = 5;*/  { _snackService.Add("Bien sortie !", Severity.Success); NavigationManager.NavigateTo($"/ScannerPge"); }
                 else state = 0;
 
                 return state;
@@ -240,36 +240,41 @@ namespace KANTAIM.WEB.Pages.Kanban
 
         void TransferBacToPalette(Container bac, Container palette)
         {
-
-            bac.CellId = palette.CellId;
-            bac.ActionID = palette.ActionID;
-            bac.FillStatus = palette.FillStatus;
-            bac.Status = palette.Status;
-            bac.InJail = palette.InJail;
-            bac.InMaintenance = palette.InMaintenance;
-            bac.Comment = palette.Comment;
-            bac.ContainerID = palette.Id;
-            _contenaireService.UpSert(bac);
-
-
-            Log bacLog = new Log()
+            if (bac.ContainerID == palette.Id)
             {
-                EventTime = DateTime.Now,
-                Operation = palette.ActionID, // Initialisation pour le bac
-                ProductID = logRescent.ProductID,
-                Press = logRescent.Press,
-                PressID = logRescent.PressID,
-                Shape = logRescent.Shape,
-                ShapeID = logRescent.ShapeID,
-                Container = bac,
-                ContainerID = bac.Id,
-                ProdColor = logRescent.ProdColor,
-                ProdColorID = logRescent.ProdColorID,
-                CellID = logRescent.CellID,
-                FillStatus = logRescent.FillStatus
-            };
-            _logService.UpSert(bacLog);
-            _snackService.Add("Réussi !", Severity.Success);
+                _snackService.Add("Déjà ajouté !", Severity.Error);
+            } else
+            {
+                bac.CellId = palette.CellId;
+                bac.ActionID = palette.ActionID;
+                bac.FillStatus = palette.FillStatus;
+                bac.Status = palette.Status;
+                bac.InJail = palette.InJail;
+                bac.InMaintenance = palette.InMaintenance;
+                bac.Comment = palette.Comment;
+                bac.ContainerID = palette.Id;
+                _contenaireService.UpSert(bac);
+
+
+                Log bacLog = new Log()
+                {
+                    EventTime = DateTime.Now,
+                    Operation = palette.ActionID, // Initialisation pour le bac
+                    ProductID = logRescent.ProductID,
+                    Press = logRescent.Press,
+                    PressID = logRescent.PressID,
+                    Shape = logRescent.Shape,
+                    ShapeID = logRescent.ShapeID,
+                    Container = bac,
+                    ContainerID = bac.Id,
+                    ProdColor = logRescent.ProdColor,
+                    ProdColorID = logRescent.ProdColorID,
+                    CellID = logRescent.CellID,
+                    FillStatus = logRescent.FillStatus
+                };
+                _logService.UpSert(bacLog);
+                _snackService.Add("Réussi !", Severity.Success);
+            }
         }
 
         void FillstatusSelected(int fillstatu)
@@ -306,7 +311,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                 
                 if(isPalette && _contenaireService.CountBac(ContainerScanner.Id) < 24 )
                 {
-                    _snackService.Add("Le nombre de bac doit être superieur que 24 !", Severity.Error);
+                    _snackService.Add("Le nombre de bac est inférieur que 24 !", Severity.Error);
                     //stock = false;
                     //return;
                 }
@@ -409,7 +414,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                     }
                     else
                     {
-                        if (cellScanner.Status == 2)
+                        if (cellScanner.Status == 2) // 
                         {
                             _snackService.Add("Attention la cellule est pleine.", Severity.Error);
                             cellScanner = null;

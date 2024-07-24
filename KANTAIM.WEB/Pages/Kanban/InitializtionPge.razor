@@ -48,12 +48,19 @@
         flex-wrap: wrap;
         gap: 10px;
         margin-top: 10px;
+        padding: 10px; /* Padding inside the tree view */
+        /* Add margin to the bottom to prevent overlap with action buttons */
+        overflow-y: auto; /* Enable vertical scroll */
+        max-height: 200px;
+        width: 100%;
+
     }
 
     .text-container {
         text-align: center;
-        margin: 20px 0;
+
     }
+
 </style>
 
 <div class="main-container">
@@ -136,7 +143,7 @@
                     }
                     @if (ColorChoose != null)
                     {
-                        <div>
+                        <div >
                             <br>Couleur: @ColorChoose.Name
                             <MudIcon Icon="@Icons.Material.Filled.Circle" Style="@($"color:{ColorChoose.ColorNumber};")" />
                         </div>
