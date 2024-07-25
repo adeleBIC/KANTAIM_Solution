@@ -63,7 +63,8 @@ namespace KANTAIM.WEB.Pages.Kanban
         public int actionId;
         public List<CellLog> cellList { get; set; }
         public Log? cellLog { get; set; }
-
+        public Log? containerLog { get; set; }
+        
         public string? TextValue { get; set; }
 
         private static StockagePge _instance;
@@ -324,14 +325,14 @@ namespace KANTAIM.WEB.Pages.Kanban
         void findCells()
         {
             cellList = new List<CellLog>();
-            foreach (Container container in _contenaireService.Cache.Where(c => c.CellStock != null)) // recherche tous les contenaire qui est stockés dans la cellule, find all the contenaire who in currutly in the cell
+            foreach (Container container in _contenaireService.Cache.Where(c => c.CellStock != null && c.ContainerType.IsContainable == false)) // recherche tous les contenaire qui est stockés dans la cellule, find all the contenaire who in currutly in the cell
             {
                 cellLog = _logService.GetByContenaireByActionId(container.Id, 2);
                 Cell? cellAct = _cellService.GetById(cellLog?.CellID ?? 0);
-                if(cellAct != null && cellAct.IsJail != true && cellAct.IsMaintenance != true && cellAct.ForEmpty != true && cellAct.IsPhantom != true && cellAct.Status != 2 && _cellProductService.FindLink(cellAct.Id, product.Id) && cellAct.Id != ContainerScanner.CellId) { 
+                if(cellAct != null && cellAct.IsJail != true && cellAct.IsMaintenance != true && cellAct.ForEmpty != true && cellAct.IsPhantom != true && cellAct.Status != 2 && _cellProductService.FindLink(cellAct.Id, product.Id) && cellAct.Id != ContainerScanner?.CellId) { 
                     if (cellLog != null && cellLog.ProductID == product.Id )
                     {
-                        if (colorOfProduct == null || logRescent.ProdColorID == colorOfProduct.Id)
+                        if (colorOfProduct == null || cellLog.ProdColorID == colorOfProduct.Id)
                         {
                             if (!cellList.Any(c => c.Cell.Id == container.CellStock.Id) )
                             {
@@ -339,8 +340,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                             }
                         }
                     }
-                }
-                
+                }  
             }
             if (cellList != null && cellList.Count > 0)
             {
@@ -414,10 +414,11 @@ namespace KANTAIM.WEB.Pages.Kanban
                     }
                     else
                     {
-                        if (cellScanner.Status == 2) // 
+                        if (cellScanner.Status == 2) 
                         {
                             _snackService.Add("Attention la cellule est pleine.", Severity.Error);
                             cellScanner = null;
+                            return;
                         }
                         if (cellPropose == null)
                         {
@@ -425,8 +426,23 @@ namespace KANTAIM.WEB.Pages.Kanban
                             {
                                 _snackService.Add("Attention c'est pas une zone Fantôme.", Severity.Error);
                                 cellScanner = null;
+                                return;
                             }
 
+                        }
+                        /*Verify the others products in this cell is the same type with the product in the contenaire we scan*/
+                        if(cellScanner != null)
+                        {
+                            foreach (Container container in cellScanner.Containers)
+                            {
+                                containerLog = _logService.GetByContenaireByActionId(container.Id, 2);
+                                if (containerLog?.ProductID != product.Id || containerLog.ProdColorID != colorOfProduct.Id)
+                                {
+                                    _snackService.Add("Attention la produit n'est pas correcte.", Severity.Error);
+                                    cellScanner = null;
+                                    return;
+                                }
+                            }
                         }
                     }
                 }
@@ -434,6 +450,22 @@ namespace KANTAIM.WEB.Pages.Kanban
 
         }
 
+        void upDateCellState()
+        {
+            if (_contenaireService.CountCells(cellScanner.Id) == 0)
+            {
+                cellScanner.Status = 0;
+            }
+            else if (_contenaireService.CountCells(cellScanner.Id) < cellScanner.NbMax)
+            {
+                cellScanner.Status = 1;
+            }
+            else
+            {
+                cellScanner.Status = 2;
+            }
+            _cellService.Upsert(cellScanner);
+        }
 
         void Exit(int action)
         {
@@ -490,6 +522,7 @@ namespace KANTAIM.WEB.Pages.Kanban
             if (cellScanner != null)
             {
                 u.CellID = cellScanner.Id;
+                cellScanner.Containers.Add(ContainerScanner); /*Add contenaire into the liste of cell's contenaires*/
             }
 
             if (actionId == 0 || actionId == 2 || actionId == 3)
@@ -500,7 +533,7 @@ namespace KANTAIM.WEB.Pages.Kanban
             ContainerScanner.FillStatus = fillstatus;
             ContainerScanner.CellId = u.CellID;
             _contenaireService.UpSert(ContainerScanner);
-
+            
             if (isPalette)
             {
                 foreach (var item in _contenaireService.GetAllBacs(ContainerScanner.Id))
@@ -516,6 +549,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                     _contenaireService.UpSert(item);
                 }
             }
+            upDateCellState();
             bienStock = true;
            }
     }

@@ -79,8 +79,13 @@
                     </div>
                 
                 }
-                
-                <div class="status-item">Contenaire: @ContainerScanner.Number</div>
+
+            @if (cellStock != null)
+            {
+                <div class="status-item">Cellule: @cellStock.Name</div>
+            }
+            
+                <div class="status-item">Contenaire: @ContainerScanner?.Number</div>
                 </div>
 
                 <div class="button-group">
