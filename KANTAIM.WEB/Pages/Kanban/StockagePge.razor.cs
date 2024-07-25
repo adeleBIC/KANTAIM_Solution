@@ -175,7 +175,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                 }
                 else
                 {
-                    _snackService.Add("Scp scannez un bac !", Severity.Error);
+                    _snackService.Add("Svp scannez un bac !", Severity.Error);
                 }
             }
         }
@@ -228,13 +228,13 @@ namespace KANTAIM.WEB.Pages.Kanban
                     }
                     else
                     {
-                        _snackService.Add("Scp scannez un bac !", Severity.Error);
+                        _snackService.Add("Scannez un bac s'il vous plaît!", Severity.Error);
                     }
 
                 }
                 else
                 {
-                    _snackService.Add("Scp scannez un bac !", Severity.Error);
+                    _snackService.Add("Scannez un bac s'il vous plaît!", Severity.Error);
                 }
             }
         }
@@ -336,7 +336,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                         {
                             if (!cellList.Any(c => c.Cell.Id == container.CellStock.Id) )
                             {
-                                cellList.Add(new CellLog { Cell = container.CellStock, EventTime = logRescent.EventTime });
+                                cellList.Add(new CellLog { Cell = container.CellStock, EventTime = cellLog.EventTime });
                             }
                         }
                     }

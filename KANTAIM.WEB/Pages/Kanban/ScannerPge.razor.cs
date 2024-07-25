@@ -64,6 +64,7 @@ namespace KANTAIM.WEB.Pages.Kanban
 
         [JSInvokable]
         public static void CaptureInput(string input)
+        
         {
             _instance?.HandleInput(input);
         }

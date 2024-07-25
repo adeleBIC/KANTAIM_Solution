@@ -219,6 +219,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                 if (type == 3 && Number > 0) // scanner une press
                 {
                     PressScanner = _pressService.GetByNumber(Number);
+                    return;
                 }
                 else if (type == 2 && Number > 0) // scanner un machine inject pour initialiser
                 {
@@ -227,8 +228,12 @@ namespace KANTAIM.WEB.Pages.Kanban
                     {
                         _snackService.Add("Ce n'est pas une machine INK JET !", Severity.Error);
                         MachineScanner = null;
+                       
                     }
+                    return;
                 }
+
+                _snackService.Add("Svp scanner une presse ou machine INK JET!", Severity.Error);
             }
         }
 
