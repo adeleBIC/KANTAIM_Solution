@@ -122,7 +122,7 @@
                         <h3 style="color:red;"> Attention vous choisissez une zone maintenance </h3>
                     }
                     <div class="button-group">
-                        <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>cellScanner=null">RetourS</MudButton>
+                        <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>cellScanner=null">Retour</MudButton>
                         @if (cellScanner.IsMaintenance)
                         {
                             <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="()=>{fillstatus = 1;Exit(2); }">Valider</MudButton>
@@ -142,7 +142,7 @@
             @if (Id == 2)
             {
                 <div class="button-group">
-                    <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="() => Exit(3)">Passage en Directe</MudButton>
+                    <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="() => Exit(3)">Passage en Direct</MudButton>
                 </div>
             }
 
@@ -197,7 +197,7 @@
                            <div class="status-item">Produit: @product.Name</div> 
                         }
                         
-                        @if (colorOfProduct != null)
+                        @if (colorOfProduct != null) 
                         {
                             <div class="status-item">Couleur: @colorOfProduct.Name<MudIcon Icon="@Icons.Material.Filled.Circle" Style="@($"color:{colorOfProduct.ColorNumber};")" /></div>
                             
