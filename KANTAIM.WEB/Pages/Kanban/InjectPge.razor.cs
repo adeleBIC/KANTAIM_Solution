@@ -99,28 +99,32 @@ namespace KANTAIM.WEB.Pages.Kanban
 
         private void HandleInput(string input)
         {
-
-            if (input == "Enter" && currentUrl == pageUrl)
+            if (currentUrl == pageUrl)
             {
-                switch (state)
+                if (input == "Enter")
                 {
-                    case 2:
-                        machineScan(TextValue);
-                        break;
-                    case 3:
-                        contenaireScan(TextValue);
-                        break;
+                    switch (state)
+                    {
+                        case 2:
+                            machineScan(TextValue);
+                            break;
+                        case 3:
+                            contenaireScan(TextValue);
+                            break;
+                    }
+
+                    StateHasChanged();
+                    TextValue = null;
                 }
+                else
+                {
+                    TextValue += input;
+                    StateHasChanged();
 
-                StateHasChanged();
-                TextValue = null;
+                }
             }
-            else
-            {
-                TextValue += input;
-                StateHasChanged();
 
-            }
+            
         }
         void contenaireScan(string code)
         {
