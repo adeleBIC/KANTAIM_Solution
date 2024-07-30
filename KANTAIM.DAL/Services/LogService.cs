@@ -67,7 +67,6 @@ namespace KANTAIM.DAL.Services
                         else
                             item.MachineID = null;
                         item.Container = _repoContainer.GetById(item.ContainerID);
-                        item.Container.ContainerType = _repoContainerType.GetById(item.Container.ContainerTypeID);
                     }
                 }
                 return cache;
