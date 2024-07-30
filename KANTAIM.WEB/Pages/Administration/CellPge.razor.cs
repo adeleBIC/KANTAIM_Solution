@@ -21,24 +21,24 @@ namespace KANTAIM.WEB.Pages.Administration
 
         protected override async Task OnInitializedAsync()
         {
-            //RefreshData();
-            //CellStatus = new StatusCell().Status;
-            //foreach (var item in _cellService.GetAll())
-            //{
-            //    if (_contenaireService.CountCells(item.Id) == 0)
-            //    {
-            //        item.Status = 0;
-            //    }
-            //    else if (_contenaireService.CountCells(item.Id) < item.NbMax)
-            //    {
-            //        item.Status = 1;
-            //    }
-            //    else
-            //    {
-            //        item.Status = 2;
-            //    }
-            //    _cellService.Upsert(item);
-            //}
+            RefreshData();
+            CellStatus = new StatusCell().Status;
+            foreach (var item in _cellService.GetAll())
+            {
+                if (_contenaireService.CountCells(item.Id) == 0)
+                {
+                    item.Status = 0;
+                }
+                else if (_contenaireService.CountCells(item.Id) < item.NbMax)
+                {
+                    item.Status = 1;
+                }
+                else
+                {
+                    item.Status = 2;
+                }
+                _cellService.Upsert(item);
+            }
             await Task.Run(RefreshData);
         }
 

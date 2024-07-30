@@ -270,12 +270,12 @@ namespace KANTAIM.WEB.Pages.Kanban
                 if (ContainerScanner.ActionID != 0)
                 {
                     ContainerScanner = null;
-                    ContainerFeedback = "Contenaire n'est pas vide"; // Set feedback message
+                    _snackService.Add("Contenaire doit être vide pour l'initialiser sous la presse!", Severity.Error);
                 }
-                else
-                {
-                    ContainerFeedback = string.Empty; // Reset feedback message if the condition does not match
-                }
+
+            } else
+            {
+                _snackService.Add("Scannez une contenaire ou palette s'il vous plaît!", Severity.Error);
             }
 
         }

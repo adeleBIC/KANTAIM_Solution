@@ -431,7 +431,7 @@ namespace KANTAIM.WEB.Pages.Kanban
 
                         }
                         /*Verify the others products in this cell is the same type with the product in the contenaire we scan*/
-                        if(cellScanner != null)
+                        if(cellScanner != null && fillstatus > 1)
                         {
                             foreach (Container container in cellScanner.Containers)
                             {
