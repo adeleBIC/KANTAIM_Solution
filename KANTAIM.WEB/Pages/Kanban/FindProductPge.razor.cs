@@ -118,7 +118,7 @@ namespace KANTAIM.WEB.Pages.Kanban
         void findCells()
         {
             cells = new List<CellLog>();
-            foreach (Container container in _contenaireService.Cache.Where(c => c.CellStock != null))
+            foreach (Container container in _contenaireService.GetAll().Where(c => c.CellStock != null))
             {
                 logRescent = _logService.GetByContenaireByActionId(container.Id, 2);
                 if (logRescent != null && logRescent.ProductID == ProductScanner.Id)
@@ -160,7 +160,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                     if (int.TryParse(parts[1], out int containerNumber))
                     {
 
-                        ContainerScanner = _contenaireService.GetContainerByNumber(containerNumber).FirstOrDefault();
+                        ContainerScanner = _contenaireService.GetContainerByNumber(containerNumber);
                         logRescent = _logService.GetByContenaireId(ContainerScanner.Id);
                         containerProduct = _productService.GetById(logRescent.ProductID);
                         containerProdColor = _colorService.GetById(logRescent.ProdColorID);

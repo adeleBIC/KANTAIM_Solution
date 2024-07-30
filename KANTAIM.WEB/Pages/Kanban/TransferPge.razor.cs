@@ -115,7 +115,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                 else
                 {
                     int.TryParse(parts[1], out int Number);
-                    ContainerScanner = _contenaireService.GetContainerByNumber(Number).FirstOrDefault();
+                    ContainerScanner = _contenaireService.GetContainerByNumber(Number);
                     logRescent = _logService.GetByContenaireId(ContainerScanner.Id);
                 }
             }
@@ -135,7 +135,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                 else
                 {
                     int.TryParse(parts[1], out int Number);
-                    AutreScanner = _contenaireService.GetContainerByNumber(Number).FirstOrDefault();
+                    AutreScanner = _contenaireService.GetContainerByNumber(Number);
                     if (AutreScanner.FillStatus != 1)
                     {
                         _snackService.Add("Svp vérifier la Contenaire est vide.", Severity.Error);

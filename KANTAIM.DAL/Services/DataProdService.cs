@@ -1,4 +1,5 @@
 ﻿using KANTAIM.DAL.Model;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,21 +12,6 @@ namespace KANTAIM.DAL.Services
     {
         ProductService _productService;
         PressService _pressService;
-        private List<DataProd> cache;
-
-        public IEnumerable<DataProd> Cache
-        {
-            get
-            {
-                if (cache == null) cache = _repo.GetAll().ToList();
-                foreach (DataProd item in cache)
-                {
-                    item.Product = _productService.GetById(item.ProductID);
-                    item.Press = _pressService.GetById(item.PressID);
-                }
-                return cache;
-            }
-        }
 
         Repository<DataProd> _repo;
         public DataProdService(Repository<DataProd> _repo, ProductService productService, PressService pressService)
@@ -35,21 +21,15 @@ namespace KANTAIM.DAL.Services
             _pressService = pressService;
         }
 
-        public IEnumerable<DataProd> GetAll() => Cache;
-        public DataProd? GetById(int id) => Cache.SingleOrDefault(c => c.Id == id);
-        public void ResetCache() => cache = null;
-
-        public void UpSert(DataProd item)
+        public IEnumerable<DataProd> GetAll()
         {
-            ResetCache();
-            _repo.UpSert(item);
+            using DataKANTAIMContext ctx = new();
+            return ctx.DataProds.Include(c => c.Product).Include(c => c.Press).ToList();
         }
+        public DataProd? GetById(int id) => GetAll().SingleOrDefault(c => c.Id == id);
 
-        public void Delete(int id)
-        {
-            ResetCache();
-            _repo.Delete(id);
-        }
+        public void UpSert(DataProd item) => _repo.UpSert(item);
+        public void Delete(int id) => _repo.Delete(id);
 
         public IEnumerable<Product> GetAllProducts() => _productService.GetAll();
         public IEnumerable<Press> GetAllPresses() => _pressService.GetAll();

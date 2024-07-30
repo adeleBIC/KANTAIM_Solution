@@ -181,7 +181,7 @@ namespace KANTAIM.WEB.Pages.Kanban
         }
         void ContainerManage(int containerNumber)
         {
-            ContainerScanner = _contenaireService.GetContainerByNumber(containerNumber).FirstOrDefault();
+            ContainerScanner = _contenaireService.GetContainerByNumber(containerNumber);
             if (ContainerScanner.ContainerType.TypeNumber != 2 || ContainerScanner.FillStatus != 1)
             {
                 if (ContainerScanner.ContainerType.TypeNumber == 3) // S'il est palette, soit on fait stocker dans la cellule, soit on met bac dessus.
@@ -221,7 +221,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                 //int.TryParse(parts[2], out int ContenaireType);
                 if (type == 1)
                 {
-                    BacScanner = _contenaireService.GetContainerByNumber(BacNumber).FirstOrDefault();
+                    BacScanner = _contenaireService.GetContainerByNumber(BacNumber);
                     if (BacScanner.ContainerType.IsContainable)
                     {
                         TransferBacToPalette(BacScanner, ContainerScanner);
@@ -325,7 +325,7 @@ namespace KANTAIM.WEB.Pages.Kanban
         void findCells()
         {
             cellList = new List<CellLog>();
-            foreach (Container container in _contenaireService.Cache.Where(c => c.CellStock != null && c.ContainerType.IsContainable == false)) // recherche tous les contenaire qui est stockés dans la cellule, find all the contenaire who in currutly in the cell
+            foreach (Container container in _contenaireService.GetAll().Where(c => c.CellStock != null && c.ContainerType.IsContainable == false)) // recherche tous les contenaire qui est stockés dans la cellule, find all the contenaire who in currutly in the cell
             {
                 cellLog = _logService.GetByContenaireByActionId(container.Id, 2);
                 Cell? cellAct = _cellService.GetById(cellLog?.CellID ?? 0);

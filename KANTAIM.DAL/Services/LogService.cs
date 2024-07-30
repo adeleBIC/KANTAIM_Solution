@@ -1,5 +1,6 @@
 ﻿using Azure;
 using KANTAIM.DAL.Model;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -11,7 +12,6 @@ namespace KANTAIM.DAL.Services
 {
     public class LogService
     {
-        private List<Log> cache;
         Repository<Log> _repo;
         Repository<Product> _repoProduct;
         Repository<Container> _repoContainer;
@@ -33,59 +33,15 @@ namespace KANTAIM.DAL.Services
             _repoColor = repoColor;
             _repoCell = repoCell;
         }
-        public IEnumerable<Log> Cache
-        {
-            get
-            {
-                if (cache == null)
-                {
-                    cache = _repo.GetAll().ToList();
-                    foreach (Log item in cache)
-                    {
-                        if (item.ProductID.HasValue)
-                            item.ProductID = _repoProduct.GetById(item.ProductID.Value).Id;
-                        else
-                            item.ProductID = null;
-                        if (item.PressID.HasValue)
-                            item.PressID = _repoPress.GetById(item.PressID.Value).Id;
-                        else
-                            item.PressID = null;
-                        if (item.ShapeID.HasValue)
-                            item.ShapeID = _repoShape.GetById(item.ShapeID.Value).Id;
-                        else
-                            item.ShapeID = null;
-                        if (item.CellID.HasValue)
-                            item.CellID = _repoCell.GetById(item.CellID.Value).Id;
-                        else
-                            item.CellID = null;
-                        if (item.ProdColorID.HasValue)
-                            item.ProdColorID = _repoColor.GetById(item.ProdColorID.Value).Id;
-                        else
-                            item.ProdColorID = null;
-                        if (item.MachineID.HasValue)
-                            item.MachineID = _repoMachine.GetById(item.MachineID.Value).Id;
-                        else
-                            item.MachineID = null;
-                        item.Container = _repoContainer.GetById(item.ContainerID);
-                    }
-                }
-                return cache;
-            }
-        }
 
-        public IEnumerable<Log> GetAll() => Cache;
-        public void ResetCache() => cache = null;
-        public void UpSert(Log item)
+        public IEnumerable<Log> GetAll()
         {
-            ResetCache();
-            _repo.UpSert(item);
+            using DataKANTAIMContext ctx = new();
+            return ctx.Logs.Include(c => c.Product).Include(c => c.Press).Include(c => c.Shape).Include(c => c.Cell).Include(c => c.ProdColor).Include(c => c.Machine).Include(c => c.Container).ThenInclude(x=>x.ContainerType).ToList();
         }
+        public void UpSert(Log item) => _repo.UpSert(item);
 
-        public void Delete(int id)
-        {
-            ResetCache();
-            _repo.Delete(id);
-        }
+        public void Delete(int id) => _repo.Delete(id);
         public IEnumerable<Container> GetAllContainer() => _repoContainer.GetAll();
         public IEnumerable<Product> GetAllProduct() => _repoProduct.GetAll();
         public IEnumerable<Cell> GetAllCell() => _repoCell.GetAll();
@@ -94,7 +50,7 @@ namespace KANTAIM.DAL.Services
         public IEnumerable<ProdColor> GetAllColor() => _repoColor.GetAll();
         public IEnumerable<Machine> GetAllMachine() => _repoMachine.GetAll();
 
-        public Log? GetByContenaireId(int id) => Cache.OrderByDescending(u => u.EventTime).FirstOrDefault(c => c.ContainerID == id);
-        public Log? GetByContenaireByActionId(int contId, int opeId) => Cache.Where(u=>u.Operation == opeId).OrderByDescending(u => u.EventTime).FirstOrDefault(c => c.ContainerID == contId);
+        public Log? GetByContenaireId(int id) => GetAll().OrderByDescending(u => u.EventTime).FirstOrDefault(c => c.ContainerID == id);
+        public Log? GetByContenaireByActionId(int contId, int opeId) => GetAll().Where(u=>u.Operation == opeId).OrderByDescending(u => u.EventTime).FirstOrDefault(c => c.ContainerID == contId);
     }
 }

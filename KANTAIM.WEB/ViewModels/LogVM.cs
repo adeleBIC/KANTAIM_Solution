@@ -43,6 +43,13 @@ namespace KANTAIM.WEB.ViewModels
             colorID = model.ProdColorID;
             machineID = model.MachineID;
             comment = model.Comment;
+            container = model.Container;
+            product = model.Product ?? new Product();
+            press = model.Press ?? new Press();
+            shape = model.Shape ?? new Shape();
+            cell = model.Cell ?? new Cell();
+            prodColor = model.ProdColor ?? new ProdColor();
+            machine = model.Machine ?? new Machine();
 
         }
 
@@ -87,12 +94,28 @@ namespace KANTAIM.WEB.ViewModels
             set { containerID = value; IsEditing = true; }
         }
 
+        [Label("Container")]
+        private Container container;
+        public Container Container
+        {
+            get { return container; }
+            set { container = value; }
+        }
+
         [Label("FKTProductID")]
         private int? productID;
         public int? ProductID
         {
             get { return productID; }
             set { productID = value; IsEditing = true; }
+        }
+
+        [Label("Product")]
+        private Product product;
+        public Product Product
+        {
+            get { return product; }
+            set { product = value; }
         }
 
         [Label("FKTPressID")]
@@ -103,12 +126,28 @@ namespace KANTAIM.WEB.ViewModels
             set { pressID = value; IsEditing = true; }
         }
 
+        [Label("Presse")]
+        private Press press;
+        public Press Press
+        {
+            get { return press; }
+            set { press = value; }
+        }
+
         [Label("FKTShapeID")]
         private int? shapeID;
         public int? ShapeID
         {
             get { return shapeID; }
             set { shapeID = value; IsEditing = true; }
+        }
+
+        [Label("Moule")]
+        private Shape shape;
+        public Shape Shape
+        {
+            get { return shape; }
+            set { shape = value; }
         }
 
         [Label("FKTCellID")]
@@ -119,12 +158,28 @@ namespace KANTAIM.WEB.ViewModels
             set { cellID = value; IsEditing = true; }
         }
 
+        [Label("Cellule")]
+        private Cell cell;
+        public Cell Cell
+        {
+            get { return cell; }
+            set { cell = value; }
+        }
+
         [Label("FKTColorID")]
         private int? colorID;
         public int? ColorID
         {
             get { return colorID; }
             set { colorID = value; IsEditing = true; }
+        }
+
+        [Label("Couleur")]
+        private ProdColor prodColor;
+        public ProdColor ProdColor
+        {
+            get { return prodColor; }
+            set { prodColor = value; }
         }
 
         [Label("FKTMachineID")]
@@ -135,7 +190,13 @@ namespace KANTAIM.WEB.ViewModels
             set { machineID = value; IsEditing = true; }
         }
 
-
+        [Label("Machine")]
+        private Machine machine;
+        public Machine Machine
+        {
+            get { return machine; }
+            set { machine = value; }
+        }
 
         private string? comment;
         [Label("Commentaire")]

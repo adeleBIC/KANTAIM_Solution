@@ -33,7 +33,7 @@ namespace KANTAIM.WEB.Pages.Kanban
 
         protected override void OnInitialized()
         {
-            ContainerScanner = _contenaireService.GetContainerByNumber(Number).FirstOrDefault();
+            ContainerScanner = _contenaireService.GetContainerByNumber(Number);
             if(ContainerScanner.ContainerType.Name == "Palette" && _contenaireService.CountBac(ContainerScanner.Id) != 0)// S'il est palette et n'est pas vide, on interdit cette opération
             {
                 correct = false;
@@ -59,7 +59,7 @@ namespace KANTAIM.WEB.Pages.Kanban
 
         void VerifyPalette(int paletteNumber)
         {
-            PaletteScanner = _contenaireService.GetContainerByNumber(paletteNumber).FirstOrDefault();
+            PaletteScanner = _contenaireService.GetContainerByNumber(paletteNumber);
             if(_contenaireService.CountBac(PaletteScanner.Id) == 0) // s'il n'y a plus de bac sur la palette
             {
                 PaletteScanner.ActionID = 0; // Stocké Vide

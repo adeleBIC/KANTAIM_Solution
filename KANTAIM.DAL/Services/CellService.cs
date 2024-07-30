@@ -10,24 +10,8 @@ namespace KANTAIM.DAL.Services
 {
     public class CellService
     {
-        private List<Cell> cache;
         Repository<Cell> _repo;
         Repository<Container> _repoContainer;
-
-        public IEnumerable<Cell> Cache
-        {
-            get
-            {
-                if (cache == null)
-                {
-                    //cache = _repo.GetAll().ToList();
-                    using DataKANTAIMContext ctx = new();
-                    cache = ctx.Cells.Include(c => c.Containers).ToList();
-                }
-
-                return cache;
-            }
-        }
 
         public CellService(Repository<Cell> repo, Repository<Container> repoContainer)
         {
@@ -35,26 +19,34 @@ namespace KANTAIM.DAL.Services
             _repoContainer = repoContainer;
         }
 
-        public IEnumerable<Cell> GetAll() => Cache;
-        public Cell? GetById(int? id) => id == null ? null : Cache.SingleOrDefault(x => x.Id == id);
-        public Cell? GetByNumber(string n) => Cache.SingleOrDefault(x => x.Name == n);
-        public Cell? GetByXY(int X, int Y) => Cache.SingleOrDefault(x => x.X == X && x.Y == Y);
-
+        public IEnumerable<Cell> GetAll()
+        {
+            using DataKANTAIMContext ctx = new();
+            return ctx.Cells.Include(c => c.Containers).ToList();
+        }
+        public Cell? GetById(int? id)
+        {
+            using DataKANTAIMContext ctx = new();
+            return id == null ? null : ctx.Cells.Include(c => c.Containers).SingleOrDefault(x => x.Id == id); ;
+        }
+        public Cell? GetByNumber(string n)
+        {
+            using DataKANTAIMContext ctx = new();
+            return ctx.Cells.Include(c => c.Containers).SingleOrDefault(x => x.Name == n);
+        }
+        public Cell? GetByXY(int X, int Y)
+        {
+            using DataKANTAIMContext ctx = new();
+            return ctx.Cells.Include(c => c.Containers).SingleOrDefault(x => x.X == X && x.Y == Y);
+        }
 
         public int GetContainerCount(int cellId)
         {
             return _repoContainer.GetAll().Count(c => c.CellId == cellId && (c.ContainerTypeID == 1 || c.ContainerTypeID == 3));// conpte juste le contenaire normal et palette
         }
-        public void ResetCache() => cache = null;
-        public void Upsert(Cell item)
-        {
-            ResetCache();
-            _repo.UpSert(item);
-        }
-        public void Delete(int id)
-        {
-            ResetCache();
-            _repo.Delete(id);
-        }
+
+        public void Upsert(Cell item) => _repo.UpSert(item);
+        public void Delete(int id) => _repo.Delete(id);
+
     }
 }

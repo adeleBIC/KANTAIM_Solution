@@ -99,7 +99,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                                         if (int.TryParse(c, out int containerNumber))
                                         {
 
-                                            ContainerScanner = _contenaireService.GetContainerByNumber(containerNumber).FirstOrDefault();
+                                            ContainerScanner = _contenaireService.GetContainerByNumber(containerNumber);
                                             if (ContainerScanner != null)
                                             {
                                                 switch (ContainerScanner.ActionID)

@@ -70,7 +70,7 @@ namespace KANTAIM.WEB.Pages.Kanban
             {
                 //Scanner le contenaire
                 case 1:
-                    ContainerScanner = _contenaireService.GetContainerByNumber(Number).FirstOrDefault();
+                    ContainerScanner = _contenaireService.GetContainerByNumber(Number);
                     logRescent = _logService.GetByContenaireId(ContainerScanner.Id);
                     product = _productService.GetById(logRescent.ProductID.Value);
                     prodColor = _colorService.GetById(logRescent.ProdColorID);
@@ -138,7 +138,7 @@ namespace KANTAIM.WEB.Pages.Kanban
             else
             {
                 int.TryParse(parts[1], out int Container);
-                ContainerScanner = _contenaireService.GetContainerByNumber(Container).FirstOrDefault();
+                ContainerScanner = _contenaireService.GetContainerByNumber(Container);
                 if (ContainerScanner.ActionID != 3)
                 {
                     _snackService.Add("Svp scanner le QR code de la contenaire qui a sortie de rack avec produits.", Severity.Error);

@@ -83,7 +83,7 @@ namespace KANTAIM.WEB.Pages.Kanban
             switch (Id)
             {
                 case 0:
-                    ContainerScanner = _contenaireService.GetContainerByNumber(Number).FirstOrDefault();
+                    ContainerScanner = _contenaireService.GetContainerByNumber(Number);
                     if (ContainerScanner.ContainerType.IsContainable) // Quand on scan le bac
                     {
                         BacInitialisation = true;
@@ -152,7 +152,7 @@ namespace KANTAIM.WEB.Pages.Kanban
 
                 if (type == 1)
                 {
-                    PaletteScanner = _contenaireService.GetContainerByNumber(PaletteNumber).FirstOrDefault();
+                    PaletteScanner = _contenaireService.GetContainerByNumber(PaletteNumber);
                     if (PaletteScanner.ActionID == 0) // On ne peux pas mettre une bac vide dans une palette, on ne peux pas mettre un bac dans une palette qu'il n'as pas été initialisé.
                     {
                         _snackService.Add("Svp initialisez palette d'abord!", Severity.Error);
@@ -266,7 +266,7 @@ namespace KANTAIM.WEB.Pages.Kanban
 
             if (type == 1 && ContainerNumber > 0)
             {
-                ContainerScanner = _contenaireService.GetContainerByNumber(ContainerNumber).FirstOrDefault();
+                ContainerScanner = _contenaireService.GetContainerByNumber(ContainerNumber);
                 // Vérifier si le Contenaire que l'on veut initialiser est bien vide
                 if (ContainerScanner.ActionID != 0)
                 {

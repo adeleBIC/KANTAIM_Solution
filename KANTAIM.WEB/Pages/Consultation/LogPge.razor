@@ -17,13 +17,13 @@
 @if (Logs != null)
 {
     /* ReadOnly=true si on voudrais log ne peux pas etre modifié */
-    <MudDataGrid T="LogVM" RowClassFunc="RowClassFct" Items="@Logs" Dense=true Hover=true ReadOnly=false EditMode="MudBlazor.DataGridEditMode.Cell"
+    <MudDataGrid T="LogVM" RowClassFunc="RowClassFct" Items="@Logs" Dense=true Hover=true ReadOnly=true EditMode="MudBlazor.DataGridEditMode.Cell"
                  Virtualize="true" SelectOnRowClick=false MultiSelection=true SelectedItemsChanged="SelectionChanged" Bordered=true
                  Filterable="true" SortMode="SortMode.Multiple" Hideable="false" QuickFilter="@_quickFilter">
         <ToolBarContent>
-            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Save" OnClick="SaveAsync" Color="Color.Primary"></MudIconButton>
+@*             <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Save" OnClick="SaveAsync" Color="Color.Primary"></MudIconButton>
             <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Delete" OnClick="DeleteAsync" Color="Color.Error"></MudIconButton>
-            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Cancel" OnClick="CancelAsync" Color="Color.Primary"></MudIconButton>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Cancel" OnClick="CancelAsync" Color="Color.Primary"></MudIconButton> *@
             <MudSpacer />
             <MudTextField @bind-Value="_searchString" Placeholder="Recherche Container" Adornment="Adornment.Start" Immediate="true"
                           AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
@@ -32,115 +32,65 @@
         <Columns>
             <SelectColumn ShowInFooter=false />
             <PropertyColumn Property="x => x.EventTime" Title="Date" Class="wide-column">
-                <EditTemplate>
+                <CellTemplate>
                     <MudTextField @bind-Value="context.Item.EventTime" Format="dd/MM/yyyy HH:mm:ss" />
-                </EditTemplate>
+                </CellTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.ContainerID" Title="Contenaire">
-                <EditTemplate>
-                    <MudSelect T=int @bind-Value="context.Item.ContainerID">
-                        @foreach (var f in context.Item.Containers.OrderBy(p => p.Number))
-                        {
-                            <MudSelectItem T=int Value="@f.Id">@f.ContainerType?.Name - @f.Number</MudSelectItem>
-                        }
-                    </MudSelect>
-                </EditTemplate>
+            <PropertyColumn Property="x => x.Container.Number" Title="Contenaire">
+                <CellTemplate>
+                    @context.Item.Container.ContainerType.Name - @context.Item.Container.Number
+                </CellTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.Operation" Title="Action">
-                <EditTemplate>
-                    <MudSelect T=int @bind-Value="context.Item.Operation">
-                        @foreach (var f in Actions)
-                        {
-                            <MudSelectItem Value="@f.Key">@f.Value</MudSelectItem>
-                        }
-                    </MudSelect>
-                </EditTemplate>
+            <PropertyColumn Property="x => x.Operation.ToString()" Title="Action">
+                <CellTemplate>
+                    @Actions[context.Item.Operation]
+                </CellTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.FillStatus" Title="Remplissage">
-                <EditTemplate>
-                    <MudSelect T=int @bind-Value="context.Item.FillStatus">
-                        @foreach (var f in ContainerStatus)
-                        {
-                            <MudSelectItem Value="@f.Key">@f.Value</MudSelectItem>
-                        }
-                    </MudSelect>
-                </EditTemplate>
+            <PropertyColumn Property="x => x.FillStatus.ToString()" Title="Remplissage">
+                <CellTemplate>
+                    @ContainerStatus[context.Item.FillStatus]
+                </CellTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.ContainerID" Title="Conditioné dans">
-                <EditTemplate>
-                    <MudSelect T=int @bind-Value="context.Item.ContainerID">
-                        @foreach (Container f in context.Item.Containers)
-                        {
-                            <MudSelectItem T=int Value="@f.Id">@f.Number</MudSelectItem>
-                        }
-                    </MudSelect>
-                </EditTemplate>
+            <PropertyColumn Property="x => x.Container.Number" Title="Conditioné dans">
+                <CellTemplate>
+                    @context.Item.Container.Number
+                </CellTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.CellID" Title="Cellule">
-                <EditTemplate>
-                    <MudSelect T=int? @bind-Value=context.Item.CellID>
-                        @foreach (var f in context.Item.Cells.OrderBy(p => p.Name))
-                        {
-                            <MudSelectItem T=int? Value="@f.Id">@f.Name</MudSelectItem>
-                        }
-                    </MudSelect>
-                </EditTemplate>
+            <PropertyColumn Property="x => x.Cell.Name" Title="Cellule">
+                <CellTemplate>
+                    @context.Item.Cell.Name
+                </CellTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.ProductID" Title="Produit">
-                <EditTemplate>
-                    <MudSelect T=int? @bind-Value="context.Item.ProductID">
-                        @foreach (var f in context.Item.Products)
-                        {
-                            <MudSelectItem T=int? Value="@f.Id">@f.Name</MudSelectItem>
-                        }
-                    </MudSelect>
-                </EditTemplate>
+            <PropertyColumn Property="x => x.Product.Name" Title="Produit">
+                <CellTemplate>
+                    @context.Item.Product.Name
+                </CellTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.ColorID" Title="Couleur">
-                <EditTemplate>
-                    <MudSelect T=int? @bind-Value="context.Item.ColorID">
-                        @foreach (var f in context.Item.Colors)
-                        {
-                            <MudSelectItem T=int? Value="@f.Id">@f.Name</MudSelectItem>
-                        }
-                    </MudSelect>
-                </EditTemplate>
+            <PropertyColumn Property="x => x.ProdColor.Name" Title="Couleur">
+                <CellTemplate>
+                    @context.Item.ProdColor.Name
+                </CellTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.PressID" Title="Presse">
-                <EditTemplate>
-                    <MudSelect T=int? @bind-Value="context.Item.PressID">
-                        @foreach (var f in context.Item.Presses.OrderBy(p => p.Number))
-                        {
-                            <MudSelectItem T=int? Value="@f.Id">@f.Number</MudSelectItem>
-                        }
-                    </MudSelect>
-                </EditTemplate>
+            <PropertyColumn Property="x => x.Press.Number" Title="Presse">
+                <CellTemplate>
+                    @context.Item.Press.Number
+                </CellTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.ShapeID" Title="Moule">
-                <EditTemplate>
-                    <MudSelect T=int? @bind-Value="context.Item.ShapeID">
-                        @foreach (var f in context.Item.Shapes.OrderBy(p => p.Number))
-                        {
-                            <MudSelectItem T=int? Value="@f.Id">@f.Number - @f.Name</MudSelectItem>
-                        }
-                    </MudSelect>
-                </EditTemplate>
+            <PropertyColumn Property="x => x.Shape.Name" Title="Moule">
+                <CellTemplate>
+                    @context.Item.Shape.Number - @context.Item.Shape.Name
+                </CellTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.MachineID" Title="Machine">
-                <EditTemplate>
-                    <MudSelect T=int? @bind-Value="context.Item.MachineID">
-                        @foreach (var f in context.Item.Machines.OrderBy(p => p.Number))
-                        {
-                            <MudSelectItem T=int? Value="@f.Id">@f.Name</MudSelectItem>
-                        }
-                    </MudSelect>
-                </EditTemplate>
+            <PropertyColumn Property="x => x.Machine.Name" Title="Machine">
+                <CellTemplate>
+                    @context.Item.Machine.Name
+                </CellTemplate>
             </PropertyColumn>
             
             <PropertyColumn Property="x => x.Comment" Title="Commentaire" Required=false />
         </Columns>
         <PagerContent>
-            <MudDataGridPager T="LogVM" PageSizeOptions="@(new int[] {10, 30, 50,100})" />
+            <MudDataGridPager T="LogVM" PageSizeOptions="@(new int[] {13, 30, 50,100})" />
         </PagerContent>
     </MudDataGrid>
 }
