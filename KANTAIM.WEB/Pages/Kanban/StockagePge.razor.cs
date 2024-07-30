@@ -402,7 +402,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                 }
 
 
-                if (cellScanner == cellPropose)
+                if (cellScanner.Id == cellPropose.Id)
                 {
                     Exit(2);
                 }
