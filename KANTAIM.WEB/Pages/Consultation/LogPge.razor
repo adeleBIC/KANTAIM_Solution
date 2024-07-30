@@ -86,7 +86,7 @@
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.ProductID" Title="Product">
+            <PropertyColumn Property="x => x.ProductID" Title="Produit">
                 <EditTemplate>
                     <MudSelect T=int? @bind-Value="context.Item.ProductID">
                         @foreach (var f in context.Item.Products)
@@ -96,7 +96,7 @@
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.ColorID" Title="Colors">
+            <PropertyColumn Property="x => x.ColorID" Title="Couleur">
                 <EditTemplate>
                     <MudSelect T=int? @bind-Value="context.Item.ColorID">
                         @foreach (var f in context.Item.Colors)
@@ -106,7 +106,7 @@
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.PressID" Title="Press">
+            <PropertyColumn Property="x => x.PressID" Title="Presse">
                 <EditTemplate>
                     <MudSelect T=int? @bind-Value="context.Item.PressID">
                         @foreach (var f in context.Item.Presses.OrderBy(p => p.Number))
@@ -116,7 +116,7 @@
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.ShapeID" Title="Shape">
+            <PropertyColumn Property="x => x.ShapeID" Title="Moule">
                 <EditTemplate>
                     <MudSelect T=int? @bind-Value="context.Item.ShapeID">
                         @foreach (var f in context.Item.Shapes.OrderBy(p => p.Number))

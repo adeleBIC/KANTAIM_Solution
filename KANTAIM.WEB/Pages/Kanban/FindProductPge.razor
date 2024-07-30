@@ -6,125 +6,105 @@
 @using static MudBlazor.Icons
 @using Microsoft.AspNetCore.Components.Routing
 
-<h1>Recherche le produit</h1>
-
+<div class="main-container">
+    <div class="pageTitle">
+        <MudText Typo="Typo.h4">Recherche le produit dans une cellule</MudText>
+    </div>
 
     @if (cellPropose != null)
     {
-        <div class="display-container">
-            <div class="display-container">
-        <h3 class="title">Cellule proposée: @cellPropose.Name</h3>
-                <div>
-                    @* <MudTextField @bind-Value="ContainerValue" AutoFocus="true" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="ContainerScan"></MudTextField> *@
-                    <MudButton Class="bouton" OnClick="ToggleCellList" Variant="MudBlazor.Variant.Filled" >
-                        @(ShowAllCells ? "Masquer" : "Afficher autres contenaires")
-                    </MudButton>
-                </div>
-                <h3>Scannez le contenaire s'il vous plaît</h3>
-                <MudText> @TextValue</MudText>
+        <div class="content">
+            <h3 class="title">Cellule proposée: @cellPropose.Name</h3>
+            <div>
+                @* <MudTextField @bind-Value="ContainerValue" AutoFocus="true" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="ContainerScan"></MudTextField> *@
+                <MudButton Class="bouton" OnClick="ToggleCellList" Variant="MudBlazor.Variant.Filled" Style="margin-top: 20px;">
+                    @(ShowAllCells ? "Masquer" : "Afficher autres contenaires")
+                </MudButton>
             </div>
-        </div>
+            <h3 class="title">Scannez le contenaire s'il vous plaît</h3>
+            <MudText> @TextValue</MudText>
+            </div>
     }
     else if (cells != null && cells.Count == 0)
     {
-        <div class="display-container">
-            <h3 class="title">
+        <div class="content">
             Il n'y a pas <b>@ProductScanner.Name</b> en
             @if (ColorChoose != null)
             {
                 <b style="@($"color:{ColorChoose.Name};")">@ColorChoose.Name</b>
             }
-
             stocké dans la cellule
-        </h3>
         </div>
     }
 
     @if (cells != null && cells.Count > 0)
     {
-        <div class="display-container">
         @if (ShowAllCells)
         {
-            
+            <div class="content">
                 @foreach (var cellLog in cells)
                 {
-                    <div class="status-item">
-                        Cellule: @cellLog.Cell.Name (Stockée le: @cellLog.EventTime)
-                    </div>
+                    <h3 class="title">Cellule: @cellLog.Cell.Name (Stockée le: @cellLog.EventTime)</h3>
                 }
-           
+            </div>
         }
-        </div>
     }
 
     @if (cells == null)
     {
-        <div class="display-container">
-        <div class="status-display">
-            <div class="status-item">
-                <br>Produit : @ProductScanner.Name
-            </div>
+        <div class="content">
+            <br>Produit : @ProductScanner.Name
+            <h3>Choisissez la couleur svp</h3>
         </div>
-        <h3 class="title">Choisissez la couleur s'il vous plaît</h3>
-        </div>
+
         @if (Colors != null)
         {
-            @foreach (var color in Colors)
-            {
-                <div class="colors-container">
+            <div class="colors-container">
+                @foreach (var color in Colors)
+                {
                     <MudButton Class="bouton" Style="@($"background: {color.ColorNumber};")" OnClick="() => ColorSelected(color.Id)" Variant="MudBlazor.Variant.Filled">
                         @color.Name
                     </MudButton>
-                </div>
-            }
+                }
+            </div>
         }
-        
-    <div class="button-group">
+        <div class="button-container">
             <MudButton Class="bouton" OnClick="GoBack" Color="Color.Error" Variant="MudBlazor.Variant.Filled">Retour</MudButton>
         </div>
     }
+</div>
 
 <style>
     .main-container {
+        display: flex;
+        flex-direction: column;
         padding: 10px;
-        font-family: 'Roboto', sans-serif;
     }
 
-    .selection-container, .display-container {
-        background-color: #FFFFFF;
-        border-radius: 10px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        padding: 20px;
-        margin-bottom: 10px;
-    }
-
-    .title {
+    .pageTitle {
         text-align: center;
         margin-bottom: 20px;
     }
 
-    .status-display, .status-item {
-        color: #555555;
-        margin: 5px 0;
-        padding: 5px;
-        background-color: #f2f2f2;
-        border-radius: 5px;
-    }
-
-    .button-group {
+    .content {
+        flex: 1;
         display: flex;
-        justify-content: space-evenly;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        overflow-y: auto;
     }
 
-    .fillstatus-container {
-        text-align: center;
+    .button-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
     }
-
 
     .bouton {
         width: 120px;
         height: 50px;
-        margin: 5px;
+        margin: 10px;
         font-size: 16px;
     }
 
@@ -138,5 +118,9 @@
         overflow-y: auto; /* Enable vertical scroll */
         max-height: 150px;
         width: 100%;
+    }
+
+    .title {
+        text-align: center;
     }
 </style>
