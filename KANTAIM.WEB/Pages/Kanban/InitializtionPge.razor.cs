@@ -254,6 +254,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                     Colors.Add(_colorService.GetById(colorProduct.ColorID));
                 }
             }
+            Colors = Colors.OrderBy(x => x.Name).ToList();
             
         }
         void ContainerScan(string code)
