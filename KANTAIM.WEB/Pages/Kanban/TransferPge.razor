@@ -66,14 +66,14 @@
         <div class="display-container">
 
             <h3 class="title">
-                Bien Transfer
+                Bien Transféré
             </h3>
         </div>
         break;
     
     case 2:
         <div class="display-container">
-            <h3 class="title">Svp Scannez une autre contenaire que vous voulez transfer</h3>
+            <h3 class="title">Svp Scannez un autre contenaire dans le quel vous voulez transférer</h3>
             <MudText> @TextValue</MudText>
             @* <div>
                 <MudTextField @bind-Value="autreValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" ></MudTextField>
@@ -85,7 +85,7 @@
         break;
     case 1 :
         <div class="display-container">
-            <h3 class="title">Transfer @ContainerScanner.Number to @AutreScanner.Number</h3>
+            <h3 class="title">Transfert du @ContainerScanner.Number vers @AutreScanner.Number</h3>
         </div>
         <div class="button-group">
             <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>AutreScanner=null">Retour</MudButton>
@@ -94,7 +94,7 @@
         break;
     case 0 :
         <div class="display-container">
-            <h3 class="title">Svp Scannez la contenaire que vous voulez transfer</h3>
+            <h3 class="title">Svp Scannez le contenaire que vous voulez transférer</h3>
             <MudText> @TextValue</MudText>
             @* <div>
                 <MudTextField @bind-Value="ContainerValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true"></MudTextField>

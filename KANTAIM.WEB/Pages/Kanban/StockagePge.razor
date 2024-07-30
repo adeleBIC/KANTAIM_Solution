@@ -84,7 +84,7 @@
     case 3: @if (ContainerScanner == null)
         {
             <h3 class="title">
-                Svp Scannez la contenaire
+                Svp Scannez le contenaire
             </h3>
             <MudText> @TextValue</MudText>
             @* <MudTextField @bind-Value="ContainerValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="ContainerScan"></MudTextField> *@
@@ -168,7 +168,7 @@
                     <h3 class="redtitle">
                         @cellPropose.Name
                     </h3>
-                    <h3 class="title">Scanner la cellule correspondant s'il vous plait</h3>
+                    <h3 class="title">Scannez la cellule correspondant s'il vous plait</h3>
                     <MudText> @TextValue</MudText>
                    @*  <div>
                         <MudTextField @bind-Value="CellValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="cellScan"></MudTextField>
@@ -220,7 +220,7 @@
                 <MudText> @TextValue</MudText>
             }
             <div class="fillstatus-container">
-                <h3 class="title">Ou choisissez l'état de remplissage s'il vous plait</h3>
+                <h3 class="title">Choisissez l'état de remplissage s'il vous plait</h3>
                 <div class="button-group">
                     @if (Id == 1)
                     {

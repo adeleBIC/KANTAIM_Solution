@@ -76,57 +76,58 @@
     {
         case 0: //Scan du contenaire
             <div class="display-container">
-                <h3 class="title">Scanner le contenaire s'il vous plait</h3>
                 <div class="status-display">
+                    <div class="status-item">Press: @PressScanner.Number</div>
                     <div class="status-item">Moule : @PressScanner.Shape.Name</div>
                     <div class="status-item">Produit : @PressScanner.Shape.Product.Name</div>
-                    <div class="status-item">Press: @PressScanner.Number</div>
                     <MudText> @TextValue</MudText>
-                    </div>
                 </div>
+                <h3 class="title">Scanner le contenaire s'il vous plait</h3>
+            </div>
+       
             break;
 
         case 1: //Scan la palette
             <div class="display-container">
-                <h3 class="title">Scanner la palette s'il vous plait</h3>
                 <div class="status-display">
                     <div class="status-item">Bac scanné: @ContainerScanner.Number</div>
                     <MudText> @TextValue</MudText>
-                    </div>
                 </div>
-
+                <h3 class="title">Scanner la palette s'il vous plait</h3>
+            </div>      
             break;
 
         case 2: //Scan de la presse
             <div class="display-container">
-                <h3 class="title">Scanner la presse s'il vous plait</h3>
                 <div class="status-display">
                     <div class="status-item">Contenaire scanné: @ContainerScanner.Number</div>
                     <MudText> @TextValue</MudText>
-                    </div>
                 </div>
+                <h3 class="title">Scanner la presse s'il vous plait</h3>
+            </div>
             break;
 
         case 3: //Selection de la couleur
             <div class="display-container">
-                <h3 class="title">Choisissez la couleur s'il vous plait</h3>
                 <div class="status-display">
-                @if(PressScanner != null)
-                {
-                    <div class="status-item">Moule : @PressScanner.Shape.Name<br />
-                        Produit : @PressScanner.Shape.Product.Name<br />
-                        Press : @PressScanner.Number<br />
-                        Contenaire: @ContainerScanner?.Number
-                    </div>
-                }
+                    @if(PressScanner != null)
+                    {
+                        <div class="status-item">
+                            Press : @PressScanner.Number<br />
+                            Moule : @PressScanner.Shape.Name<br />
+                            Produit : @PressScanner.Shape.Product.Name<br />
+                            Contenaire: @ContainerScanner?.Number
+                        </div>
+                    }
 
-                @if(MachineScanner != null)
-                {
-                    <div class="status-item">Machine : @MachineScanner.Name<br />
-                        Produit : @MachineScanner.Product?.Name<br />
-                        Contenaire: @ContainerScanner?.Number
-                    </div>
-                }
+                    @if(MachineScanner != null)
+                    {
+                        <div class="status-item">Machine : @MachineScanner.Name<br />
+                            Produit : @MachineScanner.Product?.Name<br />
+                            Contenaire: @ContainerScanner?.Number
+                        </div>
+                    }
+                    <h3 class="title">Choisissez la couleur s'il vous plait</h3>
                 </div>
             </div>
 

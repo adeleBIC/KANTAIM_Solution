@@ -18,10 +18,10 @@
             <div>
                 @* <MudTextField @bind-Value="ContainerValue" AutoFocus="true" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="ContainerScan"></MudTextField> *@
                 <MudButton Class="bouton" OnClick="ToggleCellList" Variant="MudBlazor.Variant.Filled" Style="margin-top: 20px;">
-                    @(ShowAllCells ? "Masquer" : "Afficher")
+                    @(ShowAllCells ? "Masquer" : "Afficher autres contenaires")
                 </MudButton>
             </div>
-            <h3 class="title">Scannez la contenaire s'il vous plaît</h3>
+            <h3 class="title">Scannez le contenaire s'il vous plaît</h3>
             <MudText> @TextValue</MudText>
             </div>
     }

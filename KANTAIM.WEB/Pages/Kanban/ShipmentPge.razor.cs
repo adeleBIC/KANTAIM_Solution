@@ -38,7 +38,7 @@ namespace KANTAIM.WEB.Pages.Kanban
             {
                 correct = false;
                 NavigationManager.NavigateTo($"/ScannerPge");
-                _snackService.Add("Opération interdit!", Severity.Error);
+                _snackService.Add("Scannez les bacs à la place de la palette", Severity.Error);
                 
             }
             if (ContainerScanner.ContainerTypeID == 2) //s'il est un bac 

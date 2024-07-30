@@ -377,7 +377,7 @@ namespace KANTAIM.WEB.Pages.Kanban
 
             if (type != 4)
             {
-                _snackService.Add("Svp scanner le QR code de la cellule.", Severity.Error);
+                _snackService.Add("Svp scannez le QR code de la cellule.", Severity.Error);
             }
             else
             {
@@ -396,7 +396,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                     }
                     else
                     {
-                        _snackService.Add("Svp scanner le QR code de la maintenance.", Severity.Error);
+                        _snackService.Add("Svp scannez le QR code de la maintenance.", Severity.Error);
                     }
 
                 }
@@ -438,7 +438,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                                 containerLog = _logService.GetByContenaireByActionId(container.Id, 2);
                                 if (containerLog?.ProductID != product.Id || containerLog.ProdColorID != colorOfProduct.Id)
                                 {
-                                    _snackService.Add("Attention la produit n'est pas correcte.", Severity.Error);
+                                    _snackService.Add("Attention le produit déjà stocké n'est pas identique.", Severity.Error);
                                     cellScanner = null;
                                     return;
                                 }
