@@ -6,56 +6,66 @@
 @using static MudBlazor.Icons
 @using Microsoft.AspNetCore.Components.Routing
 
-<div class="main-container">
-    <div class="pageTitle">
-        <MudText Typo="Typo.h4">Recherche le produit dans une cellule</MudText>
-    </div>
+<h1>Recherche le produit</h1>
+
 
     @if (cellPropose != null)
     {
-        <div class="content">
-            <h3 class="title">Cellule proposée: @cellPropose.Name</h3>
-            <div>
-                @* <MudTextField @bind-Value="ContainerValue" AutoFocus="true" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="ContainerScan"></MudTextField> *@
-                <MudButton Class="bouton" OnClick="ToggleCellList" Variant="MudBlazor.Variant.Filled" Style="margin-top: 20px;">
-                    @(ShowAllCells ? "Masquer" : "Afficher autres contenaires")
-                </MudButton>
+        <div class="display-container">
+            <div class="display-container">
+        <h3 class="title">Cellule proposée: @cellPropose.Name</h3>
+                <div>
+                    @* <MudTextField @bind-Value="ContainerValue" AutoFocus="true" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="ContainerScan"></MudTextField> *@
+                    <MudButton Class="bouton" OnClick="ToggleCellList" Variant="MudBlazor.Variant.Filled" >
+                        @(ShowAllCells ? "Masquer" : "Afficher autres contenaires")
+                    </MudButton>
+                </div>
+                <h3>Scannez le contenaire s'il vous plaît</h3>
+                <MudText> @TextValue</MudText>
             </div>
-            <h3 class="title">Scannez le contenaire s'il vous plaît</h3>
-            <MudText> @TextValue</MudText>
-            </div>
+        </div>
     }
     else if (cells != null && cells.Count == 0)
     {
-        <div class="content">
+        <div class="display-container">
+            <h3 class="title">
             Il n'y a pas <b>@ProductScanner.Name</b> en
             @if (ColorChoose != null)
             {
                 <b style="@($"color:{ColorChoose.Name};")">@ColorChoose.Name</b>
             }
+
             stocké dans la cellule
+        </h3>
         </div>
     }
 
     @if (cells != null && cells.Count > 0)
     {
+        <div class="display-container">
         @if (ShowAllCells)
         {
-            <div class="content">
+            
                 @foreach (var cellLog in cells)
                 {
-                    <h3 class="title">Cellule: @cellLog.Cell.Name (Stockée le: @cellLog.EventTime)</h3>
+                    <div class="status-item">
+                        Cellule: @cellLog.Cell.Name (Stockée le: @cellLog.EventTime)
+                    </div>
                 }
-            </div>
+           
         }
+        </div>
     }
 
     @if (cells == null)
     {
-        <div class="content">
-            <br>Produit : @ProductScanner.Name
-            <br>Choisissez la couleur s'il vous plait
-            <br>
+        <div class="display-container">
+        <div class="status-display">
+            <div class="status-item">
+                <br>Produit : @ProductScanner.Name
+            </div>
+        </div>
+        <h3 class="title">Choisissez la couleur s'il vous plaît</h3>
         </div>
         @if (Colors != null)
         {
@@ -68,43 +78,53 @@
                 </div>
             }
         }
-        <div class="button-container">
+        
+    <div class="button-group">
             <MudButton Class="bouton" OnClick="GoBack" Color="Color.Error" Variant="MudBlazor.Variant.Filled">Retour</MudButton>
         </div>
     }
-</div>
 
 <style>
     .main-container {
-        display: flex;
-        flex-direction: column;
         padding: 10px;
+        font-family: 'Roboto', sans-serif;
     }
 
-    .pageTitle {
+    .selection-container, .display-container {
+        background-color: #FFFFFF;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        padding: 20px;
+        margin-bottom: 10px;
+    }
+
+    .title {
         text-align: center;
         margin-bottom: 20px;
     }
 
-    .content {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        overflow-y: auto;
+    .status-display, .status-item {
+        color: #555555;
+        margin: 5px 0;
+        padding: 5px;
+        background-color: #f2f2f2;
+        border-radius: 5px;
     }
 
-    .button-container {
+    .button-group {
         display: flex;
-        justify-content: center;
-        margin-top: 20px;
+        justify-content: space-evenly;
     }
+
+    .fillstatus-container {
+        text-align: center;
+    }
+
 
     .bouton {
         width: 120px;
         height: 50px;
-        margin: 10px;
+        margin: 5px;
         font-size: 16px;
     }
 
@@ -118,9 +138,5 @@
         overflow-y: auto; /* Enable vertical scroll */
         max-height: 150px;
         width: 100%;
-    }
-
-    .title {
-        text-align: center;
     }
 </style>
