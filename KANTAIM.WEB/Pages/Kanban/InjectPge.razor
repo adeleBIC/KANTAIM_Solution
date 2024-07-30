@@ -106,7 +106,10 @@
         break;
     case 3 :
         <div class="display-container">
+            <div class="status-display">
             <h3 class="title">Scannez la contenaire svp</h3>
+                <div class="status-item">Machine: @MachineScanner.Name</div>
+            </div>
             <MudText> @TextValue</MudText>
             @* <div>
                 <MudTextField @bind-Value="ContainerValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true"></MudTextField>
