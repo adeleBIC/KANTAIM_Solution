@@ -41,17 +41,7 @@
                     <MudSelect T=int @bind-Value="context.Item.ContainerID">
                         @foreach (var f in context.Item.Containers.OrderBy(p => p.Number))
                         {
-                            <MudSelectItem T=int Value="@f.Id">@f.Number</MudSelectItem>
-                        }
-                    </MudSelect>
-                </EditTemplate>
-            </PropertyColumn>
-            <PropertyColumn Property="x => x.FillStatus" Title="Remplissage">
-                <EditTemplate>
-                    <MudSelect T=int @bind-Value="context.Item.FillStatus">
-                        @foreach (var f in ContainerStatus)
-                        {
-                            <MudSelectItem Value="@f.Key">@f.Value</MudSelectItem>
+                            <MudSelectItem T=int Value="@f.Id">@f.ContainerType?.Name - @f.Number</MudSelectItem>
                         }
                     </MudSelect>
                 </EditTemplate>
@@ -66,12 +56,32 @@
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.ContainerID" Title="Stocké dans">
+            <PropertyColumn Property="x => x.FillStatus" Title="Remplissage">
+                <EditTemplate>
+                    <MudSelect T=int @bind-Value="context.Item.FillStatus">
+                        @foreach (var f in ContainerStatus)
+                        {
+                            <MudSelectItem Value="@f.Key">@f.Value</MudSelectItem>
+                        }
+                    </MudSelect>
+                </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.ContainerID" Title="Conditioné dans">
                 <EditTemplate>
                     <MudSelect T=int @bind-Value="context.Item.ContainerID">
                         @foreach (Container f in context.Item.Containers)
                         {
                             <MudSelectItem T=int Value="@f.Id">@f.Number</MudSelectItem>
+                        }
+                    </MudSelect>
+                </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.CellID" Title="Cellule">
+                <EditTemplate>
+                    <MudSelect T=int? @bind-Value=context.Item.CellID>
+                        @foreach (var f in context.Item.Cells.OrderBy(p => p.Name))
+                        {
+                            <MudSelectItem T=int? Value="@f.Id">@f.Name</MudSelectItem>
                         }
                     </MudSelect>
                 </EditTemplate>
@@ -121,31 +131,12 @@
                     <MudSelect T=int? @bind-Value="context.Item.MachineID">
                         @foreach (var f in context.Item.Machines.OrderBy(p => p.Number))
                         {
-                            <MudSelectItem T=int? Value="@f.Id">@f.Number</MudSelectItem>
-                        }
-                    </MudSelect>
-                </EditTemplate>
-            </PropertyColumn>
-            <PropertyColumn Property="x => x.CellID" Title="Cellule">
-                <EditTemplate>
-                    <MudSelect T=int? @bind-Value=context.Item.CellID>
-                        @foreach (var f in context.Item.Cells.OrderBy(p => p.Name))
-                        {
                             <MudSelectItem T=int? Value="@f.Id">@f.Name</MudSelectItem>
                         }
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
-            @* <PropertyColumn Property="x => x.ActionID" Title="Action Liée" Required=false>
-                <EditTemplate>
-                    <MudSelect T=int @bind-Value=context.Item.ActionID>
-                        @foreach (var f in context.Item.Actions)
-                        {
-                            <MudSelectItem T=int Value="@f.Id">@f.Name</MudSelectItem>
-                        }
-                    </MudSelect>
-                </EditTemplate>
-            </PropertyColumn> *@
+            
             <PropertyColumn Property="x => x.Comment" Title="Commentaire" Required=false />
         </Columns>
         <PagerContent>

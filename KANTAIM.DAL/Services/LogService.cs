@@ -15,6 +15,7 @@ namespace KANTAIM.DAL.Services
         Repository<Log> _repo;
         Repository<Product> _repoProduct;
         Repository<Container> _repoContainer;
+        Repository<ContainerType> _repoContainerType;
         Repository<Press> _repoPress;
         Repository<Shape> _repoShape;
         Repository<Machine> _repoMachine;
@@ -66,6 +67,7 @@ namespace KANTAIM.DAL.Services
                         else
                             item.MachineID = null;
                         item.Container = _repoContainer.GetById(item.ContainerID);
+                        item.Container.ContainerType = _repoContainerType.GetById(item.Container.ContainerTypeID);
                     }
                 }
                 return cache;
