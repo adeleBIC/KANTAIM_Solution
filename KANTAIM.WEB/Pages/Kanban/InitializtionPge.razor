@@ -100,7 +100,7 @@
         case 2: //Scan de la presse
             <div class="display-container">
                 <div class="status-display">
-                    <div class="status-item">Contenaire scanné: @ContainerScanner.Number</div>
+                <div class="status-item">@ContainerScanner.ContainerType.Name scanné: @ContainerScanner.Number</div>
                     <MudText> @TextValue</MudText>
                 </div>
                 <h3 class="title">Scanner la presse s'il vous plait</h3>
@@ -161,14 +161,14 @@
                     <div class="status-item">Presse: @PressScanner.Number<br />
                         Moule : @PressScanner.Shape.Name<br />
                         Produit : @PressScanner.Shape.Product.Name<br />
-                        Contenaire: @ContainerScanner?.Number
+                        @ContainerScanner.ContainerType.Name: @ContainerScanner?.Number
                     </div>
                     }
                     @if (MachineScanner != null)
                     {
                     <div class="status-item">Machine : @MachineScanner.Name<br />
                         Produit : @MachineScanner.Product.Name<br />
-                        Contenaire: @ContainerScanner?.Number
+                        @ContainerScanner.ContainerType.Name: @ContainerScanner?.Number
                     </div>
                     }
                     @if (ColorChoose != null)

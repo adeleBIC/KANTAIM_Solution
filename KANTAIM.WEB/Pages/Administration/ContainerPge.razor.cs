@@ -34,12 +34,20 @@ namespace KANTAIM.WEB.Pages.Administration
         public Dictionary<int, string> CellStatus { get; set; }
         private string _searchString;
 
+        
         protected override async Task OnInitializedAsync()
         {
-            //RefreshData();
             CellStatus = new StatusCell().Status;
             ContainerStatus = new StatusContainer().Status;
             await Task.Run(RefreshData);
+        }
+        void RefreshData()
+        {
+            Containers = _contenaireService.GetAll().Select(u => new ContainerVM(u,
+                    _contenaireService.GetAllContainer(),
+                    _contenaireService.GetAllContainerType(),
+                    _contenaireService.GetAllCell(),
+                    _contenaireService.GetAllAction())).ToList();
         }
 
         // quick filter - filter gobally across multiple columns with the same input
@@ -131,11 +139,8 @@ namespace KANTAIM.WEB.Pages.Administration
         {
             return unityVM.IsEditing ? "editing" : "";
         }
+
         
-        void RefreshData()
-        {
-            Containers = _contenaireService.GetAll().Select(u => new ContainerVM(u, _contenaireService.GetAllContainer(), _contenaireService.GetAllContainerType(), _contenaireService.GetAllCell(), _contenaireService.GetAllAction())).ToList();
-        }
         void SelectionChanged(HashSet<ContainerVM> changes)
         {
             foreach (var u in Containers)
