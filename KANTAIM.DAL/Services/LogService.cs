@@ -51,6 +51,6 @@ namespace KANTAIM.DAL.Services
         public IEnumerable<Machine> GetAllMachine() => _repoMachine.GetAll();
 
         public Log? GetByContenaireId(int id) => GetAll().OrderByDescending(u => u.EventTime).FirstOrDefault(c => c.ContainerID == id);
-        public Log? GetByContenaireByActionId(int contId, int opeId) => GetAll().Where(u=>u.Operation == opeId).OrderByDescending(u => u.EventTime).FirstOrDefault(c => c.ContainerID == contId);
+        public Log? GetByContenaireByOperationStatus(int contId, int opeStatus) => GetAll().Where(u=>u.Operation == opeStatus).OrderByDescending(u => u.EventTime).FirstOrDefault(c => c.ContainerID == contId);
     }
 }

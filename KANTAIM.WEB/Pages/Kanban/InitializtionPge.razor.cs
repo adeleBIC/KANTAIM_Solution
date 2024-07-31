@@ -9,6 +9,7 @@ using MudBlazor;
 using MudBlazor.Services;
 using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components.Routing;
+using KANTAIM.WEB.Ressources;
 
 namespace KANTAIM.WEB.Pages.Kanban
 {
@@ -21,6 +22,7 @@ namespace KANTAIM.WEB.Pages.Kanban
         [Inject] public ColorService _colorService { get; set; }
         [Inject] public ScanService _scanService { get; set; }
         [Inject] public MachineService _machineService { get; set; }
+        [Inject] public ActionService _actionService { get; set; }
         [Inject] public ColorProductService _colorProductServiceService { get; set; }
         [Inject] ISnackbar _snackService { get; set; }
         [Inject] IJSRuntime JS { get; set; }
@@ -153,7 +155,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                 if (type == 1)
                 {
                     PaletteScanner = _contenaireService.GetContainerByNumber(PaletteNumber);
-                    if (PaletteScanner.ActionID == 0) // On ne peux pas mettre une bac vide dans une palette, on ne peux pas mettre un bac dans une palette qu'il n'as pas été initialisé.
+                    if (PaletteScanner.ContainerAction.Status == 0) // On ne peux pas mettre une bac vide dans une palette, on ne peux pas mettre un bac dans une palette qu'il n'as pas été initialisé.
                     {
                         _snackService.Add("Svp initialisez palette d'abord!", Severity.Error);
                         PaletteValue = null;
@@ -189,7 +191,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                 Log bacLog = new Log()
                 {
                     EventTime = DateTime.Now,
-                    Operation = 1, // Initialisation pour le bac
+                    Operation = OperationContainer.Initisalisation, // Initialisation pour le bac
                     ProductID = logRescent.ProductID,
                     Press = logRescent.Press,
                     PressID = logRescent.PressID,
@@ -268,7 +270,7 @@ namespace KANTAIM.WEB.Pages.Kanban
             {
                 ContainerScanner = _contenaireService.GetContainerByNumber(ContainerNumber);
                 // Vérifier si le Contenaire que l'on veut initialiser est bien vide
-                if (ContainerScanner.ActionID != 0)
+                if (ContainerScanner.ContainerAction.Status != 0)
                 {
                     ContainerScanner = null;
                     _snackService.Add("Contenaire doit être vide pour l'initialiser sous la presse!", Severity.Error);
@@ -346,7 +348,8 @@ namespace KANTAIM.WEB.Pages.Kanban
             }
             _logService.UpSert(u);
 
-            ContainerScanner.ActionID = 1;
+            ContainerScanner.ContainerAction = _actionService.GetByStatus(1);
+            ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
             ContainerScanner.CellStock = null;
             ContainerScanner.CellId = null;
             if(ContainerScanner.ContainerTypeID == 2) // S'il est un bac, on initialise son fillstatue en plein directement

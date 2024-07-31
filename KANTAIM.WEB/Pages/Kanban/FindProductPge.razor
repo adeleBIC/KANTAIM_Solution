@@ -16,8 +16,7 @@
         <div class="content">
             <h3 class="title">Cellule proposée: @cellPropose.Name</h3>
             <div>
-                @* <MudTextField @bind-Value="ContainerValue" AutoFocus="true" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="ContainerScan"></MudTextField> *@
-                <MudButton Class="bouton" OnClick="ToggleCellList" Variant="MudBlazor.Variant.Filled" Style="margin-top: 20px;">
+                <MudButton Class="bouton-large" OnClick="ToggleCellList" Variant="MudBlazor.Variant.Filled" Style="margin-top: 20px;">
                     @(ShowAllCells ? "Masquer" : "Afficher autres contenaires")
                 </MudButton>
             </div>
@@ -41,7 +40,7 @@
     {
         @if (ShowAllCells)
         {
-            <div class="content">
+            <div class="content cell-log-container">
                 @foreach (var cellLog in cells)
                 {
                     <h3 class="title">Cellule: @cellLog.Cell.Name (Stockée le: @cellLog.EventTime)</h3>
@@ -108,15 +107,30 @@
         font-size: 16px;
     }
 
+    .bouton-large {
+        width: 250px;
+        height: 50px;
+        margin: 10px;
+        font-size: 16px;
+    }
+
     .colors-container {
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
         gap: 3x;
-        padding: 5px; /* Padding inside the tree view */
-        /* Add margin to the bottom to prevent overlap with action buttons */
-        overflow-y: auto; /* Enable vertical scroll */
+        padding: 5px;
+        overflow-y: auto;
         max-height: 150px;
+        width: 100%;
+    }
+
+    .cell-log-container {
+        background-color: #f0f0f0; /* Light gray background */
+        padding: 10px;
+        border-radius: 10px;
+        max-height: 200px; /* Limit the height */
+        overflow-y: auto; /* Enable scrolling */
         width: 100%;
     }
 
@@ -124,3 +138,5 @@
         text-align: center;
     }
 </style>
+
+Dispose d’un menu contextuel

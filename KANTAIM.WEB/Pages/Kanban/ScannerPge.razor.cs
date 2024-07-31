@@ -102,7 +102,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                                             ContainerScanner = _contenaireService.GetContainerByNumber(containerNumber);
                                             if (ContainerScanner != null)
                                             {
-                                                switch (ContainerScanner.ActionID)
+                                                switch (ContainerScanner.ContainerAction.Status)
                                                 {
                                                     case 0:
                                                         /*Quand on scan un contenaire vide, on l'initialise sur press.*/

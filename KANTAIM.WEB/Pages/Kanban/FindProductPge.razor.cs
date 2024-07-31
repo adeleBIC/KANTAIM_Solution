@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using MudBlazor;
 using System;
+using System.Buffers;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using static System.Collections.Specialized.BitVector32;
@@ -120,7 +121,7 @@ namespace KANTAIM.WEB.Pages.Kanban
             cells = new List<CellLog>();
             foreach (Container container in _contenaireService.GetAll().Where(c => c.CellStock != null))
             {
-                logRescent = _logService.GetByContenaireByActionId(container.Id, 2);
+                logRescent = _logService.GetByContenaireByOperationStatus(container.Id, OperationContainer.Store);
                 if (logRescent != null && logRescent.ProductID == ProductScanner.Id)
                 {
                     if (ColorChoose == null || logRescent.ProdColorID == ColorChoose.Id)
@@ -166,13 +167,13 @@ namespace KANTAIM.WEB.Pages.Kanban
                         containerProdColor = _colorService.GetById(logRescent.ProdColorID);
                         if (containerProduct != ProductScanner || containerProdColor != ColorChoose)
                         {
-                            _snackService.Add("Scp vérifiez le produit dans le contenaire et le produit que vous voulez rechercher !", Severity.Error);
+                            _snackService.Add("Svp vérifiez le produit dans le contenaire et le produit que vous voulez rechercher !", Severity.Error);
                         }
                         else
                         {
                             if (ContainerScanner != null)
                             {
-                                switch (ContainerScanner.ActionID)
+                                switch (ContainerScanner.ContainerAction.Status)
                                 {
                                     case 0:
                                         /*Quand on scan un contenaire vide, on l'initialise sur press.*/

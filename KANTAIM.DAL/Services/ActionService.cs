@@ -32,6 +32,7 @@ namespace KANTAIM.DAL.Services
 
         public IEnumerable<ContainerAction> GetAll() => Cache;
         public ContainerAction? GetById(int id) => Cache.SingleOrDefault(c => c.Id == id);
+        public ContainerAction? GetByStatus(int status) => Cache.SingleOrDefault(c => c.Status == status);
         public void ResetCache() => cache = null;
 
         public void UpSert(ContainerAction item)

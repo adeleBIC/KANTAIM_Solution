@@ -71,7 +71,7 @@
                     <MudSelect T=int @bind-Value=context.Item.ActionID>
                         @foreach (var f in context.Item.Actions)
                         {
-                            <MudSelectItem T=int Value="@f.Status">@f.Name</MudSelectItem>
+                            <MudSelectItem T=int Value="@f.Id">@f.Name</MudSelectItem>
                         }
                     </MudSelect>
                 </EditTemplate>

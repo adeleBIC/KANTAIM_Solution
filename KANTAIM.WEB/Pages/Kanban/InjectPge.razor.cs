@@ -1,5 +1,6 @@
 using KANTAIM.DAL.Model;
 using KANTAIM.DAL.Services;
+using KANTAIM.WEB.Ressources;
 using KANTAIM.WEB.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
@@ -18,6 +19,8 @@ namespace KANTAIM.WEB.Pages.Kanban
         [Inject] public ScanService _scanService { get; set; }
         [Inject] public ProductService _productService { get; set; }
         [Inject] public ColorService _colorService { get; set; }
+        [Inject] public ActionService _actionService { get; set; }
+        [Inject] public CellService _cellService { get; set; }
         [Inject] ISnackbar _snackService { get; set; }
 
         [Parameter] public int Id { get; set; }
@@ -139,7 +142,7 @@ namespace KANTAIM.WEB.Pages.Kanban
             {
                 int.TryParse(parts[1], out int Container);
                 ContainerScanner = _contenaireService.GetContainerByNumber(Container);
-                if (ContainerScanner.ActionID != 3)
+                if (ContainerScanner.ContainerAction.Status != 3)
                 {
                     _snackService.Add("Svp scanner le QR code de la contenaire qui a sortie de rack avec produits.", Severity.Error);
                     ContainerScanner = null;
@@ -193,12 +196,27 @@ namespace KANTAIM.WEB.Pages.Kanban
             }
         }
 
+        void upDateCellState(Cell cell)
+        {
+            if (_contenaireService.CountCells(cell.Id) == 0)
+            {
+                cell.Status = StatusCell.Empty;
+            }
+            else 
+            {
+                cell.Status = StatusCell.InFill;
+            }
+
+            _cellService.Upsert(cell);
+
+        }
+
         void Inject()
         {
             Log u = new Log()
             {
                 EventTime = DateTime.Now,
-                Operation = 4, // Mise en machine
+                Operation = OperationContainer.Inject, // Mise en machine
                 Product = logRescent.Product,
                 ProductID = logRescent.ProductID,
                 Press = logRescent.Press,
@@ -210,15 +228,17 @@ namespace KANTAIM.WEB.Pages.Kanban
                 ProdColorID = logRescent.ProdColorID,
                 FillStatus = logRescent.FillStatus,
                 Machine = MachineScanner,
-                MachineID = MachineScanner.Id,
-                Cell = logRescent.Cell,
-                CellID = logRescent.CellID
+                MachineID = MachineScanner.Id
             };
             _logService.UpSert(u);
 
-            ContainerScanner.ActionID = 4; // En vidange
+            ContainerScanner.ContainerAction = _actionService.GetByStatus(4);// En vidange
+            ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
             ContainerScanner.FillStatus = logRescent.FillStatus;
+            ContainerScanner.CellId = null;
             _contenaireService.UpSert(ContainerScanner);
+
+            upDateCellState(ContainerScanner.CellStock);
 
             inject = true;
          }    

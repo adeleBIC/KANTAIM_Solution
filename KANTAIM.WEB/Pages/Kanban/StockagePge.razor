@@ -1,6 +1,7 @@
 ﻿@page "/StockagePge/{id:int}/{number:int}"
 @layout PhoneLayout
 @using KANTAIM.DAL.Model;
+@using KANTAIM.WEB.Ressources
 @using KANTAIM.WEB.ViewModels;
 @using MudBlazor
 @using static MudBlazor.Icons
@@ -125,7 +126,7 @@
                         <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>cellScanner=null">Retour</MudButton>
                         @if (cellScanner.IsMaintenance)
                         {
-                            <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="()=>{fillstatus = 1;Exit(2); }">Valider</MudButton>
+                            <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="()=>{fillstatus = StatusContainer.Empty;Exit(2); }">Valider</MudButton>
                         }
                         else
                         {

@@ -1,5 +1,6 @@
 using KANTAIM.DAL.Model;
 using KANTAIM.DAL.Services;
+using KANTAIM.WEB.Ressources;
 using KANTAIM.WEB.Services;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
@@ -14,10 +15,9 @@ namespace KANTAIM.WEB.Pages.Kanban
         [Inject] public ColorService _colorService { get; set; }
         [Inject] public ProductService _productService { get; set; }
         [Inject] public CellService _cellService { get; set; }
-        [Parameter]
-        public int Id { get; set; }
-        [Parameter]
-        public int Number { get; set; }
+        [Inject] public ActionService _actionService { get; set; }
+        [Parameter] public int Id { get; set; }
+        [Parameter] public int Number { get; set; }
 
 
         public Product? product { get; set; }
@@ -57,13 +57,14 @@ namespace KANTAIM.WEB.Pages.Kanban
             }
         }
 
-        void VerifyPalette(int paletteNumber)
+        void VerifyPaletteEmpty(int paletteNumber)
         {
             PaletteScanner = _contenaireService.GetContainerByNumber(paletteNumber);
             if(_contenaireService.CountBac(PaletteScanner.Id) == 0) // s'il n'y a plus de bac sur la palette
             {
-                PaletteScanner.ActionID = 0; // Stocké Vide
-                PaletteScanner.FillStatus = 1;//Pelette statu change à vide
+                PaletteScanner.ContainerAction = _actionService.GetByStatus(0);// Stocké Vide
+                PaletteScanner.ActionID = PaletteScanner.ContainerAction.Id;
+                PaletteScanner.FillStatus = StatusContainer.Empty;//Palette statut changé à vide
                 _contenaireService.UpSert(PaletteScanner);
             }
         }
@@ -76,7 +77,7 @@ namespace KANTAIM.WEB.Pages.Kanban
             Log u = new Log()
             {
                 EventTime = DateTime.Now,
-                Operation = 3, // shipment
+                Operation = OperationContainer.Shipment, // shipment
                 Product = logRescent.Product,
                 ProductID = logRescent.ProductID,
                 Press = logRescent.Press,
@@ -99,7 +100,8 @@ namespace KANTAIM.WEB.Pages.Kanban
             }
             _logService.UpSert(u);
 
-            ContainerScanner.ActionID = 3; // Sortie stock
+            ContainerScanner.ContainerAction = _actionService.GetByStatus(3);// Sortie stock
+            ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
             ContainerScanner.CellId = null;
             if (ContainerScanner.ContainerType.IsContainable == true) //s'il est un bac 
             {
@@ -107,7 +109,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                 ContainerScanner.BigContainer = null;
                 ContainerScanner.ContainerID = null;
                 _contenaireService.UpSert(ContainerScanner);
-               VerifyPalette(paletteNumber);
+                VerifyPaletteEmpty(paletteNumber);
             } else
             {
                 _contenaireService.UpSert(ContainerScanner);

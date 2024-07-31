@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components.Routing;
+using KANTAIM.WEB.Ressources;
+using System;
 
 namespace KANTAIM.WEB.Pages.Kanban
 {
@@ -14,6 +16,7 @@ namespace KANTAIM.WEB.Pages.Kanban
         [Inject] public NavigationManager NavigationManager { get; set; }
         [Inject] public ContenaireService _contenaireService { get; set; }
         [Inject] public ScanService _scanService { get; set; }
+        [Inject] public ActionService _actionService { get; set; }
         [Inject] ISnackbar _snackService { get; set; }
         [Inject] public LogService _logService { get; set; }
         public string? ContainerValue { get; set; }
@@ -156,14 +159,15 @@ namespace KANTAIM.WEB.Pages.Kanban
             AutreScanner.Comment = ContainerScanner.Comment;
             _contenaireService.UpSert(AutreScanner);
 
-            ContainerScanner.FillStatus = 1; // vide
-            ContainerScanner.ActionID = 0;
+            ContainerScanner.FillStatus = StatusContainer.Empty; // vide
+            ContainerScanner.ContainerAction = _actionService.GetByStatus(0);
+            ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
             _contenaireService.UpSert(ContainerScanner);
 
             Log u_autre = new Log()
             {
                 EventTime = DateTime.Now,
-                Operation = 6, // Mise en contenaire
+                Operation = OperationContainer.Install, // Mise en contenaire
                 ProductID = logRescent.ProductID,
                 Press = logRescent.Press,
                 PressID = logRescent.PressID,
@@ -181,7 +185,7 @@ namespace KANTAIM.WEB.Pages.Kanban
             Log u_contenaire = new Log()
             {
                 EventTime = DateTime.Now,
-                Operation = 6, // Mise en contenaire
+                Operation = OperationContainer.Install, // Mise en contenaire
                 Container = ContainerScanner,
                 ContainerID = ContainerScanner.Id,
                 FillStatus = ContainerScanner.FillStatus

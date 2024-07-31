@@ -127,18 +127,6 @@ namespace KANTAIM.WEB.ViewModels
         }
         public int ContainerCount { get; set; }
 
-        public string DynamicStatus
-        {
-            get
-            {
-                if (ContainerCount == 0)
-                    return "Vide";
-                else if (ContainerCount < NbMax)
-                    return "En Remplissage";
-                else
-                    return "Plein";
-            }
-        }
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             List<ValidationResult> list = new List<ValidationResult>();
