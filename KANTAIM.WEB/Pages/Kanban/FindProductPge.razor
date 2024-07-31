@@ -41,7 +41,7 @@
         @if (ShowAllCells)
         {
             <div class="content cell-log-container">
-                @foreach (var cellLog in cells)
+                @foreach (var cellLog in cells.OrderBy(u => u.EventTime))
                 {
                     <h3 class="title">Cellule: @cellLog.Cell.Name (Stockée le: @cellLog.EventTime)</h3>
                 }
@@ -129,7 +129,7 @@
         background-color: #f0f0f0; /* Light gray background */
         padding: 10px;
         border-radius: 10px;
-        max-height: 200px; /* Limit the height */
+        max-height: 150px; /* Limit the height */
         overflow-y: auto; /* Enable scrolling */
         width: 100%;
     }
@@ -138,5 +138,3 @@
         text-align: center;
     }
 </style>
-
-Dispose d’un menu contextuel
