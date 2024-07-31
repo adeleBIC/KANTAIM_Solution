@@ -24,6 +24,7 @@ namespace KANTAIM.WEB.Pages.Kanban
         [Inject] public MachineService _machineService { get; set; }
         [Inject] public ActionService _actionService { get; set; }
         [Inject] public ColorProductService _colorProductServiceService { get; set; }
+        [Inject] public CellService _cellService { get; set; }
         [Inject] ISnackbar _snackService { get; set; }
         [Inject] IJSRuntime JS { get; set; }
         [Parameter] public int Id { get; set; }
@@ -315,6 +316,21 @@ namespace KANTAIM.WEB.Pages.Kanban
             StateHasChanged();
         }
 
+        void upDateCellState(Cell cell)
+        {
+            if (_contenaireService.CountCells(cell.Id) == 0)
+            {
+                cell.Status = StatusCell.Empty;
+            }
+            else
+            {
+                cell.Status = StatusCell.InFill;
+            }
+
+            _cellService.Upsert(cell);
+
+        }
+
         void SaveLog()
         {
             Log u = new Log()
@@ -350,11 +366,13 @@ namespace KANTAIM.WEB.Pages.Kanban
 
             ContainerScanner.ContainerAction = _actionService.GetByStatus(1);
             ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
-            ContainerScanner.CellStock = null;
+            //ContainerScanner.CellStock = null;
             ContainerScanner.CellId = null;
             if(ContainerScanner.ContainerTypeID == 2) // S'il est un bac, on initialise son fillstatue en plein directement
                 ContainerScanner.Status = 3;
             _contenaireService.UpSert(ContainerScanner);
+
+            upDateCellState(ContainerScanner.CellStock);
             
             NavigationManager.NavigateTo("/ScannerPge");
             _snackService.Add("Bien initialisé !", Severity.Success);

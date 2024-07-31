@@ -70,6 +70,20 @@ namespace KANTAIM.WEB.Pages.Kanban
         }
 
 
+        void upDateCellState(Cell cell)
+        {
+            if (_contenaireService.CountCells(cell.Id) == 0)
+            {
+                cell.Status = StatusCell.Empty;
+            }
+            else
+            {
+                cell.Status = StatusCell.InFill;
+            }
+
+            _cellService.Upsert(cell);
+
+        }
 
         void Shipment()
         {
@@ -114,6 +128,8 @@ namespace KANTAIM.WEB.Pages.Kanban
             {
                 _contenaireService.UpSert(ContainerScanner);
             }
+
+            upDateCellState(ContainerScanner.CellStock);
 
             //shipment = true;
             NavigationManager.NavigateTo($"/ScannerPge");
