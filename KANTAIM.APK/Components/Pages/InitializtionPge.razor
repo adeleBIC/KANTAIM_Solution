@@ -1,0 +1,196 @@
+﻿@page "/InitialisationPge/{id:int}/{number:int}"
+@using KANTAIM.DAL.Model;
+@using MudBlazor
+@using static MudBlazor.Icons
+@using Microsoft.AspNetCore.Components.Routing
+
+<h1 >Initialisation de contenaire</h1>
+
+<style>
+    .main-container {
+        padding: 10px;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    .selection-container, .display-container {
+        background-color: #FFFFFF;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        padding: 20px;
+        margin-bottom: 10px;
+    }
+
+    .title {
+        color: #333333;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .status-display, .status-item {
+        color: #555555;
+        margin: 5px 0;
+        padding: 5px;
+        background-color: #f2f2f2;
+        border-radius: 5px;
+    }
+
+    .button-group {
+        display: flex;
+        justify-content: space-evenly;
+    }
+
+    .fillstatus-container {
+        text-align: center;
+    }
+
+
+    .bouton {
+        width: 120px;
+        height: 50px;
+        margin: 5px;
+        font-size: 16px;
+    }
+
+    .colors-container {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 3x;
+        padding: 5px; /* Padding inside the tree view */
+        /* Add margin to the bottom to prevent overlap with action buttons */
+        overflow-y: auto; /* Enable vertical scroll */
+        max-height: 150px;
+        width: 100%;
+
+    }
+
+
+
+</style>
+
+
+
+    @switch (State)
+    {
+        case 0: //Scan du contenaire
+            <div class="display-container">
+                <div class="status-display">
+                    <div class="status-item">Press: @PressScanner.Number</div>
+                    <div class="status-item">Moule : @PressScanner.Shape.Name</div>
+                    <div class="status-item">Produit : @PressScanner.Shape.Product.Name</div>
+                    @* <MudText> @TextValue</MudText> *@
+                </div>
+                <h3 class="title">Scanner le contenaire s'il vous plait</h3>
+
+                @* <MudTextField Disabled=true id="myInput" @bind-Value="TextValue" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true"></MudTextField> *@
+                <MudText> @TextValue</MudText>
+            </div>
+       
+            break;
+
+        case 1: //Scan la palette
+            <div class="display-container">
+                <div class="status-display">
+                    <div class="status-item">Bac scanné: @ContainerScanner.Number</div>
+                    <MudText> @TextValue</MudText>
+                </div>
+                <h3 class="title">Scanner la palette s'il vous plait</h3>
+            </div>      
+            break;
+
+        case 2: //Scan de la presse
+            <div class="display-container">
+                <div class="status-display">
+                <div class="status-item">@ContainerScanner.ContainerType.Name scanné: @ContainerScanner.Number</div>
+                    <MudText> @TextValue</MudText>
+                </div>
+                <h3 class="title">Scanner la presse s'il vous plait</h3>
+            </div>
+            break;
+
+        case 3: //Selection de la couleur
+            <div class="display-container">
+                <div class="status-display">
+                    @if(PressScanner != null)
+                    {
+                        <div class="status-item">
+                            Press : @PressScanner.Number<br />
+                            Moule : @PressScanner.Shape.Name<br />
+                            Produit : @PressScanner.Shape.Product.Name<br />
+                            Contenaire: @ContainerScanner?.Number
+                        </div>
+                    }
+
+                    @if(MachineScanner != null)
+                    {
+                        <div class="status-item">Machine : @MachineScanner.Name<br />
+                            Produit : @MachineScanner.Product?.Name<br />
+                            Contenaire: @ContainerScanner?.Number
+                        </div>
+                    }
+                    <h3 class="title">Choisissez la couleur s'il vous plait</h3>
+                </div>
+            </div>
+
+            @if (Colors != null && Colors.Count() != 0)
+            {
+                @*                     <div class="text-container">
+                            <br> Choisissez la couleur s'il vous plait
+                        </div> *@
+                    <div class="colors-container">
+                        @foreach (var c in Colors)
+                        {
+                            <MudButton Class="bouton" Style="@($"background:{c.ColorNumber};")" OnClick="()=>ColorSelected(c.Id)" Variant="MudBlazor.Variant.Filled">
+                                @c.Name
+                            </MudButton>
+                        }
+                    </div>
+                }
+
+        <div class="button-group">
+                <MudButton Class="bouton" OnClick="() => GoBack(1)" Color="Color.Error" Variant="MudBlazor.Variant.Filled">Retour</MudButton>
+            </div>
+            break;
+
+        case 4: // Validation
+        <div class="display-container">
+            <h3 class="title">En cours de remplissage...</h3>
+
+            <div class="status-display">
+                    @if (PressScanner != null)
+                    {
+                    <div class="status-item">Presse: @PressScanner.Number<br />
+                        Moule : @PressScanner.Shape.Name<br />
+                        Produit : @PressScanner.Shape.Product.Name<br />
+                        @ContainerScanner.ContainerType.Name: @ContainerScanner?.Number
+                    </div>
+                    }
+                    @if (MachineScanner != null)
+                    {
+                    <div class="status-item">Machine : @MachineScanner.Name<br />
+                        Produit : @MachineScanner.Product.Name<br />
+                        @ContainerScanner.ContainerType.Name: @ContainerScanner?.Number
+                    </div>
+                    }
+                    @if (ColorChoose != null)
+                    {
+                        <div class="status-item">
+                            Couleur: @ColorChoose.Name
+                            <MudIcon Icon="@Icons.Material.Filled.Circle" Style="@($"color:{ColorChoose.ColorNumber};")" />
+                        </div>
+                    }
+                </div>
+            </div>
+        <div class="button-group">
+                <MudButton Class="bouton" OnClick="() => GoBack(2)" Color="Color.Error" Variant="MudBlazor.Variant.Filled">Retour</MudButton>
+                <MudButton Class="bouton" OnClick="() => SaveLog()" Color="Color.Success" Variant="MudBlazor.Variant.Filled">Valider</MudButton>
+            </div>
+            break;
+    }
+
+@if (ContainerScanner != null && PressScanner == null)
+{
+    <div class="button-group">
+        <MudButton Color="Color.Secondary" Variant="MudBlazor.Variant.Filled" Href="@($"/StockagePge/1/{ContainerScanner.Number}")" Match="NavLinkMatch.All">Déplacement Contenaire</MudButton>
+    </div>
+}

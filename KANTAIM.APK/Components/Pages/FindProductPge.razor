@@ -1,0 +1,138 @@
+﻿@page "/FindProductPge/{id:int}/{number:int}"
+@using KANTAIM.DAL.Model;
+@using MudBlazor
+@using static MudBlazor.Icons
+@using Microsoft.AspNetCore.Components.Routing
+
+<div class="main-container">
+    <div class="pageTitle">
+        <MudText Typo="Typo.h4">Recherche le produit dans une cellule</MudText>
+    </div>
+
+    @if (cellPropose != null)
+    {
+        <div class="content">
+            <h3 class="title">Cellule proposée: @cellPropose.Name</h3>
+            <div>
+                <MudButton Class="bouton-large" OnClick="ToggleCellList" Variant="MudBlazor.Variant.Filled" Style="margin-top: 20px;">
+                    @(ShowAllCells ? "Masquer" : "Afficher autres contenaires")
+                </MudButton>
+            </div>
+            <h3 class="title">Scannez le contenaire s'il vous plaît</h3>
+            <MudText> @TextValue</MudText>
+            </div>
+    }
+    else if (cells != null && cells.Count == 0)
+    {
+        <div class="content">
+            Il n'y a pas <b>@ProductScanner.Name</b> en
+            @if (ColorChoose != null)
+            {
+                <b style="@($"color:{ColorChoose.Name};")">@ColorChoose.Name</b>
+            }
+            stocké dans la cellule
+        </div>
+    }
+
+    @if (cells != null && cells.Count > 0)
+    {
+        @if (ShowAllCells)
+        {
+            <div class="content cell-log-container">
+                @foreach (var cellLog in cells.OrderBy(u => u.EventTime))
+                {
+                    <h3 class="title">Cellule: @cellLog.Cell.Name (Stockée le: @cellLog.EventTime)</h3>
+                }
+            </div>
+        }
+    }
+
+    @if (cells == null)
+    {
+        <div class="content">
+            <br>Produit : @ProductScanner.Name
+            <h3>Choisissez la couleur svp</h3>
+        </div>
+
+        @if (Colors != null)
+        {
+            <div class="colors-container">
+                @foreach (var color in Colors)
+                {
+                    <MudButton Class="bouton" Style="@($"background: {color.ColorNumber};")" OnClick="() => ColorSelected(color.Id)" Variant="MudBlazor.Variant.Filled">
+                        @color.Name
+                    </MudButton>
+                }
+            </div>
+        }
+        <div class="button-container">
+            <MudButton Class="bouton" OnClick="GoBack" Color="Color.Error" Variant="MudBlazor.Variant.Filled">Retour</MudButton>
+        </div>
+    }
+</div>
+
+<style>
+    .main-container {
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+    }
+
+    .pageTitle {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        overflow-y: auto;
+    }
+
+    .button-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .bouton {
+        width: 120px;
+        height: 50px;
+        margin: 10px;
+        font-size: 16px;
+    }
+
+    .bouton-large {
+        width: 250px;
+        height: 50px;
+        margin: 10px;
+        font-size: 16px;
+    }
+
+    .colors-container {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 3x;
+        padding: 5px;
+        overflow-y: auto;
+        max-height: 150px;
+        width: 100%;
+    }
+
+    .cell-log-container {
+        background-color: #f0f0f0; /* Light gray background */
+        padding: 10px;
+        border-radius: 10px;
+        max-height: 150px; /* Limit the height */
+        overflow-y: auto; /* Enable scrolling */
+        width: 100%;
+    }
+
+    .title {
+        text-align: center;
+    }
+</style>

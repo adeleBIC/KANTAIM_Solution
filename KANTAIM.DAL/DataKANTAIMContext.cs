@@ -1,6 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using KANTAIM.DAL.Model;
+using System.Reflection;
+using System.Net;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace KANTAIM.DAL
 {
@@ -31,20 +34,40 @@ namespace KANTAIM.DAL
         {
             if (!optionsBuilder.IsConfigured)
             {
-                if (cs == null)
+
+                if (OperatingSystem.IsAndroid())
+                {
+                    optionsBuilder.UseSqlServer("Server=MONSSQL03;Database=DATASCADAMOULAGE;User Id=UserMLV;Password=BicUserMLV20;MultipleActiveResultSets=True;Encrypt=false;TrustServerCertificate=False;MultiSubnetFailover=True");
+                }
+                else // Supposons que c'est Web
                 {
                     IConfigurationRoot config = new ConfigurationBuilder()
                         .AddJsonFile("appsettings.json")
                         .Build();
-
                     cs = config["connectionStrings:DataKANTAIMContext"];
                 }
 
-                optionsBuilder.UseSqlServer(cs);
-                #if DEBUG
+                if (cs != null)
+                {
+                    optionsBuilder.UseSqlServer(cs);
+                }
+#if DEBUG
                 //optionsBuilder.UseSqlServer("Data Source=.\\SQLEXPRESS;Initial Catalog=DATASCADAMOULAGE;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
-                #endif
+                //optionsBuilder.UseSqlServer("Server=MONSSQL03;Database=DATASCADAMOULAGE;User Id=UserMLV;Password=BicUserMLV20;MultipleActiveResultSets=True;Encrypt=false;TrustServerCertificate=False;MultiSubnetFailover=True");
+#endif
 
+            }
+        }
+
+        public async Task<bool> TestConnectionAsync()
+        {
+            try
+            {
+                return await Database.CanConnectAsync();
+            }
+            catch
+            {
+                return false;
             }
         }
     }

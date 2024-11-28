@@ -6,6 +6,7 @@ using MudBlazor;
 using MudBlazor.Services;
 using KANTAIM.DAL.Services;
 using KANTAIM.WEB.Services;
+using KANTAIM.WEB;
 
 var builder = WebApplication.CreateBuilder(args);
 

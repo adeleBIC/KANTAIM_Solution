@@ -1,0 +1,28 @@
+﻿@page "/"
+
+@using KANTAIM.DAL.Model;
+@using MudBlazor
+@using static MudBlazor.Icons
+
+<style>
+
+    .title {
+        color: #333333;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+</style>
+
+<h3 class="title">
+    Scannez un QR Code svp
+</h3>
+
+
+@* <MudTextField @ref="scanField" Value=@TextValue Margin="Margin.Dense" Variant="Variant.Outlined" Style="height:auto" ValueChanged="(string? newValue) => HandleInput(newValue)" AutoFocus="true" />
+<MudButton  Class="bouton" Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="ClearTextField">Vider le code</MudButton> *@
+
+@* <MudTextField Disabled=true id="myInput" @bind-Value="TextValue" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true"></MudTextField> *@
+<MudText> @TextValue</MudText>
+
+
