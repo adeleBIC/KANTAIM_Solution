@@ -117,34 +117,6 @@ namespace KANTAIM.APK.Components.Pages
             _instance?.HandleInput(input);
         }
 
-
-        //private void HandleInput(string input)
-        //{
-
-        //    if (currentUrl == pageUrl)
-        //    {
-        //        input = input.Remove(0, 1);
-        //        TextValue = input;
-
-        //        switch (state)
-        //        {
-        //            case 0:
-        //                ContainerScan(TextValue);
-        //                break;
-        //            case 1:
-        //                PaletteScan(TextValue);
-        //                break;
-        //            case 2:
-        //                PressScan(TextValue);
-        //                break;
-        //        }
-
-        //        StateHasChanged();
-        //        ClearTextField();
-
-        //    }
-        //}
-
         private void HandleInput(string input)
         {
 

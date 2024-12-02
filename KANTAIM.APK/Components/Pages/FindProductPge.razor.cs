@@ -212,7 +212,7 @@ namespace KANTAIM.APK.Components.Pages
         }
         void GoBack()
         {
-            NavigationManager.NavigateTo("/ScannerPge");
+            NavigationManager.NavigateTo("/");
         }
 
 

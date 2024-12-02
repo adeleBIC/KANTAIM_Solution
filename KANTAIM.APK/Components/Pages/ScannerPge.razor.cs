@@ -169,6 +169,7 @@ namespace KANTAIM.APK.Components.Pages
                                         {
                                             CellScanner = _cellService.GetByXY(x, y);
                                             //NavigationManager.NavigateTo($"/StockagePge/4/{CellScanner.Id}");
+                                            _snackService.Add("Mauvais QRCode scanné !", MudBlazor.Severity.Error);
                                         }
                                         break;
                                     case '5':
@@ -189,7 +190,7 @@ namespace KANTAIM.APK.Components.Pages
                     }
 
                     TextValue = null;
-                    //_snackService.Add("Mauvais QRCode scanné !",MudBlazor.Severity.Error);
+                    //
                 }
                 else
                 {
