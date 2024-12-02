@@ -1,0 +1,94 @@
+﻿@page "/Consultation/FindPge"
+@using Azure;
+@using KANTAIM.DAL.Model;
+@using KANTAIM.DAL.Services;
+@using KANTAIM.WEB.Ressources;
+@using KANTAIM.WEB.ViewModels;
+@using Microsoft.AspNetCore.Components;
+@using MudBlazor;
+@using System.ComponentModel.DataAnnotations;
+
+<MudPaper Height="850px" Style="overflow:hidden; position:relative;">
+    <MudDrawerContainer Class="mud-height-full">
+        <MudGrid>
+            <MudItem xs="12" Style="display: flex; justify-content: center; align-items: flex-start; margin-top: 20px;">
+                <div style="display: flex; justify-content: space-between;">
+                    <div style="flex: 1; margin-right: 10px;">
+                        <MudSelect T="int" @bind-Value="SelectedProductFamilyId" Label="ProductFamily" Variant="MudBlazor.Variant.Outlined" @onchange="RefreshData">
+                            @foreach (var productfamily in productfamiliesList)
+                            {
+                                <MudSelectItem T="int" Value="@(productfamily.Id)">@productfamily.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </div>
+                    <div style="flex: 1; margin-right: 10px;">
+                        <MudSelect T="int" @bind-Value="SelectedProductId" Label="Product" Variant="MudBlazor.Variant.Outlined">
+                            @foreach (var product in productList)
+                            {
+                                <MudSelectItem T="int" Value="@(product.Id)">@product.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </div>
+                    <div style="display: flex; justify-content: center; margin-top: 10px;">
+                    <MudButton Variant="MudBlazor.Variant.Filled" Color="Color.Primary" OnClick="RefreshData">Afficher</MudButton>
+                </div>
+                </div>
+            </MudItem>
+        </MudGrid>
+
+        <div>
+            <MudDataGrid T="StoreInfo" Items="@storeInfos" Dense=true Hover=true ReadOnly=true EditMode="MudBlazor.DataGridEditMode.Cell"
+                         Virtualize="true" SelectOnRowClick=false MultiSelection=true Bordered=true
+                         Filterable="true" SortMode="SortMode.Multiple" Hideable="false" QuickFilter="@_quickFilter">
+                <ToolBarContent>
+                    <MudTextField @bind-Value="_searchString" Placeholder="Recherche Container" Adornment="Adornment.Start" Immediate="true"
+                                  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                </ToolBarContent>
+
+                <Columns>
+                    <PropertyColumn Property="x => x.ProdColor" Title="Couleur">
+                        <CellTemplate>
+                            @context.Item.ProdColor
+                        </CellTemplate>
+                    </PropertyColumn>
+                    <PropertyColumn Property="x => x.containers.Count()" Title="Quantité de contenaire">
+                        <CellTemplate>
+                            @context.Item.containers.Count()
+                        </CellTemplate>
+                    </PropertyColumn>
+                    <PropertyColumn Property="x => x.ProductCount" Title="Quantité de produit">
+                        <CellTemplate>
+                            @context.Item.ProductCount
+                        </CellTemplate>
+                    </PropertyColumn>
+                </Columns>
+                <PagerContent>
+                    <MudDataGridPager T="LogVM" PageSizeOptions="@(new int[] {13, 30, 50,100})" />
+                </PagerContent>
+            </MudDataGrid>
+        </div>
+    </MudDrawerContainer>
+</MudPaper>
+
+@* @code {
+    [Inject] public ProductFamilyService _productfamilyService { get; set; }
+    [Inject] public ProductService _productService { get; set; }
+
+    private IEnumerable<ProductFamily> productfamiliesList;
+    private IEnumerable<Product> productList;
+
+    public int SelectedProductId { get; set; }
+    public int SelectedProductFamilyId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        productfamiliesList = _productfamilyService.GetAll();
+        productList = _productService.GetAllPerProductFamily(SelectedProductFamilyId);
+    }
+
+    void RefreshData()
+    {
+        productList = _productService.GetAllPerProductFamily(SelectedProductFamilyId);
+    }
+}
+ *@

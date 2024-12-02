@@ -113,33 +113,39 @@ namespace KANTAIM.APK.Components.Pages
                                         string c = parts[1];
                                         if (int.TryParse(c, out int containerNumber))
                                         {
-
-                                            Container? containerScanner = _contenaireService.GetContainerByNumber(containerNumber);
-                                            if (containerScanner != null)
+                                            try
                                             {
-                                                switch (containerScanner.ContainerAction.Status)
+                                                Container? containerScanner = _contenaireService.GetContainerByNumber(containerNumber);
+                                                if (containerScanner != null)
                                                 {
-                                                    case 0:
-                                                        /*Quand on scan un contenaire vide, on l'initialise sur press.*/
-                                                        NavigationManager.NavigateTo($"/InitialisationPge/0/{containerNumber}");
-                                                        break;
-                                                    case 1:
-                                                        /*Après initialisation, on choisie son fillstatus, et après on le mise en rack.*/
-                                                        NavigationManager.NavigateTo($"/StockagePge/1/{containerNumber}");
-                                                        break;
-                                                    case 2:
-                                                        /*Traite un contenaire qui stock avec produit, on peut sortir stock ou le déplacer.*/
-                                                        NavigationManager.NavigateTo($"/ShipmentPge/1/{containerNumber}");
-                                                        break;
-                                                    case 3:
-                                                        /*Après sortie le contenaire avec produit, on vas le mise en Machine*/
-                                                        NavigationManager.NavigateTo($"/InjectPge/1/{containerNumber}");
-                                                        break;
-                                                    case 4:
-                                                        /*Apres vidange le contenaire est vide, on Mise en rack.*/
-                                                        NavigationManager.NavigateTo($"/StockagePge/1/{containerNumber}");
-                                                        break;
+                                                    switch (containerScanner.ContainerAction.Status)
+                                                    {
+                                                        case 0:
+                                                            /*Quand on scan un contenaire vide, on l'initialise sur press.*/
+                                                            NavigationManager.NavigateTo($"/InitialisationPge/0/{containerNumber}");
+                                                            break;
+                                                        case 1:
+                                                            /*Après initialisation, on choisie son fillstatus, et après on le mise en rack.*/
+                                                            NavigationManager.NavigateTo($"/StockagePge/1/{containerNumber}");
+                                                            break;
+                                                        case 2:
+                                                            /*Traite un contenaire qui stock avec produit, on peut sortir stock ou le déplacer.*/
+                                                            NavigationManager.NavigateTo($"/ShipmentPge/1/{containerNumber}");
+                                                            break;
+                                                        case 3:
+                                                            /*Après sortie le contenaire avec produit, on vas le mise en Machine*/
+                                                            NavigationManager.NavigateTo($"/InjectPge/1/{containerNumber}");
+                                                            break;
+                                                        case 4:
+                                                            /*Apres vidange le contenaire est vide, on Mise en rack.*/
+                                                            NavigationManager.NavigateTo($"/StockagePge/1/{containerNumber}");
+                                                            break;
+                                                    }
                                                 }
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                _snackService.Add(ex.Message + containerNumber, MudBlazor.Severity.Error);
                                             }
 
                                         }
@@ -162,15 +168,15 @@ namespace KANTAIM.APK.Components.Pages
                                         break;
                                     case '4':
                                         // Traiter la cell
-                                        string X = parts[1];
-                                        string Y = parts[2];
-
-                                        if (int.TryParse(X, out int x) && int.TryParse(Y, out int y))
-                                        {
-                                            CellScanner = _cellService.GetByXY(x, y);
-                                            //NavigationManager.NavigateTo($"/StockagePge/4/{CellScanner.Id}");
-                                            _snackService.Add("Mauvais QRCode scanné !", MudBlazor.Severity.Error);
-                                        }
+                                        //string X = parts[1];
+                                        //string Y = parts[2];
+                                        _snackService.Add("Impossible de scanner une cellule en premier !", MudBlazor.Severity.Error);
+                                        //if (int.TryParse(X, out int x) && int.TryParse(Y, out int y))
+                                        //{
+                                        //    CellScanner = _cellService.GetByXY(x, y);
+                                        //    NavigationManager.NavigateTo($"/StockagePge/4/{CellScanner.Id}");
+                                        //    _snackService.Add("Mauvais QRCode scanné !", MudBlazor.Severity.Error);
+                                        //}
                                         break;
                                     case '5':
                                         // Recherche le produit

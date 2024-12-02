@@ -124,11 +124,11 @@ namespace KANTAIM.APK.Components.Pages
             get
             {
                 state = 0;
-                if (bienStock) /*state = 1;*/{ _snackService.Add("Bien Stocké !", Severity.Success); NavigationManager.NavigateTo($"/ScannerPge"); }
+                if (bienStock) /*state = 1;*/{ _snackService.Add("Bien Stocké !", Severity.Success); NavigationManager.NavigateTo($"/"); }
                 else if (maintenance) state = 2;
                 else if (cellScanner != null) state = 3;
                 else if (stock) state = 4;
-                else if (shipment) /*state = 5;*/  { _snackService.Add("Bien sortie !", Severity.Success); NavigationManager.NavigateTo($"/ScannerPge"); }
+                else if (shipment) /*state = 5;*/  { _snackService.Add("Bien sortie !", Severity.Success); NavigationManager.NavigateTo($"/"); }
                 else state = 0;
 
                 return state;
