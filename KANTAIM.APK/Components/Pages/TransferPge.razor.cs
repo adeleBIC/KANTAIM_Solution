@@ -115,7 +115,7 @@ namespace KANTAIM.APK.Components.Pages
                 int.TryParse(parts[0], out int type);
                 if (type != 1)
                 {
-                    _snackService.Add("Svp scanner le QR code de la Contenaire.", Severity.Error);
+                    _snackService.Add("Svp scanner le QR code du Contenaire.", Severity.Error);
                 }
                 else
                 {
@@ -135,7 +135,7 @@ namespace KANTAIM.APK.Components.Pages
                 int.TryParse(parts[0], out int type);
                 if (type != 1)
                 {
-                    _snackService.Add("Svp scanner le QR code de la Contenaire.", Severity.Error);
+                    _snackService.Add("Svp scanner le QR code du Contenaire.", Severity.Error);
                 }
                 else
                 {
@@ -143,7 +143,7 @@ namespace KANTAIM.APK.Components.Pages
                     AutreScanner = _contenaireService.GetContainerByNumber(Number);
                     if (AutreScanner.FillStatus != 1)
                     {
-                        _snackService.Add("Svp vérifier la Contenaire est vide.", Severity.Error);
+                        _snackService.Add("Svp vérifier le Contenaire est vide.", Severity.Error);
                         AutreScanner = null;
                     }
                 }
