@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System.ComponentModel.DataAnnotations;
 
-namespace KANTAIM.WEB.Pages.Consultation
+namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
 {
     public partial class LogPge
     {
@@ -48,7 +48,7 @@ namespace KANTAIM.WEB.Pages.Consultation
 
             return false;
         };
-        
+
         public string RowClassFct(LogVM unityVM, int row)
         {
             return unityVM.IsEditing ? "editing" : "";

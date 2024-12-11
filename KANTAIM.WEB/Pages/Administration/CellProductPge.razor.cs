@@ -89,7 +89,7 @@ namespace KANTAIM.WEB.Pages.Administration
         {
             CellTreeItems.Clear();
             ProductTreeItems.Clear();
-            cells = _cellService.GetAll().OrderBy(c => c.Name).Select(u => new CellVM(u)).ToList();
+            cells = _cellService.GetAll().OrderBy(c => c.Name.Length).ThenBy(c => c.Name).Select(u => new CellVM(u)).ToList();
             foreach (var cell in cells)
             {
                 if (ProductActivatedValue != null && _cellProductService.FindLink(cell.Id, ProductActivatedValue.Id))

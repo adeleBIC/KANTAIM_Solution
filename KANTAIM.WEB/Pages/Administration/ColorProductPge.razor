@@ -117,15 +117,15 @@
                 <div class="tree-view-container">
                     @if (Colors != null)
                     {
-                        <MudTreeView Items="ColorTreeItems" Hover="true" @bind-ActivatedValue="ColorActivatedValue" @bind-SelectedValues="ColorSelectedValues">
+                        <MudTreeView Items="ColorTreeItems" Hover="true"  @bind-SelectedValue="ColorActivatedValue">
                             <ItemTemplate>
                                 @if (@context.IsSelected)
                                 {
-                                    <MudTreeViewItem Icon="@Icons.Material.Filled.Label" IconColor="Color.Success" ActivatedChanged="@(() => ActiveAsync(context, 0))" @bind-Expanded="@context.IsExpanded" Items="@context.TreeItems" Value="@context" Text="@context.Name"></MudTreeViewItem>
+                                    <MudTreeViewItem Icon="@Icons.Material.Filled.Label" IconColor="Color.Success" OnClick="@(() => ActiveAsync(context, 0))" @bind-Expanded="@context.IsExpanded" Items="@context.TreeItems" Value="@context" Text="@context.Name"></MudTreeViewItem>
                                 }
                                 else
                                 {
-                                    <MudTreeViewItem Icon="@Icons.Material.Filled.Label" ActivatedChanged="@(() => ActiveAsync(context, 0))" @bind-Expanded="@context.IsExpanded" Items="@context.TreeItems" Value="@context" Text="@context.Name"></MudTreeViewItem>
+                                    <MudTreeViewItem Icon="@Icons.Material.Filled.Label" OnClick="@(() => ActiveAsync(context, 0))" @bind-Expanded="@context.IsExpanded" Items="@context.TreeItems" Value="@context" Text="@context.Name"></MudTreeViewItem>
                                 }
                             </ItemTemplate>
                         </MudTreeView>
@@ -139,15 +139,15 @@
                 <div class="tree-view-container">
                     @if (ProductFamilies != null)
                     {
-                        <MudTreeView Items="ProductTreeItems" Hover="true" @bind-ActivatedValue="ProductActivatedValue" @bind-SelectedValues="ProductSelectedValues">
+                        <MudTreeView Items="ProductTreeItems" Hover="true" @bind-SelectedValue="ProductActivatedValue">
                             <ItemTemplate>
                                 @if (@context.IsSelected)
                                 {
-                                    <MudTreeViewItem Icon="@Icons.Material.Filled.Label" IconColor="Color.Success" ActivatedChanged="@(() => ActiveAsync(context, 1))" @bind-Expanded="@context.IsExpanded" Items="@context.TreeItems" Value="@context" Text="@context.Name"></MudTreeViewItem>
+                                    <MudTreeViewItem Icon="@Icons.Material.Filled.Label" IconColor="Color.Success" OnClick="@(() => ActiveAsync(context, 1))" @bind-Expanded="@context.IsExpanded" Items="@context.TreeItems" Value="@context" Text="@context.Name"></MudTreeViewItem>
                                 }
                                 else
                                 {
-                                    <MudTreeViewItem Icon="@Icons.Material.Filled.Label" ActivatedChanged="@(() => ActiveAsync(context, 1))" @bind-Expanded="@context.IsExpanded" Items="@context.TreeItems" Value="@context" Text="@context.Name"></MudTreeViewItem>
+                                    <MudTreeViewItem Icon="@Icons.Material.Filled.Label" OnClick="@(() => ActiveAsync(context, 1))" @bind-Expanded="@context.IsExpanded" Items="@context.TreeItems" Value="@context" Text="@context.Name"></MudTreeViewItem>
                                 }
                             </ItemTemplate>
                         </MudTreeView>

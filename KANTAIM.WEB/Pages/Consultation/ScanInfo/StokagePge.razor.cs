@@ -1,4 +1,4 @@
-namespace KANTAIM.WEB.Pages.Consultation
+namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
 {
     public partial class StokageMap
     {

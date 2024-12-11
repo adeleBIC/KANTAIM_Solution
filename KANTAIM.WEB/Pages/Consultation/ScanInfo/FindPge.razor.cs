@@ -8,7 +8,7 @@ using MudBlazor;
 using System.ComponentModel.DataAnnotations;
 using static KANTAIM.WEB.Pages.Kanban.FindProductPge;
 
-namespace KANTAIM.WEB.Pages.Consultation
+namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
 {
     public partial class FindPge
     {
