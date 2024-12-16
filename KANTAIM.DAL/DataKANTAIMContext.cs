@@ -34,10 +34,13 @@ namespace KANTAIM.DAL
         {
             if (!optionsBuilder.IsConfigured)
             {
-
+                Console.WriteLine("Testing...");
+                bool isConnected = TestConnectionAsync().GetAwaiter().GetResult(); // Blocking for testing purposes
+                Console.WriteLine($"Database connection: {isConnected}");
                 if (OperatingSystem.IsAndroid())
                 {
                     optionsBuilder.UseSqlServer("Server=MONSSQL03;Database=DATASCADAMOULAGE;User Id=UserMLV;Password=BicUserMLV20;MultipleActiveResultSets=True;Encrypt=false;TrustServerCertificate=False;MultiSubnetFailover=True");
+                    
                 }
                 else // Supposons que c'est Web
                 {
@@ -63,10 +66,12 @@ namespace KANTAIM.DAL
         {
             try
             {
+                Console.WriteLine("Testing database connection...");
                 return await Database.CanConnectAsync();
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"Database connection failed: {ex.Message}");
                 return false;
             }
         }

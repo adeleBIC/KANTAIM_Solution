@@ -29,8 +29,8 @@ namespace KANTAIM.WEB.Pages.Administration
 
         public HashSet<TreeItemData> ProductTreeItems { get; set; } = new HashSet<TreeItemData>();
         public HashSet<TreeItemData> CellTreeItems { get; set; } = new HashSet<TreeItemData>();
-        public TreeItemData ProductActivatedValue { get; set; }
-        public TreeItemData CellActivatedValue { get; set; }
+        public TreeItemData? ProductActivatedValue { get; set; }
+        public TreeItemData? CellActivatedValue { get; set; }
         public HashSet<TreeItemData> ProductSelectedValues { get; set; }
         public HashSet<TreeItemData> CellSelectedValues { get; set; }
 

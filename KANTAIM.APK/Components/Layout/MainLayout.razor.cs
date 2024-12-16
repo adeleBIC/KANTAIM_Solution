@@ -27,6 +27,7 @@ namespace KANTAIM.APK.Components.Layout
 
         protected override async Task OnInitializedAsync()
         {
+           
             await InvokeAsync(StateHasChanged);
         }
 

@@ -1,0 +1,85 @@
+﻿@page "/Consulation/StoragePge"
+@using KANTAIM.DAL.Model;
+@using KANTAIM.WEB.ViewModels;
+<style>
+    .bordered-paper {
+        border: 1px solid #dee2e6; /* Border color */
+        border-radius: 4px; /* Rounded corners */
+        overflow: hidden; /* Prevent overflow */
+    }
+
+    .tree-view-container {
+        padding: 10px; /* Padding inside the tree view */
+        /* Add margin to the bottom to prevent overlap with action buttons */
+        overflow-y: auto; /* Enable vertical scroll */
+        height: calc(100vh - 275px);
+    }
+
+    .tree-view-container-edit {
+        padding: 10px; /* Padding inside the tree view */
+        /* Add margin to the bottom to prevent overlap with action buttons */
+        overflow-y: auto; /* Enable vertical scroll */
+        height: calc(100vh - 335px);
+    }
+
+    .tree-title {
+        padding: 10px; /* Padding around title */
+        background: #f5f5f5; /* Light grey background for the title */
+        border-bottom: 1px solid #dee2e6; /* Border under the title */
+    }
+
+    .action-buttons {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background: white;
+        padding: 10px;
+        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+        .action-buttons .mud-grid-item {
+            display: flex;
+            justify-content: center; /* Center button horizontally */
+            align-items: center; /* Center button vertically */
+        }
+
+    .sticky-header {
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 1000;
+    }
+</style>
+
+<div class="pageTitle sticky-header">
+    <MudText Typo="Typo.h4">Stockage Consultation</MudText>
+</div>
+
+<div class="pa-4 content">
+    <MudGrid>
+        <MudItem xs="6" Class="bordered-paper">
+            <div class="tree-title sticky-header">
+                <MudText Typo="Typo.h5">Produits</MudText>
+            </div>
+            <div class="tree-view-container">
+                @if (ProductFamilies != null)
+                {
+                    <MudTreeView Items="ProductTreeItems" Hover="true" SingleSelection="true" @bind-SelectedValue="ProductActivatedValue">
+                        <ItemTemplate>
+                            <MudTreeViewItem Icon="@Icons.Material.Filled.Label" OnClick="@(() => SelectAsync(context))" @bind-Expanded="@context.IsExpanded" Items="@context.TreeItems" Value="@context" Text="@context.Name"></MudTreeViewItem>
+                        </ItemTemplate>
+                    </MudTreeView>
+                }
+            </div>
+        </MudItem>
+
+        <MudItem xs="6" Class="bordered-paper">
+            <div class="tree-title sticky-header">
+                <MudText Typo="Typo.h5">stockage Info</MudText>
+            </div>
+            
+        </MudItem>
+        
+    </MudGrid>
+
+</div>
