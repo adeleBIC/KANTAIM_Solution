@@ -169,14 +169,22 @@
                     <h3 class="redtitle">
                         @cellPropose.Name
                     </h3>
-                    <h3 class="title">Scannez la cellule correspondant s'il vous plait</h3>
-                    <MudText> @TextValue</MudText>
+                    @if (scanPallete)
+                    {
+                        <h3 class="title">Scannez la palette s'il vous plait</h3>
+                        <MudText> @TextValue</MudText>
+                    }
+                    else
+                    {
+                        <h3 class="title">Scannez la cellule correspondant s'il vous plait</h3>
+                        <MudText> @TextValue</MudText>
+                    }
                    @*  <div>
                         <MudTextField @bind-Value="CellValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="cellScan"></MudTextField>
                     </div> *@
 
                     <div class="button-group">
-                        <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>{stock=false;}">Retour</MudButton>
+                        <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>{stock=false;scanPallete=false;fillstatus = 0;}">Retour</MudButton>
                     </div>
                 }
             </div>

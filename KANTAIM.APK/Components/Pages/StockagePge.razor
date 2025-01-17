@@ -4,6 +4,7 @@
 @using MudBlazor
 @using static MudBlazor.Icons
 @using Microsoft.AspNetCore.Components.Routing
+@inject IDialogService DialogService
 
 <style>
     .main-container {
@@ -149,6 +150,9 @@
                         Choisissez une zone fantôme
                     </h3>
                     <MudText> @TextValue</MudText>
+                    <div class="button-group">
+                        <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>{stock=false;scanPallete=false;fillstatus=0;}">Retour</MudButton>
+                    </div>
                     @* <MudTextField @bind-Value="CellValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="cellScan"></MudTextField> *@
                 }
                 else
@@ -163,14 +167,20 @@
                     <h3 class="redtitle">
                         @cellPropose.Name
                     </h3>
-                    <h3 class="title">Scannez la cellule correspondant s'il vous plait</h3>
-                    <MudText> @TextValue</MudText>
+                    @if (scanPallete) {
+                        <h3 class="title">Scannez la palette s'il vous plait</h3>
+                        <MudText> @TextValue</MudText>
+                    } else{
+                        <h3 class="title">Scannez la cellule correspondant s'il vous plait</h3>
+                        <MudText> @TextValue</MudText>
+                    }
+                    
                    @*  <div>
                         <MudTextField @bind-Value="CellValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="cellScan"></MudTextField>
                     </div> *@
 
                     <div class="button-group">
-                        <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>{stock=false;}">Retour</MudButton>
+                        <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>{stock=false;scanPallete=false;fillstatus = 0;}">Retour</MudButton>
                     </div>
                 }
             </div>
@@ -201,8 +211,17 @@
 
                         @if (isPalette)
                         {
-                            <div class="status-item">Nombre de Bac : @_contenaireService.CountBac(ContainerScanner.Id)</div>
+                            <div class="status-item">Nombre de Bac : @_contenaireService.CountBac(ContainerScanner.Id)
+                                <MudButton @onclick="OpenDialogAsync" Variant="Variant.Filled" Color="Color.Primary">
+                                    <MudIcon Icon=@Icons.Material.Filled.RemoveRedEye/>
+                                    Afficher
+                                </MudButton>
+                                
+
+                            </div>
+                            
                         }
+
                     </div>
                 }
             </div>

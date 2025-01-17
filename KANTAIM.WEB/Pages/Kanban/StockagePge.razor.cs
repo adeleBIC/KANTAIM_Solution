@@ -20,6 +20,7 @@ namespace KANTAIM.WEB.Pages.Kanban
 {
     public partial class StockagePge
     {
+        [Inject] private IJSRuntime JSRuntime { get; set; }
         [Inject] public ContenaireService _contenaireService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
         [Inject] public LogService _logService { get; set; }
@@ -51,10 +52,11 @@ namespace KANTAIM.WEB.Pages.Kanban
         public string? ContainerValue { get; set; }
 
         public Container? ContainerScanner { get; set; }
+        public Container? PaletteScanner { get; set; }
         public Log? logRescent { get; set; }
-        public Cell? cellPropose { get; set; }
+        public DAL.Model.Cell? cellPropose { get; set; }
 
-        public Cell? cellScanner { get; set; }
+        public DAL.Model.Cell? cellScanner { get; set; }
         public int fillstatus = 0;
         public Boolean isPalette { get; set; } = false;
         public Container? BacScanner { get; set; }
@@ -64,7 +66,9 @@ namespace KANTAIM.WEB.Pages.Kanban
         public List<CellLog> cellList { get; set; }
         public Log? cellLog { get; set; }
         public Log? containerLog { get; set; }
-        
+        public Log? paletteLog { get; set; }
+        public Boolean scanPallete { get; set; } = false;
+
         public string? TextValue { get; set; }
 
         private static StockagePge _instance;
@@ -72,33 +76,50 @@ namespace KANTAIM.WEB.Pages.Kanban
         private string pageUrl;
         private int state;
 
+        private string LastKey { get; set; }
+
         [JSInvokable]
         public static void CaptureInputStock(string input)
         {
             _instance?.HandleInput(input);
         }
+
         private async void HandleInput(string input)
         {
-            if(currentUrl == pageUrl)
+            if (currentUrl == pageUrl)
             {
-                if (input == "Enter" )
+                if (input == "Enter")
                 {
                     switch (state)
                     {
-                        case 0: 
-                            if(isPalette)
+                        case 0:
+                            if (isPalette)
                             {
                                 BacScan(TextValue);
                             }
                             break;
                         case 2:
-                            cellScan(TextValue);
+                            if (scanPallete)
+                            {
+                                PalleteScan(TextValue);
+                            }
+                            else
+                            {
+                                cellScan(TextValue);
+                            }
                             break;
                         case 3:
                             ContainerScan(TextValue);
                             break;
                         case 4:
-                            cellScan(TextValue);
+                            if (scanPallete)
+                            {
+                                PalleteScan(TextValue);
+                            }
+                            else
+                            {
+                                cellScan(TextValue);
+                            }
                             break;
                     }
 
@@ -113,7 +134,7 @@ namespace KANTAIM.WEB.Pages.Kanban
 
                 }
             }
-            
+
         }
 
         public int State
@@ -121,11 +142,11 @@ namespace KANTAIM.WEB.Pages.Kanban
             get
             {
                 state = 0;
-                if (bienStock) /*state = 1;*/{ _snackService.Add("Bien Stocké !", Severity.Success); NavigationManager.NavigateTo($"/ScannerPge"); }
+                if (bienStock) /*state = 1;*/{ _snackService.Add("Bien Stocké !", Severity.Success); NavigationManager.NavigateTo($"/"); }
                 else if (maintenance) state = 2;
                 else if (cellScanner != null) state = 3;
                 else if (stock) state = 4;
-                else if (shipment) /*state = 5;*/  { _snackService.Add("Bien sortie !", Severity.Success); NavigationManager.NavigateTo($"/ScannerPge"); }
+                else if (shipment) /*state = 5;*/  { _snackService.Add("Bien sortie !", Severity.Success); NavigationManager.NavigateTo($"/"); }
                 else state = 0;
 
                 return state;
@@ -207,7 +228,7 @@ namespace KANTAIM.WEB.Pages.Kanban
             {
                 ContainerScanner = null;
                 _snackService.Add("Svp scannez une palette ou un contenaire !", Severity.Error);
-                NavigationManager.NavigateTo($"/ScannerPge");
+                NavigationManager.NavigateTo($"/");
             }
         }
 
@@ -244,7 +265,8 @@ namespace KANTAIM.WEB.Pages.Kanban
             if (bac.ContainerID == palette.Id)
             {
                 _snackService.Add("Déjà ajouté !", Severity.Error);
-            } else
+            }
+            else
             {
                 bac.CellId = palette.CellId;
                 bac.ActionID = palette.ActionID;
@@ -281,36 +303,41 @@ namespace KANTAIM.WEB.Pages.Kanban
         void FillstatusSelected(int fillstatu)
         {
             fillstatus = fillstatu;
-            List<Cell> cells = new List<Cell>();
+            List<DAL.Model.Cell> cells = new List<DAL.Model.Cell>();
             stock = true;
-            if(fillstatus == StatusContainer.Empty) // vide
+            if (fillstatus == StatusContainer.Empty) // vide
             {
                 cells = _cellService.GetAll().Where(u => u.ForEmpty == true).ToList();
-                if(ContainerScanner.ContainerType.IsContainable == true)
+                if (ContainerScanner.ContainerType.IsContainable == true)
                 {
                     cells = cells.FindAll(u => u.IsPhantom == true); // if it is a bac empty, we stock it in the cell phantom and empty
-                } else
+                }
+                else
                 {
                     cells = cells.FindAll(u => u.IsPhantom != true);// if it isn't a bac empty, we stock it in the cell empty
                 }
-                foreach (Cell cell in cells)
+                foreach (DAL.Model.Cell cell in cells)
                 {
                     if (cell.Status != StatusCell.Full && cell.Id != ContainerScanner.CellId)
                     {
                         cellPropose = cell;
-                        
-                    }       
+
+                    }
                 }
-            } else // plein ou semi-plein
+            }
+            else // plein ou semi-plein
             {
-                
+
                 if (logRescent != null)
                 {
                     product = _productService.GetById((int)logRescent.ProductID);
                     colorOfProduct = _colorService.GetById(logRescent.ProdColorID);
                 }
-                
-                if(isPalette && _contenaireService.CountBac(ContainerScanner.Id) < 24 )
+                if (ContainerScanner.ContainerType.TypeNumber == 2)
+                {
+                    scanPallete = true;
+                }
+                if (isPalette && _contenaireService.CountBac(ContainerScanner.Id) < 24)
                 {
                     _snackService.Add("Le nombre de bac est inférieur que 24 !", Severity.Error);
                     //stock = false;
@@ -319,7 +346,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                 findCells();
 
             }
-           
+
         }
 
         void findCells()
@@ -328,19 +355,20 @@ namespace KANTAIM.WEB.Pages.Kanban
             foreach (Container container in _contenaireService.GetAll().Where(c => c.CellStock != null && c.ContainerType.IsContainable == false)) // recherche tous les contenaire qui est stockés dans la cellule, find all the contenaire who in currutly in the cell
             {
                 cellLog = _logService.GetByContenaireByOperationStatus(container.Id, OperationContainer.Store);
-                Cell? cellAct = _cellService.GetById(cellLog?.CellID ?? 0);
-                if(cellAct != null && cellAct.IsJail != true && cellAct.IsMaintenance != true && cellAct.ForEmpty != true && cellAct.IsPhantom != true && cellAct.Status != StatusCell.Full && _cellProductService.FindLink(cellAct.Id, product.Id) && cellAct.Id != ContainerScanner?.CellId) { 
-                    if (cellLog != null && cellLog.ProductID == product.Id )
+                DAL.Model.Cell? cellAct = _cellService.GetById(cellLog?.CellID ?? 0);
+                if (cellAct != null && cellAct.IsJail != true && cellAct.IsMaintenance != true && cellAct.ForEmpty != true && cellAct.IsPhantom != true && cellAct.Status != StatusCell.Full && _cellProductService.FindLink(cellAct.Id, product.Id) && cellAct.Id != ContainerScanner?.CellId)
+                {
+                    if (cellLog != null && cellLog.ProductID == product.Id)
                     {
                         if (colorOfProduct == null || cellLog.ProdColorID == colorOfProduct.Id)
                         {
-                            if (!cellList.Any(c => c.Cell.Id == container.CellStock.Id) )
+                            if (!cellList.Any(c => c.Cell.Id == container.CellStock.Id))
                             {
                                 cellList.Add(new CellLog { Cell = container.CellStock, EventTime = cellLog.EventTime });
                             }
                         }
                     }
-                }  
+                }
             }
             if (cellList != null && cellList.Count > 0)
             {
@@ -349,10 +377,12 @@ namespace KANTAIM.WEB.Pages.Kanban
                 {
                     cellPropose = oldestCellLog.Cell;
                 }
-            } else {
-                List<Cell> cells = new List<Cell>();
+            }
+            else
+            {
+                List<DAL.Model.Cell> cells = new List<DAL.Model.Cell>();
                 cells = _cellService.GetAll().Where(u => u.IsJail != true && u.IsMaintenance != true && u.ForEmpty != true && u.IsPhantom != true && u.Status == StatusCell.Empty).ToList();
-                foreach (Cell cell in cells)
+                foreach (DAL.Model.Cell cell in cells)
                 {
                     if (_cellProductService.FindLink(cell.Id, product.Id) && cell.Id != ContainerScanner.CellId)
                     {
@@ -385,7 +415,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                 int.TryParse(parts[2], out int Y);
                 // int.TryParse(parts[3], out int typeCell);
                 cellScanner = _cellService.GetAll().Where(u => u.X == X && u.Y == Y).FirstOrDefault();
-                
+
 
                 if (maintenance)
                 {
@@ -414,7 +444,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                     }
                     else
                     {
-                        if (cellScanner.Status == StatusCell.Full) 
+                        if (cellScanner.Status == StatusCell.Full)
                         {
                             _snackService.Add("Attention la cellule est pleine.", Severity.Error);
                             cellScanner = null;
@@ -431,7 +461,7 @@ namespace KANTAIM.WEB.Pages.Kanban
 
                         }
                         /*Verify the others products in this cell is the same type with the product in the contenaire we scan*/
-                        if(cellScanner != null && fillstatus > StatusContainer.Empty && !cellScanner.IsPhantom && !cellScanner.IsJail && !cellScanner.IsMaintenance)
+                        if (cellScanner != null && fillstatus > StatusContainer.Empty && !cellScanner.IsPhantom && !cellScanner.IsJail && !cellScanner.IsMaintenance)
                         {
                             foreach (Container container in cellScanner.Containers)
                             {
@@ -467,17 +497,79 @@ namespace KANTAIM.WEB.Pages.Kanban
             _cellService.Upsert(cellScanner);
         }
 
+        void PalleteScan(string code)
+        {
+            string[] parts = _scanService.scanCode(code);
+
+            if (parts != null)
+            {
+                int.TryParse(parts[0], out int type);
+                int.TryParse(parts[1], out int PaletteNumber);
+                int.TryParse(parts[2], out int ContenaireType);
+                if (type == 1 && ContenaireType == 3)
+                {
+                    PaletteScanner = _contenaireService.GetContainerByNumber(PaletteNumber);
+                    paletteLog = _logService.GetByContenaireByOperationStatus(PaletteScanner.Id, OperationContainer.Store);
+                    containerLog = _logService.GetByContenaireId(ContainerScanner.Id);
+                    if (paletteLog.Product != null && paletteLog.ProductID != containerLog.ProductID)
+                    {
+                        _snackService.Add("Scannez une Palette qui a le même produit que bac s'il vous plaît!", Severity.Error);
+                    }
+                    Exit(2);
+                }
+                else
+                {
+                    _snackService.Add("Scannez une Palette s'il vous plaît!", Severity.Error);
+                }
+            }
+
+        }
+
+        void BacInPallete(int action)
+        {
+            Log u;
+            u = new Log()
+            {
+                EventTime = DateTime.Now,
+                Operation = shipment ? OperationContainer.Shipment : OperationContainer.Store,
+                Product = logRescent.Product,
+                ProductID = logRescent.ProductID,
+                Press = logRescent.Press,
+                PressID = logRescent.PressID,
+                Shape = logRescent.Shape,
+                ShapeID = logRescent.ShapeID,
+                Container = ContainerScanner,
+                ContainerID = ContainerScanner.Id,
+                ProdColor = logRescent.ProdColor,
+                ProdColorID = logRescent.ProdColorID,
+                FillStatus = fillstatus
+            };
+            if (paletteLog != null)
+            {
+                u.Cell = paletteLog.Cell;
+                u.CellID = paletteLog.CellID;
+            }
+            ContainerScanner.ContainerAction = _actionService.GetByStatus(action);/*0: Stocké vide, store without product 2 : store with product 3 : Shipment*/
+            ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
+            _logService.UpSert(u);
+            ContainerScanner.FillStatus = fillstatus;
+            ContainerScanner.CellId = u.CellID;
+            _contenaireService.UpSert(ContainerScanner);
+            bienStock = true;
+        }
+
         void Exit(int action)
         {
-            if(action == 3)
+            if (action == 3)
                 shipment = true;
             Log u;
             if (fillstatus != 1)
             {//if container is not empty
-                if (ContainerScanner != null && ContainerScanner.ContainerType.TypeNumber == 2)
+                if (ContainerScanner != null && ContainerScanner.ContainerType.TypeNumber == 2) // if it isn't an empty bac, we can replace this bac to correspond pallete 
                 {
-                    _snackService.Add("Non vide bac stock dans une cellule est interdit !", Severity.Error);
-                    cellScanner = null;
+                    BacInPallete(action);
+                    //_snackService.Add("Non vide bac stock dans une cellule est interdit !", Severity.Error);
+                    //cellScanner = null;
                     return;
                 }
                 u = new Log()
@@ -496,13 +588,14 @@ namespace KANTAIM.WEB.Pages.Kanban
                     ProdColorID = logRescent.ProdColorID,
                     FillStatus = fillstatus
                 };
-                if(cellScanner != null)
+                if (cellScanner != null)
                 {
                     u.Cell = cellScanner;
                     u.CellID = cellScanner.Id;
                 }
                 //ContainerScanner.ActionID = action; /*2 : store with product 3 : Shipment*/
-            } else
+            }
+            else
             {
                 action = 0;/*0: Stocké vide, store without product*/
                 u = new Log()
@@ -515,7 +608,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                     CellID = cellScanner.Id,
                     FillStatus = fillstatus
                 };
-                
+
                 //ContainerScanner.ActionID = 0; 
             }
 
@@ -535,7 +628,7 @@ namespace KANTAIM.WEB.Pages.Kanban
             ContainerScanner.FillStatus = fillstatus;
             ContainerScanner.CellId = u.CellID;
             _contenaireService.UpSert(ContainerScanner);
-            
+
             if (isPalette)
             {
                 foreach (var item in _contenaireService.GetAllBacs(ContainerScanner.Id))
@@ -547,14 +640,14 @@ namespace KANTAIM.WEB.Pages.Kanban
                         item.CellStock = cellScanner;
                         item.CellId = cellScanner.Id;
                     }
-                    
+
                     item.FillStatus = fillstatus;
                     _contenaireService.UpSert(item);
                 }
             }
             upDateCellState();
             bienStock = true;
-           }
+        }
     }
 }
 

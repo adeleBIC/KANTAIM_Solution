@@ -145,6 +145,7 @@ namespace KANTAIM.APK.Components.Pages
                     cellPropose = oldestCellLog.Cell;
                 }
             }
+          
         }
 
 

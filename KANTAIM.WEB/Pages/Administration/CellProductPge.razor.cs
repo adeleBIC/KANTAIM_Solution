@@ -23,9 +23,6 @@ namespace KANTAIM.WEB.Pages.Administration
         public List<CellVM> cells { get; set; }
         public List<ProductVM> Products { get; set; }
         public ProductFamilyVM SelectedProductFamily { get; set; }
-        private string _searchString;
-        MudListItem selectedItem;
-        object selectedValue;
 
         public HashSet<TreeItemData> ProductTreeItems { get; set; } = new HashSet<TreeItemData>();
         public HashSet<TreeItemData> CellTreeItems { get; set; } = new HashSet<TreeItemData>();

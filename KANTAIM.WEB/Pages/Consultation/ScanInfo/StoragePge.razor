@@ -77,6 +77,30 @@
             <div class="tree-title sticky-header">
                 <MudText Typo="Typo.h5">stockage Info</MudText>
             </div>
+            <div class="tree-view-container">
+                @if (cells != null && cells.Any())
+                {
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Cell Name</th>
+                                <th>Cell Status</th>
+                                <th>Event Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var log in cells)
+                            {
+                                <tr>
+                                    <td>@log.Cell.Name</td>
+                                    <td>@CellStatus[log.Cell.Status]</td>
+                                    <td>@log.EventTime.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
             
         </MudItem>
         

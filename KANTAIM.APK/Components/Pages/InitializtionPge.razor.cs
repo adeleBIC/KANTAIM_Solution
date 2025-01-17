@@ -228,7 +228,7 @@ namespace KANTAIM.APK.Components.Pages
                 }
                 else if (type == 2 && Number > 0) // scanner un machine inject pour initialiser
                 {
-                    MachineScanner = _machineService.GetById(Number);
+                    MachineScanner = _machineService.GetByNumber(Number);
                     if(MachineScanner.IsInkjet == false)
                     {
                         _snackService.Add("Ce n'est pas une machine INK JET !", Severity.Error);
@@ -320,17 +320,19 @@ namespace KANTAIM.APK.Components.Pages
 
         void upDateCellState(DAL.Model.Cell cell)
         {
-            if (_contenaireService.CountCells(cell.Id) == 0)
+            if(cell != null)
             {
-                cell.Status = StatusCell.Empty;
-            }
-            else
-            {
-                cell.Status = StatusCell.InFill;
-            }
+                if (_contenaireService.CountCells(cell.Id) == 0)
+                {
+                    cell.Status = StatusCell.Empty;
+                }
+                else
+                {
+                    cell.Status = StatusCell.InFill;
+                }
 
-            _cellService.Upsert(cell);
-
+                _cellService.Upsert(cell);
+            }
         }
 
         private void ClearTextField()

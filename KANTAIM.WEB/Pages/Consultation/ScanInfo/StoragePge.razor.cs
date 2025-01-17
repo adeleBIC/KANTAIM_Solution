@@ -24,7 +24,14 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
         public Dictionary<int, List<Container>> productContainer { get; set; } = new Dictionary<int, List<Container>>();
         public List<Container> InfoContainer { get; set; }
         public double totals { get; set; }
+        public List<CellLog> cells { get; set; }
+        public Dictionary<int, string> CellStatus { get; set; }
 
+        public class CellLog
+        {
+            public DAL.Model.Cell Cell { get; set; }
+            public DateTime EventTime { get; set; }
+        }
         public class TreeItemData
         {
             public int Id { get; set; }
@@ -113,6 +120,21 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
             await Task.Run(RefreshData);
         }
 
+        private void findCells()
+        {
+            foreach (Container container in _contenaireService.GetAll().Where(c => c.CellStock != null))
+            {
+                var logRescent = _logService.GetByContenaireByOperationStatus(container.Id, OperationContainer.Store);
+                if (logRescent != null && logRescent.Product != null && logRescent.Product.Number == selectedProduct.Number)
+                {
+                    if (!cells.Any(c => c.Cell.Id == container.CellStock.Id))
+                    {
+                        cells.Add(new CellLog { Cell = container.CellStock, EventTime = logRescent.EventTime });
+                    }
+                }
+            }
+        }
+
         async Task SelectAsync(TreeItemData item)
         {
             SelectedValue = item;
@@ -121,7 +143,9 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
 
         void RefreshData()
         {
-           totals = 0;
+            cells = new List<CellLog>();
+            CellStatus = new StatusCell().Status;
+            totals = 0;
            if(SelectedValue != null)
             {
                 if(SelectedValue.IsFamily)
@@ -130,10 +154,14 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
                 } else
                 {
                     selectedProduct = _productService.GetByNumber(SelectedValue.Id);
-                    InfoContainer = productContainer[selectedProduct.Number];
-                    foreach(var container in InfoContainer)
+                    if (productContainer.ContainsKey(selectedProduct.Number))
                     {
-                        totals += container.ContainerType.NbrMaxContainer * (container.FillStatus == StatusContainer.HalfFull ? 0.5 : 1);
+                        findCells();
+                        InfoContainer = productContainer[selectedProduct.Number];
+                        foreach (var container in InfoContainer)
+                        {
+                            totals += container.ContainerType.NbrMaxContainer * (container.FillStatus == StatusContainer.HalfFull ? 0.5 : 1);
+                        }
                     }
                 }
                 
