@@ -10,6 +10,7 @@
                 {
                     <li style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; margin-bottom: 0.5rem; background: #f9f9f9; border-radius: 6px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
                         <span style="font-size: 1rem; font-weight: 500;">Bac @bac.Number  </span>
+                        <div style="font-size: 0.9rem; color: #555;">@_logService.GetByContenaireId(bac.Id).EventTime.ToString("dd-MM-yyyy HH:mm:ss")</div>
                         <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" @onclick="() => RemoveBac(bac)" />
                     </li>
                 }
@@ -21,4 +22,29 @@
     </DialogActions>
 </MudDialog>
 
+@* 
+<MudDialog>
+    <TitleContent>
+        <h3>Bacs associés à la palette</h3>
+    </TitleContent>
+    <DialogContent>
+        <div style="max-height: 300px; overflow-y: auto; padding: 0; margin: 0; border: 1px solid #ddd; border-radius: 6px;">
+            <ul style="padding: 0; list-style-type: none; margin: 0;">
+                @foreach (var bacInfo in BacList)
+                {
+                    <li style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; margin-bottom: 0.5rem; background: #f9f9f9; border-radius: 6px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+                        <div>
+                            <span style="font-size: 1rem; font-weight: 500;">Bac @bacInfo.container.Number</span>
+                            <div style="font-size: 0.9rem; color: #555;">Event Time: @bacInfo.EventTime.ToString("yyyy-MM-dd HH:mm:ss")</div>
+                        </div>
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" @onclick="() => RemoveBac(bacInfo.container)" />
+                    </li>
+                }
+            </ul>
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Fermer</MudButton>
+    </DialogActions>
+</MudDialog> *@
 

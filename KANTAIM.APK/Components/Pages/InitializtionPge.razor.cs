@@ -208,7 +208,7 @@ namespace KANTAIM.APK.Components.Pages
                     FillStatus = logRescent.FillStatus
                 };
                 _logService.UpSert(bacLog);
-                NavigationManager.NavigateTo($"/ScannerPge");
+                NavigationManager.NavigateTo($"/");
                 _snackService.Add("Réussi !", Severity.Success);
             }
             

@@ -6,6 +6,7 @@ using KANTAIM.DAL.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.JSInterop;
 using MudBlazor;
 using System;
@@ -541,7 +542,7 @@ namespace KANTAIM.APK.Components.Pages
             {
                 PaletteScanner.ContainerAction = _actionService.GetByStatus(5);// Stocké avec produit
                 PaletteScanner.ActionID = ContainerScanner.ActionID;
-                PaletteScanner.FillStatus = StatusContainer.HalfFull;//Palette statut changé à vide
+                PaletteScanner.FillStatus = StatusContainer.HalfFull;//Palette statut changé à semi pleine
                 PaletteScanner.CellStock = cellPropose;
                 PaletteScanner.CellId = cellPropose.Id;
                 _contenaireService.UpSert(PaletteScanner);
@@ -595,7 +596,7 @@ namespace KANTAIM.APK.Components.Pages
         }
 
 
-       
+
         public List<Container> bacList { get; set; }
 
 
@@ -617,6 +618,48 @@ namespace KANTAIM.APK.Components.Pages
 
             await DialogService.ShowAsync<BacDialog>("Bacs associés à la palette", parameters, options);
         }
+
+        //public List<ContainerInfo> bacList { get; set; }
+
+        //public class ContainerInfo
+        //{
+        //    public Container container { get; set; }
+        //    public DateTime EventTime { get; set; }
+        //}
+
+        //async Task OpenDialogAsync()
+        //{
+        //    if (isPalette)
+        //    {
+        //        bacList = _contenaireService.GetAll()
+        //                    .Where(c => c.ContainerID == ContainerScanner.Id)
+        //                    .Select(c => new ContainerInfo
+        //                    {
+        //                        container = c,
+        //                        EventTime = _logService.GetByContenaireId(c.Id).EventTime
+        //                    })
+        //                    .ToList();
+        //    }
+        //    var parameters = new DialogParameters
+        //        {
+        //            { "BacList", bacList }
+        //        };
+
+
+        //    var options = new DialogOptions { CloseOnEscapeKey = true };
+
+        //    try
+        //    {
+        //        var task = DialogService.ShowAsync<BacDialog>("Bacs associés à la palette", parameters, options);
+        //        await task;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.Error.Write("MyAppTag", "Exception occurred: " + ex.Message);
+        //        await DialogService.ShowAsync<BacDialog>("Bacs associés à la palette");
+        //    }
+        //}
+
 
         void Exit(int action)
         {
