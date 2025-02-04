@@ -194,7 +194,7 @@ namespace KANTAIM.APK.Components.Pages
             {
                 int.TryParse(parts[0], out int type);
                 int.TryParse(parts[1], out int containerNumber);
-                //int.TryParse(parts[2], out int ContenaireType);
+                int.TryParse(parts[2], out int ContenaireType);
                 if (type == 1)
                 {
                     ContainerManage(containerNumber);
@@ -280,6 +280,10 @@ namespace KANTAIM.APK.Components.Pages
                 bac.InMaintenance = palette.InMaintenance;
                 bac.Comment = palette.Comment;
                 bac.ContainerID = palette.Id;
+                if (palette.InJail)
+                {
+                    bac.InJail = true;
+                }
                 _contenaireService.UpSert(bac);
 
 
@@ -545,6 +549,10 @@ namespace KANTAIM.APK.Components.Pages
                 PaletteScanner.FillStatus = StatusContainer.HalfFull;//Palette statut changé à semi pleine
                 PaletteScanner.CellStock = cellPropose;
                 PaletteScanner.CellId = cellPropose.Id;
+                if(cellPropose.IsJail)
+                {
+                    PaletteScanner.InJail = true;
+                }
                 _contenaireService.UpSert(PaletteScanner);
                 logPalette.Container = PaletteScanner;
                 logPalette.ContainerID = PaletteScanner.Id;
@@ -588,6 +596,10 @@ namespace KANTAIM.APK.Components.Pages
             }
             ContainerScanner.CellStock = u.Cell;
             ContainerScanner.CellId = u.CellID;
+            if (cellScanner.IsJail)
+            {
+                ContainerScanner.InJail = true;
+            }
             _contenaireService.UpSert(ContainerScanner);
             upDateCellState();
             _logService.UpSert(u);// indere log de bac
@@ -729,6 +741,10 @@ namespace KANTAIM.APK.Components.Pages
             _logService.UpSert(u);
             ContainerScanner.FillStatus = fillstatus;
             ContainerScanner.CellId = u.CellID;
+            if (cellScanner.IsJail)
+            {
+                ContainerScanner.InJail = true;
+            }
             _contenaireService.UpSert(ContainerScanner);
             
             if (isPalette)
@@ -744,6 +760,10 @@ namespace KANTAIM.APK.Components.Pages
                     }
                     
                     item.FillStatus = fillstatus;
+                    if((ContainerScanner != null && ContainerScanner.InJail) || (PaletteScanner != null && PaletteScanner.InJail))
+                    {
+                        item.InJail = true;
+                    }
                     _contenaireService.UpSert(item);
                 }
             }

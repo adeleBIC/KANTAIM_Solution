@@ -120,7 +120,7 @@ namespace KANTAIM.WEB.Pages.Administration
             Cells = _cellService.GetAll().Select(u => new CellVM(u)
             {
                 ContainerCount = _cellService.GetContainerCount(u.Id)
-            }).ToList();
+            }).OrderBy(c => c.X).ToList();
         }
         void SelectionChanged(HashSet<CellVM> changes)
         {

@@ -18,6 +18,7 @@ namespace KANTAIM.APK.Components.Pages
         [Inject] public ActionService _actionService { get; set; }
         [Parameter] public int Id { get; set; }
         [Parameter] public int Number { get; set; }
+        public Boolean isPalette { get; set; } = false;
 
 
         public Product? product { get; set; }
@@ -34,12 +35,13 @@ namespace KANTAIM.APK.Components.Pages
         protected override void OnInitialized()
         {
             ContainerScanner = _contenaireService.GetContainerByNumber(Number);
-            if(ContainerScanner.ContainerType.Name == "Palette" && _contenaireService.CountBac(ContainerScanner.Id) != 0)// S'il est palette et n'est pas vide, on interdit cette opération
+            if (ContainerScanner.ContainerType.Name == "Palette" && _contenaireService.CountBac(ContainerScanner.Id) != 0)// S'il est palette et n'est pas vide, on interdit cette opération
             {
-                correct = false;
-                NavigationManager.NavigateTo($"/");
-                _snackService.Add("Scannez les bacs à la place de la palette", Severity.Error);
-                
+                isPalette = true;
+                //correct = false;
+                //NavigationManager.NavigateTo($"/");
+                //_snackService.Add("Scannez les bacs à la place de la palette", Severity.Error);
+
             }
             if (ContainerScanner.ContainerTypeID == 2) //s'il est un bac 
             {

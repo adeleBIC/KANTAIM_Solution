@@ -34,13 +34,13 @@ namespace KANTAIM.WEB.Pages.Kanban
         protected override void OnInitialized()
         {
             ContainerScanner = _contenaireService.GetContainerByNumber(Number);
-            if(ContainerScanner.ContainerType.Name == "Palette" && _contenaireService.CountBac(ContainerScanner.Id) != 0)// S'il est palette et n'est pas vide, on interdit cette opération
-            {
-                correct = false;
-                NavigationManager.NavigateTo($"/ScannerPge");
-                _snackService.Add("Scannez les bacs à la place de la palette", Severity.Error);
+            //if(ContainerScanner.ContainerType.Name == "Palette" && _contenaireService.CountBac(ContainerScanner.Id) != 0)// S'il est palette et n'est pas vide, on interdit cette opération
+            //{
+            //    correct = false;
+            //    NavigationManager.NavigateTo($"/ScannerPge");
+            //    _snackService.Add("Scannez les bacs à la place de la palette", Severity.Error);
                 
-            }
+            //}
             if (ContainerScanner.ContainerTypeID == 2) //s'il est un bac 
             {
                 logRescent = _logService.GetByContenaireId(ContainerScanner.ContainerID.Value);
