@@ -34,9 +34,9 @@ namespace KANTAIM.DAL
         {
             if (!optionsBuilder.IsConfigured)
             {
-                Console.WriteLine("Testing...");
-                bool isConnected = TestConnectionAsync().GetAwaiter().GetResult(); // Blocking for testing purposes
-                Console.WriteLine($"Database connection: {isConnected}");
+                //Console.WriteLine("Testing...");
+                //bool isConnected = TestConnectionAsync().GetAwaiter().GetResult(); // Blocking for testing purposes
+                //Console.WriteLine($"Database connection: {isConnected}");
                 if (OperatingSystem.IsAndroid())
                 {
                     optionsBuilder.UseSqlServer("Server=MONSSQL03;Database=DATASCADAMOULAGE;User Id=UserMLV;Password=BicUserMLV20;MultipleActiveResultSets=True;Encrypt=false;TrustServerCertificate=False;MultiSubnetFailover=True");

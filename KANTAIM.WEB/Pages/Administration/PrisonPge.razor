@@ -2,6 +2,8 @@
 @page "/Administration/PrisonPge"
 @using KANTAIM.DAL.Model;
 @using KANTAIM.WEB.ViewModels;
+@* @using System.Net.Http.Json
+@inject HttpClient httpClient *@
 
 
 <style>
@@ -44,16 +46,16 @@
 
 @if (Containers != null)
 {
-    <MudDataGrid T="ContainerWithEvents" RowClassFunc="RowClassFct" Items="@Containers" Dense=true Hover=true ReadOnly=false EditMode="MudBlazor.DataGridEditMode.Cell"
+    <MudDataGrid T="ContainerWithEvents"  Items="@Containers" Dense=true Hover=true ReadOnly=false EditMode="MudBlazor.DataGridEditMode.Cell"
                  Virtualize="true" SelectOnRowClick=false MultiSelection=true Bordered=true
                  Filterable="true" SortMode="SortMode.Multiple" Hideable="false" QuickFilter="@_quickFilter">
        
         <Columns>
        
-            <PropertyColumn Property="x => x.Container.Number" Title="ContenNuméro" />
-            <PropertyColumn Property="x => x.Container.FillStatus" Title="Remplissage">
+            <PropertyColumn Property="x => x.container.Number" Title="ContenNuméro" />
+            <PropertyColumn Property="x => x.container.FillStatus" Title="Remplissage">
                 <EditTemplate>
-                    <MudSelect T=int @bind-Value="context.Item.Container.FillStatus">
+                    <MudSelect T=int @bind-Value="context.Item.container.FillStatus">
                         @foreach (var f in ContainerStatus)
                         {
                             <MudSelectItem Value="@f.Key">@f.Value</MudSelectItem>
@@ -61,30 +63,16 @@
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
+            <PropertyColumn Property="x => x.prodTime" Title="Date Produit" />
 
-            <PropertyColumn Property="x => x.ProdTime" Title="Date Produit" Class="wide-column">
-                <CellTemplate>
-                    <MudText>
-                        @if (context.Item.ProdTime != null) {
-                            @context.Item.ProdTime
-                        }
-                        @(context.Item.ProdTime == DateTime.MinValue ? "N/A" : context.Item.ProdTime.ToString("dd/MM/yyyy HH:mm:ss"))
-                    </MudText>
-                </CellTemplate>
-            </PropertyColumn>
 
-            <PropertyColumn Property="x => x.StockTime" Title="Date Prison" Class="wide-column">
-                <CellTemplate>
-                    <MudText>
-                        @(context.Item.StockTime == DateTime.MinValue ? "N/A" : context.Item.StockTime.ToString("dd/MM/yyyy HH:mm:ss"))
-                    </MudText>
-                </CellTemplate>
-            </PropertyColumn>
+            <PropertyColumn Property="x => x.stockTime" Title="Date Prison" Format="dd/MM/yyyy HH:mm:ss" />
+        
            
-            <PropertyColumn Property="x => x.Container.ContainerTypeID" Title="Type">
+            <PropertyColumn Property="x => x.container.ContainerTypeID" Title="Type">
                 <EditTemplate>
-                    <MudSelect T=int? @bind-Value="context.Item.Container.ContainerTypeID">
-                        @foreach (var f in context.Item.Container.ContainerTypes)
+                    <MudSelect T=int? @bind-Value="context.Item.container.ContainerTypeID">
+                        @foreach (var f in context.Item.container.ContainerTypes)
                         {
                             <MudSelectItem T=int? Value="@f.Id">@f.Name</MudSelectItem>
                         }
@@ -92,11 +80,11 @@
                 </EditTemplate>
             </PropertyColumn>
 
-            <PropertyColumn Property="x => x.Container.ContainerID" Title="Stocké dans">
+            <PropertyColumn Property="x => x.container.ContainerID" Title="Stocké dans">
                 <EditTemplate>
-                    <MudSelect T=int? @bind-Value=context.Item.Container.ContainerID>
-                        <MudSelectItem T=int? Value="null">None</MudSelectItem>
-                        @foreach (var f in context.Item.Container.Containers.OrderBy(s => s.Number))
+                    <MudSelect T=int? @bind-Value=context.Item.container.ContainerID>
+                        <MudSelectItem T=int? Value="null">None</MudSelectItem>                           
+                        @foreach (var f in context.Item.container.Containers.OrderBy(s => s.Number))
                         {
                             <MudSelectItem T=int? Value="@f.Id">@f.Number</MudSelectItem>
                         }
@@ -104,23 +92,33 @@
                 </EditTemplate>
             </PropertyColumn>
 
-            <PropertyColumn Property="x => x.Container.CellID" Title="Cellule">
+            <PropertyColumn Property="x => x.container.CellID" Title="Cellule">
                 <EditTemplate>
-                    <MudSelect T=int? @bind-Value=context.Item.Container.CellID>
+                    <MudSelect T=int? @bind-Value=context.Item.container.CellID>
                         <MudSelectItem T=int? Value="null">None</MudSelectItem>
-                        @foreach (var f in context.Item.Container.Cells)
+                        @foreach (var f in context.Item.container.Cells)
                         {
                             <MudSelectItem T=int? Value="@f.Id">@f.Name</MudSelectItem>
                         }
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
+            <TemplateColumn>
+                @* <CellTemplate> *@
+                    @* <MudStack Row> *@
+                       baba
+                  @*   </MudStack> *@
+               @*  </CellTemplate> *@
+            </TemplateColumn>
+            <TemplateColumn >
+                <CellTemplate>
+                    <MudStack Row>
+                        <MudRating Size="@Size.Small" SelectedValue="@context.Item.container.Number" />
+                        <MudButton Size="@Size.Small" Variant="MudBlazor.Variant.Filled" Color="@Color.Primary">Hire</MudButton>
+                    </MudStack>
+                </CellTemplate>
+            </TemplateColumn>
 
-            <PropertyColumn Property="x => x.Container.InJail" Title="Prison">
-                <EditTemplate>
-                    <MudCheckBox @bind-Checked=context.Item.Container.InJail />
-                </EditTemplate>
-            </PropertyColumn>
         </Columns>
         <PagerContent>
             <MudDataGridPager T="ContainerWithEvents" PageSizeOptions="@(new int[] {14, 30, 50,100})" />

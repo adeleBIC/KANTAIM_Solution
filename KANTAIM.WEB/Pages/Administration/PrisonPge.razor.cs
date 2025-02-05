@@ -39,19 +39,9 @@ namespace KANTAIM.WEB.Pages.Administration
         private string _searchString;
 
 
-        public class ContainerWithEvents
-        {
-            public ContainerVM Container { get; set; }
-            public DateTime ProdTime { get; set; }
-            public DateTime StockTime { get; set; }
+        public record ContainerWithEvents(ContainerVM container, string prodTime, string stockTime);
 
-            public ContainerWithEvents(ContainerVM container, DateTime prodTime, DateTime stockTime)
-            {
-                Container = container;
-                ProdTime = prodTime;
-                StockTime = stockTime;
-            }
-        }
+
 
         protected override async Task OnInitializedAsync()
         {
@@ -83,7 +73,7 @@ namespace KANTAIM.WEB.Pages.Administration
                 }
                 var prodTime = _logService.GetByContenaireIdAction(id, OperationContainer.Initisalisation)?.EventTime ?? DateTime.MinValue;
                 var stockTime = _logService.GetByContenaireIdAction(id, OperationContainer.Store)?.EventTime ?? DateTime.MinValue;
-                return new ContainerWithEvents(containerVM, prodTime, stockTime);
+                return new ContainerWithEvents(containerVM, prodTime.ToShortTimeString() + "   " + prodTime.ToShortDateString(), stockTime.ToShortTimeString() + "   " + stockTime.ToShortDateString());
             })
             .ToList();
         }
@@ -94,7 +84,7 @@ namespace KANTAIM.WEB.Pages.Administration
             if (string.IsNullOrWhiteSpace(_searchString))
                 return true;
 
-            if (x.Container.Number.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            if (x.container.Number.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
             return false;
@@ -103,7 +93,17 @@ namespace KANTAIM.WEB.Pages.Administration
        
         public string RowClassFct(ContainerWithEvents unityVM, int row)
         {
-            return unityVM.Container.IsEditing ? "editing" : "";
+            return unityVM.container.IsEditing ? "editing" : "";
+        }
+
+        public void OnViderClicked(ContainerWithEvents unityVM)
+        {
+
+        }
+
+        public void OnSortirClicked(ContainerWithEvents unityVM)
+        {
+
         }
 
     }
