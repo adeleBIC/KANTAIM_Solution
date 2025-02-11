@@ -46,13 +46,38 @@
 
 @if (Containers != null)
 {
-    <MudDataGrid T="ContainerWithEvents"  Items="@Containers" Dense=true Hover=true ReadOnly=false EditMode="MudBlazor.DataGridEditMode.Cell"
+    <MudDataGrid Items="@employees" Filterable="false" SortMode="@SortMode.None" Groupable="false">
+        <Columns>
+            <PropertyColumn Property="x => x.Name" />
+            <PropertyColumn Property="x => x.Position" />
+            <PropertyColumn Property="x => x.YearsEmployed" Title="Years Employed" />
+            <PropertyColumn Property="x => x.Salary" Format="C" />
+            <PropertyColumn Property="x => x.Salary * x.YearsEmployed" Title="Total Earned" Format="C" />
+            <TemplateColumn >
+                <CellTemplate>
+                    <MudStack Row>
+                        <MudRating  SelectedValue="@context.Item.Rating" />
+                        <MudButton Variant="MudBlazor.Variant.Filled" Color="@Color.Primary">Hire</MudButton>
+                    </MudStack>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </MudDataGrid>
+
+
+    <MudDataGrid Items="@Containers" Dense=true 
                  Virtualize="true" SelectOnRowClick=false MultiSelection=true Bordered=true
                  Filterable="true" SortMode="SortMode.Multiple" Hideable="false" QuickFilter="@_quickFilter">
        
         <Columns>
-       
-            <PropertyColumn Property="x => x.container.Number" Title="ContenNuméro" />
+
+            <PropertyColumn Property="x => x.container.Number" Title="Contenaire">
+                <CellTemplate>
+                    @context.Item.container.ContainerType.Name - @context.Item.container.Number
+                </CellTemplate>
+            </PropertyColumn>
+
+          @*   <PropertyColumn Property="x => x.container.Number" Title="ContenNuméro" /> *@
             <PropertyColumn Property="x => x.container.FillStatus" Title="Remplissage">
                 <EditTemplate>
                     <MudSelect T=int @bind-Value="context.Item.container.FillStatus">
@@ -68,7 +93,7 @@
 
             <PropertyColumn Property="x => x.stockTime" Title="Date Prison" Format="dd/MM/yyyy HH:mm:ss" />
         
-           
+  @*          
             <PropertyColumn Property="x => x.container.ContainerTypeID" Title="Type">
                 <EditTemplate>
                     <MudSelect T=int? @bind-Value="context.Item.container.ContainerTypeID">
@@ -78,9 +103,15 @@
                         }
                     </MudSelect>
                 </EditTemplate>
+            </PropertyColumn> *@
+
+            <PropertyColumn Property="x => x.container.BigContainer" Title="Conditioné dans">
+                <CellTemplate>
+                    @context.Item.container.BigContainer.ContainerType.Name
+                </CellTemplate>
             </PropertyColumn>
 
-            <PropertyColumn Property="x => x.container.ContainerID" Title="Stocké dans">
+            @* <PropertyColumn Property="x => x.container.ContainerID" Title="Stocké dans">
                 <EditTemplate>
                     <MudSelect T=int? @bind-Value=context.Item.container.ContainerID>
                         <MudSelectItem T=int? Value="null">None</MudSelectItem>                           
@@ -90,9 +121,15 @@
                         }
                     </MudSelect>
                 </EditTemplate>
+            </PropertyColumn> *@
+
+            <PropertyColumn Property="x => x.container.CellStock.Name" Title="Cellule">
+                <CellTemplate>
+                    @context.Item.container.CellStock.Name
+                </CellTemplate>
             </PropertyColumn>
 
-            <PropertyColumn Property="x => x.container.CellID" Title="Cellule">
+         @*    <PropertyColumn Property="x => x.container.CellID" Title="Cellule">
                 <EditTemplate>
                     <MudSelect T=int? @bind-Value=context.Item.container.CellID>
                         <MudSelectItem T=int? Value="null">None</MudSelectItem>
@@ -102,19 +139,13 @@
                         }
                     </MudSelect>
                 </EditTemplate>
-            </PropertyColumn>
+            </PropertyColumn> *@
+
+
             <TemplateColumn>
-                @* <CellTemplate> *@
-                    @* <MudStack Row> *@
-                       baba
-                  @*   </MudStack> *@
-               @*  </CellTemplate> *@
-            </TemplateColumn>
-            <TemplateColumn >
                 <CellTemplate>
                     <MudStack Row>
-                        <MudRating Size="@Size.Small" SelectedValue="@context.Item.container.Number" />
-                        <MudButton Size="@Size.Small" Variant="MudBlazor.Variant.Filled" Color="@Color.Primary">Hire</MudButton>
+                        <MudButton Variant="MudBlazor.Variant.Filled" Color="@Color.Primary">Hire</MudButton>
                     </MudStack>
                 </CellTemplate>
             </TemplateColumn>

@@ -27,19 +27,34 @@ namespace KANTAIM.WEB.Pages.Administration
 {
     public partial class PrisonPge
     {
+
+        public record Employee(string Name, string Position, int YearsEmployed, int Salary, int Rating);
+        public IEnumerable<Employee> employees;
+
+        protected override void OnInitialized()
+        {
+            employees = new List<Employee>
+        {
+            new Employee("Sam", "CPA", 23, 87_000, 4),
+            new Employee("Alicia", "Product Manager", 11, 143_000, 5),
+            new Employee("Ira", "Developer", 4, 92_000, 3),
+            new Employee("John", "IT Director", 17, 229_000, 4),
+        };
+        }
+
         [Inject] public ContenaireService _contenaireService { get; set; }
         [Inject] public LogService _logService { get; set; }
         [Inject] IDialogService _dialogService { get; set; }
         [Inject] ISnackbar _snackService { get; set; }
 
-        public List<ContainerWithEvents> Containers { get; set; }
+        public IEnumerable<ContainerWithEvents> Containers { get; set; }
         
         public Dictionary<int, string> ContainerStatus { get; set; }
         public Dictionary<int, string> CellStatus { get; set; }
         private string _searchString;
 
 
-        public record ContainerWithEvents(ContainerVM container, string prodTime, string stockTime);
+        public record ContainerWithEvents(Container container, string prodTime, string stockTime);
 
 
 
@@ -47,6 +62,7 @@ namespace KANTAIM.WEB.Pages.Administration
         {
             CellStatus = new StatusCell().Status;
             ContainerStatus = new StatusContainer().Status;
+            Containers = new List<ContainerWithEvents> { };
             await Task.Run(RefreshData);
         }
         void RefreshData()
@@ -55,13 +71,6 @@ namespace KANTAIM.WEB.Pages.Administration
             .Where(u => u.InJail == true)
             .Select(u =>
             {
-                var containerVM = new ContainerVM(
-                    u,
-                    _contenaireService.GetAllContainer(),
-                    _contenaireService.GetAllContainerType(),
-                    _contenaireService.GetAllCell(),
-                    _contenaireService.GetAllAction()
-                );
                 int id;
                 // Récupérer ProdTime et StockTime depuis _logService
                 if(u.ContainerType != null && (u.BigContainer == null || !u.ContainerType.IsContainable))
@@ -73,7 +82,7 @@ namespace KANTAIM.WEB.Pages.Administration
                 }
                 var prodTime = _logService.GetByContenaireIdAction(id, OperationContainer.Initisalisation)?.EventTime ?? DateTime.MinValue;
                 var stockTime = _logService.GetByContenaireIdAction(id, OperationContainer.Store)?.EventTime ?? DateTime.MinValue;
-                return new ContainerWithEvents(containerVM, prodTime.ToShortTimeString() + "   " + prodTime.ToShortDateString(), stockTime.ToShortTimeString() + "   " + stockTime.ToShortDateString());
+                return new ContainerWithEvents(u, prodTime.ToShortTimeString() + "   " + prodTime.ToShortDateString(), stockTime.ToShortTimeString() + "   " + stockTime.ToShortDateString());
             })
             .ToList();
         }
@@ -91,10 +100,6 @@ namespace KANTAIM.WEB.Pages.Administration
         };
 
        
-        public string RowClassFct(ContainerWithEvents unityVM, int row)
-        {
-            return unityVM.container.IsEditing ? "editing" : "";
-        }
 
         public void OnViderClicked(ContainerWithEvents unityVM)
         {
