@@ -424,6 +424,7 @@ namespace KANTAIM.APK.Components.Pages
                 {
                     if (cellScanner.IsMaintenance == true)
                     {
+
                         Exit(2);
                         bienStock = true;
                     }
@@ -677,6 +678,11 @@ namespace KANTAIM.APK.Components.Pages
         {
             if(action == 3)
                 shipment = true;
+            if(ContainerScanner != null && cellScanner != null)
+            {
+                ContainerScanner.InMaintenance = cellScanner.IsMaintenance;
+                ContainerScanner.InJail = cellScanner.IsJail;
+            }
             Log u;
             if (fillstatus != 1)
             {//if container is not empty
@@ -725,6 +731,7 @@ namespace KANTAIM.APK.Components.Pages
                 
                 //ContainerScanner.ActionID = 0; 
             }
+           
 
             ContainerScanner.ContainerAction = _actionService.GetByStatus(action);/*0: Stocké vide, store without product 2 : store with product 3 : Shipment*/
             ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
@@ -763,6 +770,10 @@ namespace KANTAIM.APK.Components.Pages
                     if((ContainerScanner != null && ContainerScanner.InJail) || (PaletteScanner != null && PaletteScanner.InJail))
                     {
                         item.InJail = true;
+                    }
+                    if ((ContainerScanner != null && ContainerScanner.InMaintenance) || (PaletteScanner != null && PaletteScanner.InMaintenance))
+                    {
+                        item.InMaintenance = true;
                     }
                     _contenaireService.UpSert(item);
                 }

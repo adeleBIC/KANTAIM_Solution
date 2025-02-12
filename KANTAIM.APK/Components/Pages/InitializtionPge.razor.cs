@@ -35,6 +35,7 @@ namespace KANTAIM.APK.Components.Pages
         public string ContainerFeedback { get; set; } = string.Empty;
         public string? PaletteValue { get; set; }
         public Boolean BacInitialisation { get; set; } = false;
+        public Boolean Maintenance { get; set; } = false;
         private int state;
         public Container? ContainerScanner { get; set; }
         public Press? PressScanner { get; set; }
@@ -82,6 +83,14 @@ namespace KANTAIM.APK.Components.Pages
             {
                 case 0:
                     ContainerScanner = _contenaireService.GetContainerByNumber(Number);
+                    if (ContainerScanner.InMaintenance)
+                    {
+                        Maintenance = true;
+                        ContainerScanner = null;
+                        NavigationManager.NavigateTo($"/");
+                        _snackService.Add("Le contenaire est en maintenance!", Severity.Error);
+                        return;
+                    }
                     if (ContainerScanner.ContainerType.IsContainable) // Quand on scan le bac
                     {
                         BacInitialisation = true;
@@ -158,6 +167,14 @@ namespace KANTAIM.APK.Components.Pages
                 if (type == 1)
                 {
                     PaletteScanner = _contenaireService.GetContainerByNumber(PaletteNumber);
+                    if (PaletteScanner.InMaintenance)
+                    {
+                        Maintenance = true;
+                        PaletteScanner = null;
+                        NavigationManager.NavigateTo($"/");
+                        _snackService.Add("Le contenaire est en maintenance!", Severity.Error);
+                        return;
+                    }
                     if (PaletteScanner.ContainerAction.Status == 0) // On ne peux pas mettre une bac vide dans une palette, on ne peux pas mettre un bac dans une palette qu'il n'as pas été initialisé.
                     {
                         _snackService.Add("Svp initialisez palette d'abord!", Severity.Error);
@@ -272,6 +289,14 @@ namespace KANTAIM.APK.Components.Pages
             if (type == 1 && ContainerNumber > 0)
             {
                 ContainerScanner = _contenaireService.GetContainerByNumber(ContainerNumber);
+                if (ContainerScanner.InMaintenance)
+                {
+                    Maintenance = true;
+                    ContainerScanner = null;
+                    NavigationManager.NavigateTo($"/");
+                    _snackService.Add("Le contenaire est en maintenance!", Severity.Error);
+                    return;
+                }
                 // Vérifier si le Contenaire que l'on veut initialiser est bien vide
                 if (ContainerScanner.ContainerAction.Status != 0)
                 {

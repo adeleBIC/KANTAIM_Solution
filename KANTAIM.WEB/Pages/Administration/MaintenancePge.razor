@@ -1,5 +1,4 @@
-﻿
-@page "/Administration/PrisonPge"
+﻿@page "/Administration/MaintenancePge"
 @using KANTAIM.DAL.Model;
 @using KANTAIM.WEB.ViewModels;
 
@@ -38,26 +37,21 @@
 </style>
 
 <div class="pageTitle">
-    <MudText Typo="Typo.h4">Prison Page</MudText>
+    <MudText Typo="Typo.h4">Maintenance Page</MudText>
 </div>
 
 
 @if (Containers != null)
 {
-    <MudDataGrid Items="@Containers" Dense=true 
+    <MudDataGrid Items="@Containers" Dense=true
                  Virtualize="true" SelectOnRowClick=false MultiSelection=true Bordered=true
                  Filterable="true" SortMode="SortMode.Multiple" Hideable="false" QuickFilter="@_quickFilter">
-       
+
         <Columns>
-            <PropertyColumn Property="x => x.container.Number"/>
+            <PropertyColumn Property="x => x.container.Number" />
             <PropertyColumn Property="x => x.container.BigContainer">
                 <CellTemplate>
-                    @context.Item.container.ContainerType.Name 
-                </CellTemplate>
-            </PropertyColumn>
-            <PropertyColumn Property="x => x.container.FillStatus">
-                <CellTemplate>
-                    @ContainerStatus[context.Item.container.FillStatus]
+                    @context.Item.container.ContainerType.Name
                 </CellTemplate>
             </PropertyColumn>
             <PropertyColumn Property="x => x.container.CellStock" Title="Cellule">
@@ -65,13 +59,11 @@
                     @context.Item.container.CellStock.Name
                 </CellTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.prodTime" Title="Date de Production"/>
             <PropertyColumn Property="x => x.stockTime" Title="Date de Stock en Prison" />
             <TemplateColumn>
                 <CellTemplate>
                     <MudStack Row>
-                        <MudButton Variant="MudBlazor.Variant.Filled" OnClick="() => OnSortirClicked(context.Item.container)" Color="@Color.Success">Passer</MudButton>
-                        <MudButton Variant="MudBlazor.Variant.Filled" OnClick="() => OnViderClicked(context.Item.container)" Color="@Color.Info">Vider</MudButton>
+                        <MudButton Variant="MudBlazor.Variant.Filled" OnClick="() => OnViderClicked(context.Item.container)" Color="@Color.Success">Réparé</MudButton>
                     </MudStack>
                 </CellTemplate>
             </TemplateColumn>

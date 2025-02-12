@@ -185,7 +185,8 @@ namespace KANTAIM.APK.Components.Pages
                                         NavigationManager.NavigateTo($"/InitialisationPge/0/{containerNumber}");
                                         break;
                                     case 1:
-                                        /*Après initialisation, on choisie son fillstatus, et après on le mise en rack.*/
+                                        /*Après initialisation, on choisie son fillstatus
+                                         * , et après on le mise en rack.*/
                                         NavigationManager.NavigateTo($"/StockagePge/1/{containerNumber}");
                                         break;
                                     case 2:

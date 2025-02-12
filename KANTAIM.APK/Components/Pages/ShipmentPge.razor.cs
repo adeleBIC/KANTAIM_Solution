@@ -35,6 +35,20 @@ namespace KANTAIM.APK.Components.Pages
         protected override void OnInitialized()
         {
             ContainerScanner = _contenaireService.GetContainerByNumber(Number);
+            if (ContainerScanner.InMaintenance)
+            {
+                correct = false;
+                NavigationManager.NavigateTo($"/");
+                _snackService.Add("Le contenaire est en maintenance!", Severity.Error);
+                return;
+            }
+            if (ContainerScanner.InJail)
+            {
+                correct = false;
+                NavigationManager.NavigateTo($"/");
+                _snackService.Add("Le contenaire est en prison!", Severity.Error);
+                return;
+            }
             if (ContainerScanner.ContainerType.Name == "Palette" && _contenaireService.CountBac(ContainerScanner.Id) != 0)// S'il est palette et n'est pas vide, on interdit cette opération
             {
                 isPalette = true;

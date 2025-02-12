@@ -270,6 +270,13 @@ namespace KANTAIM.WEB.Pages.Kanban
             if (type == 1 && ContainerNumber > 0)
             {
                 ContainerScanner = _contenaireService.GetContainerByNumber(ContainerNumber);
+                if (ContainerScanner.InMaintenance)
+                {
+                    ContainerScanner = null;
+                    NavigationManager.NavigateTo($"/");
+                    _snackService.Add("Le contenaire est en maintenance!", Severity.Error);
+                    return;
+                }
                 // Vérifier si le Contenaire que l'on veut initialiser est bien vide
                 if (ContainerScanner.ContainerAction.Status != 0)
                 {
