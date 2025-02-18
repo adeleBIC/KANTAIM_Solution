@@ -406,6 +406,7 @@ namespace KANTAIM.APK.Components.Pages
             ContainerScanner.CellId = null;
             if(ContainerScanner.ContainerTypeID == 2) // S'il est un bac, on initialise son fillstatue en plein directement
                 ContainerScanner.Status = 3;
+            ContainerScanner.FillStatus = StatusContainer.Undefinded;
             _contenaireService.UpSert(ContainerScanner);
 
             upDateCellState(ContainerScanner.CellStock);

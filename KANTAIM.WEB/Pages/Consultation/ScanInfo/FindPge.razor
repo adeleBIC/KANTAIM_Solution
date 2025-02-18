@@ -13,8 +13,8 @@
         <MudGrid>
             <MudItem xs="12" Style="display: flex; justify-content: center; align-items: flex-start; margin-top: 20px;">
                 <div style="display: flex; justify-content: space-between;">
-                    <div style="flex: 1; margin-right: 10px;">
-                        <MudSelect T="int" @bind-Value="SelectedProductFamilyId" Label="ProductFamily" Variant="MudBlazor.Variant.Outlined" @onchange="RefreshData">
+                    <div style="flex:2; margin-right: 10px;">
+                        <MudSelect T="int" @bind-Value="SelectedProductFamilyId" Label="Famille de produits" Variant="MudBlazor.Variant.Outlined" @onchange="RefreshData" Style="width: 200px;">
                             @foreach (var productfamily in productfamiliesList)
                             {
                                 <MudSelectItem T="int" Value="@(productfamily.Id)">@productfamily.Name</MudSelectItem>
@@ -22,7 +22,7 @@
                         </MudSelect>
                     </div>
                     <div style="flex: 1; margin-right: 10px;">
-                        <MudSelect T="int" @bind-Value="SelectedProductId" Label="Product" Variant="MudBlazor.Variant.Outlined">
+                        <MudSelect T="int" @bind-Value="SelectedProductId" Label="Produit" Variant="MudBlazor.Variant.Outlined" Style="width: 300px;" Placeholder="Aucune">
                             @foreach (var product in productList)
                             {
                                 <MudSelectItem T="int" Value="@(product.Id)">@product.Name</MudSelectItem>
@@ -48,9 +48,14 @@
                 <Columns>
                     <PropertyColumn Property="x => x.ProdColor" Title="Couleur">
                         <CellTemplate>
-                            @context.Item.ProdColor
+                            @context.Item.ProdColor.Name
                         </CellTemplate>
                     </PropertyColumn>
+       @*          <PropertyColumn Property="x => x.ProdColor.ColorNumber" Title=" ">
+                    <EditTemplate>
+                        <MudIcon Icon="@Icons.Material.Filled.Circle" Style="@($"color: {context.Item.ProdColor.ColorNumber};")" />
+                    </EditTemplate>
+                </PropertyColumn> *@
                     <PropertyColumn Property="x => x.containers.Count()" Title="Quantité de contenaire">
                         <CellTemplate>
                             @context.Item.containers.Count()

@@ -8,49 +8,49 @@
 
 <style>
     .main-container {
-        padding: 10px;
-        font-family: 'Roboto', sans-serif;
+    padding: 10px;
+    font-family: 'Roboto', sans-serif;
     }
 
     .selection-container, .display-container {
-        background-color: #FFFFFF;
-        border-radius: 10px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        padding: 10px;
-        margin-bottom: 10px;
+    background-color: #FFFFFF;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    margin-bottom: 10px;
     }
 
     .title {
-        color: #333333;
-        text-align: center;
+    color: #333333;
+    text-align: center;
     }
 
     .redtitle {
-        color: red;
-        text-align: center;
-        margin-bottom: 20px;
+    color: red;
+    text-align: center;
+    margin-bottom: 20px;
     }
 
     .status-display, .status-item {
-        color: #555555;
-        margin: 10px 0;
-        padding: 10px;
-        background-color: #f2f2f2;
-        border-radius: 10px;
+    color: #555555;
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #f2f2f2;
+    border-radius: 10px;
     }
 
     .button-group {
-        display: flex;
-        justify-content: space-evenly;
+    display: flex;
+    justify-content: space-evenly;
     }
 
     .fillstatus-container {
-        text-align: center;
+    text-align: center;
     }
 
 
     .bouton {
-        margin: 5px;
+    margin: 5px;
     }
 
 
@@ -174,14 +174,17 @@
                         <h3 class="title">Scannez la cellule correspondant s'il vous plait</h3>
                         <MudText> @TextValue</MudText>
                     }
-                    
-                   @*  <div>
+
+                    @*  <div>
                         <MudTextField @bind-Value="CellValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="cellScan"></MudTextField>
                     </div> *@
+                    @if (ContainerScanner.FillStatus != StatusContainer.Empty)
+                    {
+                        <div class="button-group">
 
-                    <div class="button-group">
                         <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>{stock=false;scanPallete=false;fillstatus = 0;}">Retour</MudButton>
                     </div>
+                    }
                 }
             </div>
         }
@@ -233,7 +236,7 @@
                 </div>
                 <MudText> @TextValue</MudText>
             }
-            <div class="fillstatus-container">
+            <div class="display-container">
                 <h3 class="title">Choisissez l'état de remplissage s'il vous plait</h3>
                 <div class="button-group">
                     @if (Id == 1)
@@ -243,7 +246,14 @@
                     <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="()=>FillstatusSelected(2)">Semi-Plein</MudButton>
                     <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="()=>FillstatusSelected(3)">Plein</MudButton>
                 </div>
+                
             </div>
+            @if (ContainerScanner.FillStatus != StatusContainer.Empty) {
+                <div class="button-group">
+                    <MudButton Color="Color.Info" Variant="MudBlazor.Variant.Filled" Href="@($"/TransferPge/{ContainerScanner.Number}")" Match="NavLinkMatch.All">Transfer Contenaire</MudButton>
+                </div>
+            }
+            
             
 
         }

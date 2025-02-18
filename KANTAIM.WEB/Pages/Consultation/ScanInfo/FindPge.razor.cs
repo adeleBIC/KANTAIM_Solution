@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System.ComponentModel.DataAnnotations;
 using static KANTAIM.WEB.Pages.Kanban.FindProductPge;
+using static MudBlazor.Colors;
 
 namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
 {
@@ -23,14 +24,39 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
 
         private string _searchString;
         private IEnumerable<ProductFamily> productfamiliesList;
+
         private IEnumerable<Product> productList;
+        private int selectedProductFamilyId;
+        Product prodDefault = new Product()
+        {
+            Id = 0,
+            Name = "Aucune"
+        };
+        public int SelectedProductFamilyId
+        {
+            get { return selectedProductFamilyId; }
+            set
+            {
+                productList = _productService.GetAllPerProductFamily(value);
+                selectedProductFamilyId = value;
+                productList = productList.Concat(new List<Product> { prodDefault }).ToList();
+                SelectedProductId = 0;
+            }
+        }
         public List<DataProd> DataProds { get; set; }
         public Product? SelectedProduct { get; set; }
         public Log logRescent { get; set; }
-        
 
-        public int SelectedProductId { get; set; }
-        public int SelectedProductFamilyId { get; set; }
+        private int selectedProductId;
+        public int SelectedProductId
+        {
+            get { return selectedProductId; }
+            set
+            {
+                selectedProductId = value;
+                SelectedProduct = productList.FirstOrDefault(p => p.Id == value) ?? prodDefault;
+            }
+        }
         public List<StoreInfo> storeInfos { get; set; }
         public class StoreInfo
         {
@@ -40,10 +66,12 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
         }
         protected override async Task OnInitializedAsync()
         {
-            SelectedProductFamilyId = 1;
-            SelectedProductId = 0;
+            Colors = new List<ProdColor> { };
             productfamiliesList = _productfamilyService.GetAll();
+            SelectedProductFamilyId = productfamiliesList.FirstOrDefault().Id;
             productList = _productService.GetAllPerProductFamily(SelectedProductFamilyId);
+            productList = productList.Concat(new List<Product> { prodDefault }).ToList();
+            SelectedProductId = 0;
             await Task.Run(RefreshData);
         }
         private Func<StoreInfo, bool> _quickFilter => x =>
@@ -60,14 +88,17 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
         void RefreshData()
         {
             productList = _productService.GetAllPerProductFamily(SelectedProductFamilyId);
-            if(SelectedProductId != 0)
+            productList = productList.Concat(new List<Product> { prodDefault }).ToList();
+            if (SelectedProductId != 0)
             {
                 SelectedProduct = _productService.GetById(SelectedProductId);
+                Colors.Clear();
                 foreach (ColorProduct colorProduct in _colorProductServiceService.GetAllPerProduct(SelectedProductId))
                 {
-                    Colors.Add(_colorService.GetById(colorProduct.ColorID));
+                    var colorProd = _colorService.GetById(colorProduct.ColorID);
+                    Colors.Add(colorProd);
                 }
-                if (Colors.Count() == 0)
+                if (Colors.Any())
                 {
                     ShowInfo();
                 }
@@ -83,7 +114,7 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
                 if (logRescent != null && logRescent.ProductID == SelectedProduct.Id)
                 {
                     // Recherche s'il y a déjà un StoreInfo pour cette couleur de produit
-                    var storeInfo = storeInfos.FirstOrDefault(s => s.ProdColor == logRescent.ProdColor);
+                    var storeInfo = storeInfos.FirstOrDefault(s => s.ProdColor.Id == logRescent.ProdColor.Id);
 
                     if (storeInfo == null)
                     {

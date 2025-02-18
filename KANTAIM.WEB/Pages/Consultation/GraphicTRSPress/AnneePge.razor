@@ -17,7 +17,7 @@
         <MudGrid>
             <MudItem xs="12" Style="display: flex; justify-content: center; align-items: flex-start; margin-top: 20px;">
                 <div style="display: flex; flex-direction: row; align-items: center;">
-                    <MudSelect T="int" @bind-Value="selectedPressId" Label="Press" Variant="MudBlazor.Variant.Outlined" Style="margin-right: 10px;">
+                    <MudSelect T="int" @bind-Value="selectedPressId" Label="Moule" Variant="MudBlazor.Variant.Outlined" Style="margin-right: 10px;">
                         @foreach (var press in pressesList.OrderBy(p => p.Number))
                         {
                             <MudSelectItem T="int" Value="@(press.Id)">@press.Number</MudSelectItem>

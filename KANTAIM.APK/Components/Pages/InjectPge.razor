@@ -46,6 +46,7 @@
     .button-group {
         display: flex;
         justify-content: space-evenly;
+        gap: 10px;
     }
 
     .fillstatus-container {
@@ -55,6 +56,7 @@
 
     .bouton {
         margin: 5px;
+        padding: 10px;
     }
 
 </style>
@@ -100,6 +102,7 @@
         </div>
         <div class="button-group">
         <MudButton Color="Color.Secondary" Variant="MudBlazor.Variant.Filled" Href="@($"/StockagePge/1/{ContainerScanner.Number}")" Match="NavLinkMatch.All">Déplacement Contenaire</MudButton>
+            
         </div>
         break;
     case 3 :

@@ -158,32 +158,38 @@
                             <tr>
                             <th class="orange-th">@number</th>
                             @for(int j = 0; j < 4; j++){
-                                if (Data[i][j] != null) {
-                                        <td colspan="1" class="sizeTd">@Data[i][j].Counter.ToString("# ### ### ##0")</td>
-                                    <td colspan="1" class="@((Data[i][j].objOK) ? "correct" : "fault")">@Data[i][j].ValueTRS %</td>
-                                    @if (!string.IsNullOrWhiteSpace(@Data[i][j].comment))
-                                    {
-                                        <td class="sizeCommentTdColor">
-                                            <div class="tooltip1">
-                                                C
-                                                <span class="tooltiptext1">@Data[i][j].comment</span>
-                                            </div>
-                                        </td>
+                                    if (Data[i] != null){
+
+                                        if (Data[i][j] != null)
+                                        {
+                                            <td colspan="1" class="sizeTd">@Data[i][j].Counter.ToString("# ### ### ##0")</td>
+                                            <td colspan="1" class="@((Data[i][j].objOK) ? "correct" : "fault")">@Data[i][j].ValueTRS %</td>
+                                            @if (!string.IsNullOrWhiteSpace(@Data[i][j].comment))
+                                            {
+                                                <td class="sizeCommentTdColor">
+                                                    <div class="tooltip1">
+                                                        C
+                                                        <span class="tooltiptext1">@Data[i][j].comment</span>
+                                                    </div>
+                                                </td>
+                                            }
+                                            else
+                                            {
+                                                <td class="sizeCommentTd">
+                                                    <div class="tooltip1">
+                                                    </div>
+                                                </td>
+                                                // Affichage case vide
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <td colspan="1" class="sizeTd"></td>
+                                            <td colspan="1" class="sizeTd"></td>
+                                            <td class="sizeCommentTd"> </td>
+                                        }
                                     }
-                                    else
-                                    {
-                                        <td class="sizeCommentTd">
-                                            <div class="tooltip1">
-                                            </div>
-                                        </td>
-                                        // Affichage case vide
                                     }
-                                } else {
-                                    <td colspan="1" class="sizeTd"></td>
-                                    <td colspan="1" class="sizeTd" ></td>
-                                    <td class="sizeCommentTd"> </td>
-                                }
-                        }
                  
                         </tr>
 

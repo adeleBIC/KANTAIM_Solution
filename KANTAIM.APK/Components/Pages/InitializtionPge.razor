@@ -23,7 +23,7 @@
     .title {
         color: #333333;
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
     }
 
     .status-display, .status-item {
@@ -128,10 +128,10 @@
                             Contenaire: @ContainerScanner?.Number
                         </div>
                     }
-                    <h3 class="title">Choisissez la couleur s'il vous plait</h3>
+                   
                 </div>
             </div>
-
+            <h3 class="title">Choisissez la couleur svp</h3>
             @if (Colors != null && Colors.Count() != 0)
             {
                 @*                     <div class="text-container">
@@ -181,7 +181,7 @@
                     }
                 </div>
             </div>
-        <div class="button-group">
+            <div class="button-group">
                 <MudButton Class="bouton" OnClick="() => GoBack(2)" Color="Color.Error" Variant="MudBlazor.Variant.Filled">Retour</MudButton>
                 <MudButton Class="bouton" OnClick="() => SaveLog()" Color="Color.Success" Variant="MudBlazor.Variant.Filled">Valider</MudButton>
             </div>

@@ -20,12 +20,12 @@ using KANTAIM.DAL.Services;
 using KANTAIM.WEB.ViewModels;
 using System.ComponentModel.DataAnnotations;
 using KANTAIM.WEB.Ressources;
-using static KANTAIM.WEB.Pages.Administration.PrisonPge;
+using static KANTAIM.WEB.Pages.Administration.JailPge;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 
 namespace KANTAIM.WEB.Pages.Administration
 {
-    public partial class PrisonPge
+    public partial class JailPge
     {
         [Inject] public ContenaireService _contenaireService { get; set; }
         [Inject] public LogService _logService { get; set; }

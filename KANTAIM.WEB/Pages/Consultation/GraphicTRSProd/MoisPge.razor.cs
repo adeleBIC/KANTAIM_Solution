@@ -48,7 +48,7 @@ namespace KANTAIM.WEB.Pages.Consultation.GraphicTRSProd
         Product prodDefault = new Product()
         {
             Id = 0,
-            Name = "All"
+            Name = "Aucune"
         };
 
         public int SelectedProductFamilyId
@@ -57,7 +57,7 @@ namespace KANTAIM.WEB.Pages.Consultation.GraphicTRSProd
             set
             {
                 productList = _productService.GetAllPerProductFamily(value);
-                productList.Concat(new List<Product> { prodDefault });
+                productList = productList.Concat(new List<Product> { prodDefault }).ToList();
                 selectedProductFamilyId = value;
                 SelectedProductId = 0;
             }
@@ -71,6 +71,7 @@ namespace KANTAIM.WEB.Pages.Consultation.GraphicTRSProd
             pressesList = _pressService.GetAll();
             productfamiliesList = _productfamilyService.GetAll();
             productList = _productService.GetAllPerProductFamily(selectedProductFamilyId);
+            productList = productList.Concat(new List<Product> { prodDefault }).ToList();
             await Task.Run(RefreshData);
         }
 
@@ -84,6 +85,7 @@ namespace KANTAIM.WEB.Pages.Consultation.GraphicTRSProd
             if ((date != null))
             {
                 productList = _productService.GetAllPerProductFamily(selectedProductFamilyId);
+                productList = productList.Concat(new List<Product> { prodDefault }).ToList();
                 var productIDs = productList.Select(p => p.Id).ToList();
 
                 DataProds = _dataProdService.GetAll().Where(u => u.DateProd.Year == date.Value.Year).Where(u => u.DateProd.Month == date.Value.Month).Where(u => productIDs.Contains(u.ProductID)).ToList();

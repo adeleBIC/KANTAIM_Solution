@@ -47,13 +47,7 @@ namespace KANTAIM.APK.Components.Pages
         {
             get
             {
-                if (inject) // quand on n'a pas la liste de couleurs et on a déjà su le press scanner, on récupére la liste de colors 
-                {
-                    //state = 1;
-                    NavigationManager.NavigateTo($"/");
-                    _snackService.Add("Réussi !", Severity.Success);
-                }
-                else if (MachineScanner == null) state = 2;
+                if (MachineScanner == null) state = 2;
                 else if (ContainerScanner == null) state = 3;
                 else state = 4;
 
@@ -70,9 +64,15 @@ namespace KANTAIM.APK.Components.Pages
                 //Scanner le contenaire
                 case 1:
                     ContainerScanner = _contenaireService.GetContainerByNumber(Number);
-                    logRescent = _logService.GetByContenaireId(ContainerScanner.Id);
-                    product = _productService.GetById(logRescent.ProductID.Value);
-                    prodColor = _colorService.GetById(logRescent.ProdColorID);
+                    if (ContainerScanner != null)
+                    {
+                        logRescent = _logService.GetByContenaireId(ContainerScanner.Id);
+                        if (logRescent != null)
+                        {
+                            product = _productService.GetById(logRescent.ProductID ?? 0);
+                            prodColor = _colorService.GetById(logRescent.ProdColorID);
+                        }
+                    }
                     break;
                 //Scanner la machine
                 case 2:
@@ -222,11 +222,13 @@ namespace KANTAIM.APK.Components.Pages
 
             ContainerScanner.ContainerAction = _actionService.GetByStatus(4);// En vidange
             ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
-            ContainerScanner.FillStatus = logRescent.FillStatus;
+            ContainerScanner.FillStatus = StatusContainer.Undefinded;
             ContainerScanner.CellId = null;
             _contenaireService.UpSert(ContainerScanner);
 
             inject = true;
-         }    
+            NavigationManager.NavigateTo($"/");
+            _snackService.Add("Réussi !", Severity.Success);
+        }    
     }
 }

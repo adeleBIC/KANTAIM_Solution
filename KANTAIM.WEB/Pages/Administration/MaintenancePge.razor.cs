@@ -85,6 +85,20 @@ namespace KANTAIM.WEB.Pages.Administration
             return false;
         };
 
+        void upDateCellState(DAL.Model.Cell cell)
+        {
+            if (_contenaireService.CountCells(cell.Id) == 0)
+            {
+                cell.Status = StatusCell.Empty;
+            }
+            else
+            {
+                cell.Status = StatusCell.InFill;
+            }
+
+            _cellService.Upsert(cell);
+
+        }
 
 
         public void OnViderClicked(Container c)
@@ -94,6 +108,7 @@ namespace KANTAIM.WEB.Pages.Administration
             c.ContainerAction = _actionService.GetByStatus(OperationContainer.Undefinded);// En vidange;
             c.ActionID = OperationContainer.Initisalisation;
             _contenaireService.UpSert(c);
+            upDateCellState(c.CellStock);
             RefreshData();
         }
 

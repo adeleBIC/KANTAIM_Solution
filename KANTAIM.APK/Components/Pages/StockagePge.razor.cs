@@ -216,7 +216,7 @@ namespace KANTAIM.APK.Components.Pages
                 }
                 logRescent = _logService.GetByContenaireId(ContainerScanner.Id);
                 actionStatus = ContainerScanner.ContainerAction.Status;
-                if (actionStatus == 0 || actionStatus == 2 || actionStatus == 3)
+                if (actionStatus == 0 || actionStatus == 2 || actionStatus == 3 || ContainerScanner.FillStatus != StatusContainer.Undefinded)
                 {
                     FillstatusSelected(ContainerScanner.FillStatus);
                 }
