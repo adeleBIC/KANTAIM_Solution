@@ -436,7 +436,7 @@ namespace KANTAIM.APK.Components.Pages
                 }
 
 
-                if (cellScanner.Id == cellPropose.Id)
+                if (cellPropose != null && cellScanner.Id == cellPropose.Id)
                 {
                     Exit(2);
                 }
@@ -444,7 +444,7 @@ namespace KANTAIM.APK.Components.Pages
                 {
                     if (cellScanner.IsMaintenance)
                     {
-                        _snackService.Add("Attention vous avez scanné le QR code de la maintenance.", Severity.Success);
+                        _snackService.Add("Attention vous avez scanné le QR code de la maintenance.", Severity.Error);
                     }
                     else
                     {
@@ -456,7 +456,13 @@ namespace KANTAIM.APK.Components.Pages
                         }
                         if (cellPropose == null)
                         {
-                            if (!cellScanner.IsPhantom)
+                            if (cellScanner.IsJail)
+                            {
+                                _snackService.Add("Attention c'est pas une zone Fantôme. C'est la zone Prizon", Severity.Error);
+                            } else if (cellScanner.IsMaintenance)
+                            {
+                                _snackService.Add("Attention c'est pas une zone Fantôme. C'est la zone Maintenance", Severity.Error);
+                            } else if(!cellScanner.IsPhantom)
                             {
                                 _snackService.Add("Attention c'est pas une zone Fantôme.", Severity.Error);
                                 cellScanner = null;

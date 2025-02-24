@@ -199,8 +199,26 @@ namespace KANTAIM.APK.Components.Pages
             }
         }
 
+        void upDateCellState(DAL.Model.Cell cell)
+        {
+            if (cell != null)
+            {
+                if (_contenaireService.CountCells(cell.Id) == 0)
+                {
+                    cell.Status = StatusCell.Empty;
+                }
+                else
+                {
+                    cell.Status = StatusCell.InFill;
+                }
+
+                _cellService.Upsert(cell);
+            }
+        }
+
         void Inject()
         {
+            var cellstock = ContainerScanner.CellStock;
             Log u = new Log()
             {
                 EventTime = DateTime.Now,
@@ -225,7 +243,7 @@ namespace KANTAIM.APK.Components.Pages
             ContainerScanner.FillStatus = StatusContainer.Undefinded;
             ContainerScanner.CellId = null;
             _contenaireService.UpSert(ContainerScanner);
-
+            upDateCellState(cellstock);
             inject = true;
             NavigationManager.NavigateTo($"/");
             _snackService.Add("Réussi !", Severity.Success);

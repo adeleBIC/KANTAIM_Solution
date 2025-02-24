@@ -37,10 +37,36 @@
 
 </style>
 
-<div class="pageTitle">
-    <MudText Typo="Typo.h4">Prison Page</MudText>
+
+<div>
+    <MudText Typo="Typo.h4" style="display: flex;  padding: 0 15px;">Prison Page</MudText>
+    <div style="flex: 1; display: flex; justify-content: center; ">
+        <MudButton Variant="MudBlazor.Variant.Outlined" OnClick="TogglePopover" Color="@Color.Primary" style=" width: 300px;">
+            List
+        </MudButton>
+    </div>
 </div>
 
+<MudPopover Open="@isPopoverOpen" OnClose="ClosePopover">
+    <MudPaper Class="p-4"
+              Style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                     width: 300px; max-height: 600px; display: flex; flex-direction: column;
+                     background-color: white; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);">
+
+        <MudList Dense Style="flex: 1; overflow-y: auto; max-height: 500px;">
+            @foreach (var contenaire in contenairesNames)
+            {
+                <MudListItem Style="@(selectedContenaire?.Number == contenaire.Number ? "background-color: #f0f0f0;" : "")" OnClick="() => SelectContenaire(contenaire)">Contenaire - @contenaire.Number</MudListItem>
+            }
+        </MudList>
+
+        <MudButton Variant="MudBlazor.Variant.Filled" Color="Color.Warning"
+                   Style="margin-top: 10px; width: 100%;"
+                   OnClick="MiseEnPrison">
+            Mise en Prison
+        </MudButton>
+    </MudPaper>
+</MudPopover>
 
 @if (Containers != null)
 {
@@ -49,13 +75,13 @@
                  Filterable="true" SortMode="SortMode.Multiple" Hideable="false" QuickFilter="@_quickFilter">
        
         <Columns>
-            <PropertyColumn Property="x => x.container.Number"/>
-            <PropertyColumn Property="x => x.container.BigContainer">
+            <PropertyColumn Property="x => x.container.Number" Title="Numéro" />
+            <PropertyColumn Property="x => x.container.BigContainer" Title="Type de contenaire">
                 <CellTemplate>
                     @context.Item.container.ContainerType.Name 
                 </CellTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.container.FillStatus">
+                    <PropertyColumn Property="x => x.container.FillStatus" Title="Remplissage">
                 <CellTemplate>
                     @ContainerStatus[context.Item.container.FillStatus]
                 </CellTemplate>
@@ -70,8 +96,8 @@
             <TemplateColumn>
                 <CellTemplate>
                     <MudStack Row>
-                        <MudButton Variant="MudBlazor.Variant.Filled" OnClick="() => OnSortirClicked(context.Item.container)" Color="@Color.Success">Passer</MudButton>
-                        <MudButton Variant="MudBlazor.Variant.Filled" OnClick="() => OnViderClicked(context.Item.container)" Color="@Color.Info">Vider</MudButton>
+                        <MudButton Variant="MudBlazor.Variant.Filled" OnClick="() => OnSortirClicked(context.Item.container)" Color="@Color.Success">Valider</MudButton>
+                        <MudButton Variant="MudBlazor.Variant.Filled" OnClick="() => OnViderClicked(context.Item.container)" Color="@Color.Error">Vider</MudButton>
                     </MudStack>
                 </CellTemplate>
             </TemplateColumn>

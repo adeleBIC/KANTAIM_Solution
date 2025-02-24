@@ -20,6 +20,8 @@ using KANTAIM.DAL.Services;
 using KANTAIM.WEB.ViewModels;
 using System.ComponentModel.DataAnnotations;
 using KANTAIM.WEB.Ressources;
+using System.Linq.Dynamic.Core;
+using MudBlazor.Charts;
 
 namespace KANTAIM.WEB.Pages.Administration
 {
@@ -39,13 +41,62 @@ namespace KANTAIM.WEB.Pages.Administration
         public Dictionary<int, string> CellStatus { get; set; }
         private string _searchString;
 
+        bool isPopoverOpen = false;
+        List<Container> contenairesNames = new List<Container>();
+        void TogglePopover()
+        {
+            isPopoverOpen = !isPopoverOpen;
+        }
+        Container? selectedContenaire;
 
+        void SelectContenaire(Container contenaire)
+        {
+            selectedContenaire = contenaire;
+        }
+        void MiseEnMaintenance()
+        {
+            if (selectedContenaire != null)
+            {
+                var logRescent = _logService.GetByContenaireNumber(selectedContenaire.Number);
+                if (logRescent != null)
+                {
+                    selectedContenaire.InMaintenance = true;
+                    selectedContenaire.FillStatus = StatusContainer.Empty;
+                    selectedContenaire.ContainerAction = _actionService.GetByStatus(OperationContainer.Undefinded);// En vidange;
+                    selectedContenaire.ActionID = OperationContainer.Initisalisation;
+                    _contenaireService.UpSert(selectedContenaire);
+                    selectedContenaire.CellStock = _cellService.GetAll().Where(c => c.IsMaintenance == true).FirstOrDefault();
+                    upDateCellState(selectedContenaire.CellStock);
+
+                    Log logUpdate = new Log()
+                    {
+                        EventTime = DateTime.Now,
+                        Operation = selectedContenaire.ActionID, // Initialisation pour le bac
+                        ProductID = logRescent.ProductID,
+                        Press = logRescent.Press,
+                        PressID = logRescent.PressID,
+                        Shape = logRescent.Shape,
+                        ShapeID = logRescent.ShapeID,
+                        Container = selectedContenaire,
+                        ContainerID = selectedContenaire.Id,
+                        ProdColor = logRescent.ProdColor,
+                        ProdColorID = logRescent.ProdColorID,
+                        CellID = logRescent.CellID,
+                        FillStatus = selectedContenaire.FillStatus
+                    };
+                    _logService.UpSert(logRescent);
+                    _snackService.Add("Mise en Maintenance !", Severity.Success);
+                    RefreshData();
+                }
+                
+            }
+        }
         public record ContainerWithEvents(Container container, string stockTime);
 
-
-
+        
         protected override async Task OnInitializedAsync()
         {
+            contenairesNames = _contenaireService.GetAll().ToList();
             CellStatus = new StatusCell().Status;
             ContainerStatus = new StatusContainer().Status;
             Containers = new List<ContainerWithEvents> { };
@@ -87,7 +138,7 @@ namespace KANTAIM.WEB.Pages.Administration
 
         void upDateCellState(DAL.Model.Cell cell)
         {
-            if (_contenaireService.CountCells(cell.Id) == 0)
+            if (_contenaireService.CountCellsInMaintenance(cell.Id) == 0)
             {
                 cell.Status = StatusCell.Empty;
             }
