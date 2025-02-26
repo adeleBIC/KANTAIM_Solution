@@ -129,7 +129,7 @@ namespace KANTAIM.APK.Components.Pages
                             break;
                     }
 
-                    await InvokeAsync(StateHasChanged);
+                    await InvokeAsync(StateHasChanged);//nouvelle
                     TextValue = null;
 
                 }
