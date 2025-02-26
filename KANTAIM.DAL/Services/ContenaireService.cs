@@ -34,6 +34,7 @@ namespace KANTAIM.DAL.Services
         public IEnumerable<Container> GetByCellId(int CellId) => GetAll().Where(u => u.CellId == CellId);
         public IEnumerable<Container> GetAllBacs(int paletteId) => GetAll().Where(u => u.ContainerID == paletteId);
         public int CountCells(int cellId) => GetAll().Where(u => u.CellId == cellId && !u.ContainerType.IsContainable).Count();
+        public int CountCellsXY(Cell cell) => GetAll().Where(u => u.CellStock.X == cell.X && u.CellStock.Y == cell.Y).Count();
         public int CountCellsInJail(int cellId) => GetAll().Where(u => u.CellId == cellId && !u.ContainerType.IsContainable && u.InJail).Count();
         public int CountCellsInMaintenance(int cellId) => GetAll().Where(u => u.CellId == cellId && !u.ContainerType.IsContainable && u.InMaintenance).Count();
 

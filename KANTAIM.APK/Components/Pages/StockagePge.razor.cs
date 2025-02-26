@@ -361,8 +361,9 @@ namespace KANTAIM.APK.Components.Pages
             foreach (Container container in _contenaireService.GetAll().Where(c => c.CellStock != null && c.ContainerType.IsContainable == false)) // recherche tous les contenaire qui est stockés dans la cellule, find all the contenaire who in currutly in the cell
             {
                 cellLog = _logService.GetByContenaireByOperationStatus(container.Id, OperationContainer.Store);
-                DAL.Model.Cell? cellAct = _cellService.GetById(cellLog?.CellID ?? 0);
-                if(cellAct != null && cellAct.IsJail != true && cellAct.IsMaintenance != true && cellAct.ForEmpty != true && cellAct.IsPhantom != true && cellAct.Status != StatusCell.Full && _cellProductService.FindLink(cellAct.Id, product.Id) && cellAct.Id != ContainerScanner?.CellId) { 
+                //DAL.Model.Cell? cellAct = _cellService.GetById(cellLog?.CellID ?? 0);
+                DAL.Model.Cell? cellAct = _cellService.GetByXY(cellLog.Cell.X, cellLog.Cell.Y);
+                if (cellAct != null && cellAct.IsJail != true && cellAct.IsMaintenance != true && cellAct.ForEmpty != true && cellAct.IsPhantom != true && cellAct.Status != StatusCell.Full && _cellProductService.FindLink(cellAct.Id, product.Id) && cellAct.Id != ContainerScanner?.CellId) { 
                     if (cellLog != null && cellLog.ProductID == product.Id )
                     {
                         if (colorOfProduct == null || cellLog.ProdColorID == colorOfProduct.Id)
@@ -496,11 +497,13 @@ namespace KANTAIM.APK.Components.Pages
             {
                 cellScanner = cellPropose;
             }
-            if (_contenaireService.CountCells(cellScanner.Id) == 0)
+            //if (_contenaireService.CountCells(cellScanner.Id) == 0)
+            if (_contenaireService.CountCellsXY(cellScanner) == 0)
             {
                 cellScanner.Status = StatusCell.Empty;
             }
-            else if (_contenaireService.CountCells(cellScanner.Id) < cellScanner.NbMax)
+            //else if (_contenaireService.CountCells(cellScanner.Id) < cellScanner.NbMax)
+            else if (_contenaireService.CountCellsXY(cellScanner) < cellScanner.NbMax)
             {
                 cellScanner.Status = StatusCell.InFill;
             }

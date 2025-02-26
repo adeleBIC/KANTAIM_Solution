@@ -94,7 +94,7 @@ namespace KANTAIM.WEB.Pages.Administration
 
         protected override async Task OnInitializedAsync()
         {
-            contenairesNames = _contenaireService.GetAll().ToList();
+            contenairesNames = _contenaireService.GetAll().Where(c => c.InJail == false).ToList();
             CellStatus = new StatusCell().Status;
             ContainerStatus = new StatusContainer().Status;
             Containers = new List<ContainerWithEvents> { };

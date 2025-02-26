@@ -47,9 +47,9 @@ namespace KANTAIM.APK.Components.Pages
         {
             get
             {
-                if (MachineScanner == null) state = 2;
-                else if (ContainerScanner == null) state = 3;
-                else state = 4;
+                if (MachineScanner != null && ContainerScanner != null) state = 4;
+                else if (MachineScanner == null && ContainerScanner != null) state = 2;
+                else if (MachineScanner != null && ContainerScanner == null) state = 3;
 
                 return state;
             }
@@ -84,18 +84,18 @@ namespace KANTAIM.APK.Components.Pages
 
         private void OnLocationChanged(object sender, LocationChangedEventArgs e)
         {
+            Console.WriteLine($"URL changed to: {e.Location}");
             // Mettre à jour l'URL actuelle lorsque l'URL change
             currentUrl = e.Location;
             // Vous pouvez ajouter ici toute logique que vous souhaitez exécuter lorsque l'URL change
         }
 
-        public void Dispose()
-        {
-            // Se désabonner de l'événement pour éviter les fuites de mémoire
-            NavigationManager.LocationChanged -= OnLocationChanged;
-        }
+        //public void Dispose()
+        //{
+        //    // Se désabonner de l'événement pour éviter les fuites de mémoire
+        //    NavigationManager.LocationChanged -= OnLocationChanged;
+        //}
 
-        private string LastKey { get; set; }
 
         [JSInvokable]
         public static void CaptureInputInject(string input)
@@ -103,7 +103,7 @@ namespace KANTAIM.APK.Components.Pages
             _instance?.HandleInput(input);
         }
 
-        private void HandleInput(string input)
+        private async void HandleInput(string input)
         {
             if (currentUrl == pageUrl)
             {
@@ -119,18 +119,16 @@ namespace KANTAIM.APK.Components.Pages
                             break;
                     }
 
-                    StateHasChanged();
+                    await InvokeAsync(StateHasChanged);
                     TextValue = null;
                 }
                 else
                 {
                     TextValue += input;
-                    StateHasChanged();
+                    await InvokeAsync(StateHasChanged);
 
                 }
-            }
-
-            
+            } 
         }
         void contenaireScan(string code)
         {

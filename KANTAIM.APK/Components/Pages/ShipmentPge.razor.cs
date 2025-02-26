@@ -88,7 +88,7 @@ namespace KANTAIM.APK.Components.Pages
 
         void upDateCellState(DAL.Model.Cell cell)
         {
-            if (_contenaireService.CountCells(cell.Id) == 0)
+            if (_contenaireService.CountCellsXY(cell) == 0)
             {
                 cell.Status = StatusCell.Empty;
             }
@@ -103,7 +103,6 @@ namespace KANTAIM.APK.Components.Pages
 
         void Shipment()
         {
-            
             Log u = new Log()
             {
                 EventTime = DateTime.Now,
@@ -145,7 +144,7 @@ namespace KANTAIM.APK.Components.Pages
                 _contenaireService.UpSert(ContainerScanner);
             }
 
-            upDateCellState(ContainerScanner.CellStock);
+            upDateCellState(cellStock);
 
             //shipment = true;
             NavigationManager.NavigateTo($"/");

@@ -173,6 +173,7 @@ namespace KANTAIM.APK.Components.Pages
                         if (containerProduct != ProductScanner || containerProdColor != ColorChoose)
                         {
                             _snackService.Add("Svp vérifiez le produit dans le contenaire et le produit que vous voulez rechercher !", Severity.Error);
+                            TextValue = null;
                         }
                         else
                         {
@@ -209,6 +210,7 @@ namespace KANTAIM.APK.Components.Pages
                 else
                 {
                     _snackService.Add("Scannez une contenaire s'il vous plaît  !", Severity.Error);
+                    TextValue = null;
                 }
             }
         }
