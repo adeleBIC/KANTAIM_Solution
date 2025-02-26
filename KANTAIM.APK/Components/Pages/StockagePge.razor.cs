@@ -45,8 +45,9 @@ namespace KANTAIM.APK.Components.Pages
         //public Product? productModified { get; set; }
         public ProdColor? colorOfProduct { get; set; }
         public bool shipment { get; set; } = false;
-        public bool stock { get; set; } = false;
-        public bool bienStock { get; set; } = false;
+        private bool stock { get; set; } = false;
+        private bool bienStock { get; set; } = false;
+
         public bool maintenance { get; set; } = false; // pour indiquer si le contenaire est stock dans la zone maintenance
         //public ProdColor? colorOfProductModified { get; set; }
         public string? CellValue { get; set; }
@@ -497,13 +498,13 @@ namespace KANTAIM.APK.Components.Pages
             {
                 cellScanner = cellPropose;
             }
-            //if (_contenaireService.CountCells(cellScanner.Id) == 0)
-            if (_contenaireService.CountCellsXY(cellScanner) == 0)
+            if (_contenaireService.CountCells(cellScanner.Id) == 0)
+            //if (_contenaireService.CountCellsXY(cellScanner) == 0)
             {
                 cellScanner.Status = StatusCell.Empty;
             }
-            //else if (_contenaireService.CountCells(cellScanner.Id) < cellScanner.NbMax)
-            else if (_contenaireService.CountCellsXY(cellScanner) < cellScanner.NbMax)
+            else if (_contenaireService.CountCells(cellScanner.Id) < cellScanner.NbMax)
+            //else if (_contenaireService.CountCellsXY(cellScanner) < cellScanner.NbMax)
             {
                 cellScanner.Status = StatusCell.InFill;
             }

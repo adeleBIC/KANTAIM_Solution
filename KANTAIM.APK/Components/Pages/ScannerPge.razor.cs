@@ -134,7 +134,7 @@ namespace KANTAIM.APK.Components.Pages
                                                             break;
                                                         case 3:
                                                             /*Après sortie le contenaire avec produit, on vas le mise en Machine*/
-                                                            NavigationManager.NavigateTo($"/InjectPge/1/{containerNumber}");
+                                                            NavigationManager.NavigateTo($"/InjectPge/1/{containerNumber}", forceLoad:true);
                                                             break;
                                                         case 4:
                                                             /*Apres vidange le contenaire est vide, on Mise en rack.*/
@@ -151,11 +151,12 @@ namespace KANTAIM.APK.Components.Pages
                                         }
                                         break;
                                     case '2':
-                                        MachineName = parts[1];
-                                        if (int.TryParse(MachineName, out int MachineNumber))
-                                        {
-                                            NavigationManager.NavigateTo($"/InjectPge/2/{MachineNumber}");
-                                        }
+                                        _snackService.Add("Impossible de scanner une machine en premier !", MudBlazor.Severity.Error);
+                                        //MachineName = parts[1];
+                                        //if (int.TryParse(MachineName, out int MachineNumber))
+                                        //{
+                                        //    NavigationManager.NavigateTo($"/InjectPge/2/{MachineNumber}");
+                                        //}
                                         break;
                                     case '3':
                                         PressName = parts[1];

@@ -49,7 +49,7 @@ namespace KANTAIM.APK.Components.Pages
                 _snackService.Add("Le contenaire est en prison!", Severity.Error);
                 return;
             }
-            if (ContainerScanner.ContainerType.Name == "Palette" && _contenaireService.CountBac(ContainerScanner.Id) != 0)// S'il est palette et n'est pas vide, on interdit cette opération
+            if (!ContainerScanner.ContainerType.IsContainable && ContainerScanner.ContainerType.NbrMaxContainer > 0 && _contenaireService.CountBac(ContainerScanner.Id) != 0)// S'il est palette et n'est pas vide, on interdit cette opération
             {
                 isPalette = true;
                 //correct = false;
@@ -57,7 +57,7 @@ namespace KANTAIM.APK.Components.Pages
                 //_snackService.Add("Scannez les bacs à la place de la palette", Severity.Error);
 
             }
-            if (ContainerScanner.ContainerTypeID == 2) //s'il est un bac 
+            if (ContainerScanner.ContainerType.IsContainable) //s'il est un bac 
             {
                 logRescent = _logService.GetByContenaireId(ContainerScanner.ContainerID.Value);
             }
@@ -88,7 +88,7 @@ namespace KANTAIM.APK.Components.Pages
 
         void upDateCellState(DAL.Model.Cell cell)
         {
-            if (_contenaireService.CountCellsXY(cell) == 0)
+            if (_contenaireService.CountCells(cell.Id) == 0)
             {
                 cell.Status = StatusCell.Empty;
             }
