@@ -512,6 +512,7 @@ namespace KANTAIM.APK.Components.Pages
             {
                 cellScanner.Status = StatusCell.Full;
             }
+            cellScanner.Products.Add(product);
             _cellService.Upsert(cellScanner);
         }
 

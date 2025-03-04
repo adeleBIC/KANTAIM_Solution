@@ -7,13 +7,20 @@ namespace KANTAIM.WEB.ViewModels
     public class CellVM
     {
         private Cell model;
+        public List<Workshop> workshops { get; set; }
+
         public static explicit operator Cell(CellVM vm) => vm.model;
 
-        public CellVM() : this(new Cell()) { }
-        public CellVM(Cell model)
+
+        public CellVM(IEnumerable<Workshop> workshops) : this(new Cell(), workshops) { }
+        public CellVM(Cell model, IEnumerable<Workshop> workshops)
         {
             this.model = model;
+            this.workshops = workshops.ToList();
+
             name = model.Name;
+            workshopID = model.WorkshopID;
+            workshop = model.Workshop;
             status = model.Status;
             x = model.X;
             y = model.Y;
@@ -46,6 +53,24 @@ namespace KANTAIM.WEB.ViewModels
         {
             get { return status; }
             set { status = value; IsEditing = true; }
+        }
+
+        [Required]
+        [Label("Workshop")]
+        private Workshop workshop;
+        public Workshop Workshop
+        {
+            get { return workshop; }
+            set { workshop = value; IsEditing = true; }
+        }
+
+        [Required]
+        [Label("WorkshopID")]
+        private int workshopID;
+        public int WorkshopID
+        {
+            get { return workshopID; }
+            set { workshopID = value; IsEditing = true; }
         }
 
         [Label("X")]
@@ -132,12 +157,15 @@ namespace KANTAIM.WEB.ViewModels
             List<ValidationResult> list = new List<ValidationResult>();
 
             if (string.IsNullOrWhiteSpace(Name)) list.Add(new ValidationResult("Le nom est obligatoire", new string[] { "Name" }));
+            if (workshopID == 0) list.Add(new ValidationResult("Atelier est obligatoire", new string[] { "workshopID" }));
             if (list.Count <= 0)
             {
 
                 model.Name = Name;
                 model.X = x;
                 model.Y = y;
+                model.WorkshopID = workshopID;
+                //model.Workshop = workshop;
                 model.NbMax = nbMax;
                 model.Status = Status;
                 model.IsJail = isJail;

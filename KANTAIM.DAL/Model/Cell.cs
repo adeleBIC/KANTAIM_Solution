@@ -24,6 +24,13 @@ namespace KANTAIM.DAL.Model
         [StringLength(50)]
         public string Name { get; set; }
 
+
+        [Column("FKTWorkshopID")]
+        public int WorkshopID { get; set; }
+        [ForeignKey(nameof(WorkshopID))]
+        public virtual Workshop Workshop { get; set; }
+
+
         public int NbMax { get; set; }
 
         public int Status { get; set; }

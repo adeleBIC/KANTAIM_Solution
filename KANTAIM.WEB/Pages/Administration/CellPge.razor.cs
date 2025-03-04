@@ -5,6 +5,7 @@ using KANTAIM.WEB.ViewModels;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace KANTAIM.WEB.Pages.Administration
 {
@@ -40,7 +41,7 @@ namespace KANTAIM.WEB.Pages.Administration
 
         void AddAsync()
         {
-            CellVM item = new CellVM() { IsEditing = true };
+            CellVM item = new CellVM(_cellService.GetAllWorkshop()) { IsEditing = true, WorkshopID = _cellService.GetFirstWorkshop().Id }; 
             Cells.Insert(0, item);
             //await InvokeAsync(StateHasChanged);
         }
@@ -117,7 +118,7 @@ namespace KANTAIM.WEB.Pages.Administration
 
         void RefreshData()
         {
-            Cells = _cellService.GetAll().Select(u => new CellVM(u)
+            Cells = _cellService.GetAll().Select(u => new CellVM(u, _cellService.GetAllWorkshop())
             {
                 ContainerCount = _cellService.GetContainerCount(u.Id)
             }).OrderBy(c => c.X).ToList();

@@ -8,13 +8,35 @@
 @using MudBlazor;
 @using System.ComponentModel.DataAnnotations;
 
-<MudPaper Height="850px" Style="overflow:hidden; position:relative;">
+<MudPaper Height="830px" Style="overflow:hidden; position:relative;">
     <MudDrawerContainer Class="mud-height-full">
         <MudGrid>
             <MudItem xs="12" Style="display: flex; justify-content: center; align-items: flex-start; margin-top: 20px;">
+            <div style="display: flex; justify-content: space-between;">
+                <div style="flex:2; margin-right: 10px;">
+                        <MudSelect T="int" @bind-Value="SelectedWorkshopId" Label="Atelier" Variant="MudBlazor.Variant.Outlined" Style="width: 200px;">
+                            @foreach (var Workshop in _workshopList)
+                        {
+                                <MudSelectItem T="int" Value="@(Workshop.Id)">@Workshop.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </div>
+            </div>
+            </MudItem>
+
+             <MudItem xs="12" Style="display: flex; justify-content: center; align-items: center; background-color:linen">
+                <div style="display: flex; gap: 20px;">
+                    <MudText Typo="Typo.h6">Nombre de cellules: @cellNb</MudText>
+                    <MudText Typo="Typo.h6">Quantité de conteneurs: @contenaireNb</MudText>
+                    <MudText Typo="Typo.h6">Quantité de produits: @productNb</MudText>
+                </div>
+            </MudItem>
+
+            <MudItem xs="12" Style="display: flex; justify-content: center; align-items: flex-start; ">
                 <div style="display: flex; justify-content: space-between;">
+                
                     <div style="flex:2; margin-right: 10px;">
-                        <MudSelect T="int" @bind-Value="SelectedProductFamilyId" Label="Famille de produits" Variant="MudBlazor.Variant.Outlined" @onchange="RefreshData" Style="width: 200px;">
+                        <MudSelect T="int" @bind-Value="SelectedProductFamilyId" Label="Famille de produits" Variant="MudBlazor.Variant.Outlined"  Style="width: 200px;">
                             @foreach (var productfamily in productfamiliesList)
                             {
                                 <MudSelectItem T="int" Value="@(productfamily.Id)">@productfamily.Name</MudSelectItem>
@@ -29,71 +51,107 @@
                             }
                         </MudSelect>
                     </div>
-                    <div style="display: flex; justify-content: center; margin-top: 10px;">
+                    <div style="flex: 1; margin-right: 10px;">
+                            <MudSelect T="int" @bind-Value="SelectedColorId" Label="Couleur" Variant="MudBlazor.Variant.Outlined" Style="width: 300px;" Placeholder="Aucune">
+                            @foreach (var color in colorList)
+                            {
+                                    <MudSelectItem T="int" Value="@(color.Id)">@color.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </div>
+                   @*  <div style="display: flex; justify-content: center; margin-top: 10px;">
                     <MudButton Variant="MudBlazor.Variant.Filled" Color="Color.Primary" OnClick="RefreshData">Afficher</MudButton>
+                </div> *@
                 </div>
-                </div>
+                <MudPaper>
+                    <div style="overflow-x: auto; width: 100%; overflow-y: hidden">
+                        <MudList Style="display: flex; flex-direction: row; gap: 10px;">
+                            @foreach (var status in cellStatus)
+                            {
+                                <MudListItem Style="display: flex; justify-content: flex-start; align-items: center; min-width: max-content;">
+                                    <MudIcon Icon=@Icons.Material.Filled.Circle Style=@GetCircleStyle(@status.Key) />
+                                    @status.Value
+                                </MudListItem>
+                            }
+                        </MudList>
+                    </div>
+                </MudPaper>
             </MudItem>
+
         </MudGrid>
+        <MudPaper Height="840px" Style="overflow:hidden; position:relative;  margin-top: 20px; margin-right: 10px; margin-left: 10px;">
+            <div style="overflow-x: auto; width: 100%;overflow-y: hidden">
+                <MudGrid>
+                    @foreach (var row in _cellList.Where(c => c.X < 900).GroupBy(c => -c.Y).OrderBy(g => g.Key))
+                    {
+                        <MudItem xs="12" Style="display: flex; justify-content: flex-start; align-items: center; min-width: max-content;">
+                            @foreach (var cell in row.OrderBy(c => c.X))
+                            {
+                                <MudCard Class="cell-card" Style="@GetCardStyle(cell.Status)"
+                                         @onclick="() => ShowCellDetails(cell)">
+                                    @if (refreshCellList== null || refreshCellList.Contains(cell)) {
+                                        <MudTooltip Text="@cell.Name">
+                                        <ChildContent>
+                                            <MudText>@cell.Name</MudText>
+                                        </ChildContent>
+                                        <TooltipContent>
+                                            <MudText >
+                                                    Nombre: @_contenaireList.Where(u => u.CellId == cell.Id).Count()
+                                            </MudText>
+                                                <MudText>Produit: @_logList.Where(u => u.CellID == cell.Id && u.Container.CellId == cell.Id).OrderByDescending(u => u.EventTime).FirstOrDefault()?.Product?.Name</MudText>
+                                          @*   <MudText>Date: @_logService.GetByCell(cell.Id)?.EventTime.ToString("yyyy-MM-dd HH:mm:ss")</MudText> *@
+                                           @*  <MudText>Produit: @_logList.Where(u => u.CellID == cell.Id).OrderByDescending(u => u.EventTime).FirstOrDefault();</MudText> *@
+                                        </TooltipContent>
+                                    </MudTooltip>
+                                    }
+                                    
+                                </MudCard>
+                            }
+                        </MudItem>
+                    }
+                </MudGrid>
+            </div>
+            @if (_cellList.Any(c => c.X >= 900))
+            {
+                <MudDivider />
 
-        <div>
-            <MudDataGrid T="StoreInfo" Items="@storeInfos" Dense=true Hover=true ReadOnly=true EditMode="MudBlazor.DataGridEditMode.Cell"
-                         Virtualize="true" SelectOnRowClick=false MultiSelection=true Bordered=true
-                         Filterable="true" SortMode="SortMode.Multiple" Hideable="false" QuickFilter="@_quickFilter">
-                <ToolBarContent>
-                    <MudTextField @bind-Value="_searchString" Placeholder="Recherche Container" Adornment="Adornment.Start" Immediate="true"
-                                  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-                </ToolBarContent>
+                <MudPaper  Style="overflow-x: auto; white-space: nowrap; margin-top: 20px; padding: 10px;">
+                    <div style="display: flex; flex-wrap: nowrap; gap: 10px;">
+                        @foreach (var cell in _cellList.Where(c => c.X >= 900).OrderBy(c => c.X))
+                        {
+                            <MudCard Class="cell-card" Style="@GetCardStyle(cell.Status)" @onclick="() => ShowCellDetails(cell)">
+                                <MudTooltip Text="@cell.Name">
+                                    <ChildContent>
+                                        <MudText>@cell.Name</MudText>
+                                    </ChildContent>
+                                    <TooltipContent>
+                                        <MudText >
+                                            Status: @cellStatus[cell.Status]
+                                        </MudText>
+                                        <MudText>Nombre: @_contenaireService.GetByCellId(cell.Id).Count()</MudText>
+                                    </TooltipContent>
+                                </MudTooltip>
+                            </MudCard>
+                        }
+                    </div>
+                </MudPaper>
+            }
 
-                <Columns>
-                    <PropertyColumn Property="x => x.ProdColor" Title="Couleur">
-                        <CellTemplate>
-                            @context.Item.ProdColor.Name
-                        </CellTemplate>
-                    </PropertyColumn>
-       @*          <PropertyColumn Property="x => x.ProdColor.ColorNumber" Title=" ">
-                    <EditTemplate>
-                        <MudIcon Icon="@Icons.Material.Filled.Circle" Style="@($"color: {context.Item.ProdColor.ColorNumber};")" />
-                    </EditTemplate>
-                </PropertyColumn> *@
-                    <PropertyColumn Property="x => x.containers.Count()" Title="Quantité de contenaire">
-                        <CellTemplate>
-                            @context.Item.containers.Count()
-                        </CellTemplate>
-                    </PropertyColumn>
-                    <PropertyColumn Property="x => x.ProductCount" Title="Quantité de produit">
-                        <CellTemplate>
-                            @context.Item.ProductCount
-                        </CellTemplate>
-                    </PropertyColumn>
-                </Columns>
-                <PagerContent>
-                    <MudDataGridPager T="LogVM" PageSizeOptions="@(new int[] {13, 30, 50,100})" />
-                </PagerContent>
-            </MudDataGrid>
-        </div>
+        </MudPaper>
+
+
+        <MudDialog @ref="dialog" MaxWidth="400px">
+            <MudDialogTitle>Cellule @selectedCell?.Name</MudDialogTitle>
+            <MudDialogContent>
+                <MudText><b>ID:</b> @selectedCell?.Id</MudText>
+                <MudText><b>NbMax:</b> @selectedCell?.NbMax</MudText>
+            </MudDialogContent>
+            <MudDialogActions>
+                <MudButton OnClick="CloseDialog" Color="Color.Primary">Fermer</MudButton>
+            </MudDialogActions>
+        </MudDialog>
+
     </MudDrawerContainer>
 </MudPaper>
 
-@* @code {
-    [Inject] public ProductFamilyService _productfamilyService { get; set; }
-    [Inject] public ProductService _productService { get; set; }
 
-    private IEnumerable<ProductFamily> productfamiliesList;
-    private IEnumerable<Product> productList;
-
-    public int SelectedProductId { get; set; }
-    public int SelectedProductFamilyId { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        productfamiliesList = _productfamilyService.GetAll();
-        productList = _productService.GetAllPerProductFamily(SelectedProductFamilyId);
-    }
-
-    void RefreshData()
-    {
-        productList = _productService.GetAllPerProductFamily(SelectedProductFamilyId);
-    }
-}
- *@
