@@ -45,17 +45,22 @@
     </div>
 </div>
 
-
 <MudPopover Open="@isPopoverOpen" OnClose="ClosePopover">
     <MudPaper Class="p-4" 
               Style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-                     width: 300px; max-height: 600px; display: flex; flex-direction: column;
+                     width: 300px; max-height: 800px; display: flex; flex-direction: column;
                      background-color: white; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);">
-   
-        <MudList Dense Style="flex: 1; overflow-y: auto; max-height: 500px;">
+        
+        <MudIconButton Icon="@Icons.Material.Filled.Close" Color="Color.Error" OnClick="TogglePopover" 
+                       Style="position: absolute; top: 0px; right: 0px;"/>
+        
+        <MudList Dense Style="flex: 1; overflow-y: auto; max-height: 500px; margin-top: 10px">
             @foreach (var contenaire in contenairesNames)
             {
-                <MudListItem Style="@(selectedContenaire?.Number == contenaire.Number ? "background-color: #f0f0f0;" : "")" OnClick="() => SelectContenaire(contenaire)">Contenaire - @contenaire.Number</MudListItem>
+                <MudListItem Style="@(selectedContenaire?.Number == contenaire.Number ? "background-color: #f0f0f0;" : "")" 
+                             OnClick="() => SelectContenaire(contenaire)">
+                    Contenaire - @contenaire.Number
+                </MudListItem>
             }
         </MudList>
 
@@ -66,6 +71,7 @@
         </MudButton>
     </MudPaper>
 </MudPopover>
+
 
 @if (Containers != null)
 {

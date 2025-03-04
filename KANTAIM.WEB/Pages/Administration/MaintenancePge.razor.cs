@@ -87,9 +87,12 @@ namespace KANTAIM.WEB.Pages.Administration
                     _logService.UpSert(logRescent);
                     _snackService.Add("Mise en Maintenance !", Severity.Success);
                     RefreshData();
+                } else
+                {
+                    _snackService.Add("Vérifier le contenaire !", Severity.Error);
                 }
-                
             }
+            
         }
         public record ContainerWithEvents(Container container, string stockTime);
 
