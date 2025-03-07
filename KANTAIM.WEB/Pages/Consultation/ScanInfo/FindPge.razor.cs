@@ -210,7 +210,8 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
                 if (selectedColorId != 0)
                 {
                     refreshCellList = _cellList.Where(c => {
-                        var logOfCell = _logList.Where(u => u.CellID == c.Id && u.Container.CellId == c.Id).OrderByDescending(u => u.EventTime).FirstOrDefault();
+                        var logOfCell = _logList.Where(u => u.CellID == c.Id && u.Container.CellId == c.Id)
+                                        .OrderByDescending(u => u.EventTime).FirstOrDefault();
                         return logOfCell?.ProdColorID == selectedColorId && logOfCell?.ProductID == selectedProductId;
                     }).ToList();
                 }

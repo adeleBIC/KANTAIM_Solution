@@ -128,5 +128,11 @@ namespace KANTAIM.WEB.Pages.Administration
             foreach (var u in Cells)
                 u.IsChecked = changes.Contains(u);
         }
+
+        
     }
 }
+
+
+
+
