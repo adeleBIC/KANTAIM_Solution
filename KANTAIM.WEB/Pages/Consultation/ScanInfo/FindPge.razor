@@ -101,8 +101,10 @@
                                                 @if (cell != null && cell.Status != StatusCell.Empty)
                                                 {
                                                     <MudText>Produit: @_logList.Where(u => u.CellID == cell.Id && u.Container.CellId == cell.Id).OrderByDescending(u => u.EventTime).FirstOrDefault()?.Product?.Name</MudText>
+                                                    <MudText>Couleur: @_logList.Where(u => u.CellID == cell.Id && u.Container.CellId == cell.Id).OrderByDescending(u => u.EventTime).FirstOrDefault()?.ProdColor?.Name</MudText>
+                                                    <MudText>Date: @_logList.Where(u => u.CellID == cell.Id && u.Container.CellId == cell.Id).OrderByDescending(u => u.EventTime).FirstOrDefault()?.EventTime.ToString("yyyy-MM-dd HH:mm:ss")</MudText>
+
                                                 }
-                                          @*   <MudText>Date: @_logService.GetByCell(cell.Id)?.EventTime.ToString("yyyy-MM-dd HH:mm:ss")</MudText> *@
                                            @*  <MudText>Produit: @_logList.Where(u => u.CellID == cell.Id).OrderByDescending(u => u.EventTime).FirstOrDefault();</MudText> *@
                                         </TooltipContent>
                                     </MudTooltip>

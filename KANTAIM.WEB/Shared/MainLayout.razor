@@ -60,6 +60,8 @@
                     <MudMenuItem Link="/Consultation/LogPge">Historique action</MudMenuItem>
                     <MudMenuItem Link="/Consulation/StoragePge">Stockage des produits</MudMenuItem>
                     <MudMenuItem Link="/Consultation/FindPge">Produit dans cellule</MudMenuItem>
+                    <MudMenuItem Link="/Consulation/JailPge">Contenaires dans Prison</MudMenuItem>
+                    <MudMenuItem Link="/Consultation/MaintenancePge">Contenaires dans Maintenance</MudMenuItem>
                     <MudMenuItem Link="/Consultation/TabPress/JourPge">Tableau récapitulatif des presses</MudMenuItem>
                     <MudMenuItem Link="/Consultation/GraphicTRSPress/JourPge">Graphique TRS des presses</MudMenuItem>
                     <MudMenuItem Link="/Consultation/GraphicTRSProd/JourPge">Graphique TRS des produits</MudMenuItem>
@@ -73,21 +75,31 @@
                          Style="--mud-typography-button-size:20px;--mud-typography-button-weight : bold;"
                          AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" FullWidth="true">
 
-                    <MudMenuItem @onclick="@(()=>NavigateToAuthorizedPage("/Administration/CellPge",20))">Cellules</MudMenuItem>
+                         <MudNavGroup Title="Gestion de Cellule" Expanded="false">
+                            <MudMenuItem @onclick="@(()=>NavigateToAuthorizedPage("/Administration/CellPge",20))">Cellules</MudMenuItem>
+                            <MudMenuItem @onclick="@(()=>NavigateToAuthorizedPage("/Administration/CellProductPge",20))">Cellules & Produits</MudMenuItem>
+                         </MudNavGroup>
+
+                    <MudNavGroup Title="Gestion de Machine" Expanded="false">
+                            <MudMenuItem @onclick="@(()=>NavigateToAuthorizedPage("/Administration/ShapePge",20))">Moules</MudMenuItem>
+                            <MudMenuItem @onclick="@(()=>NavigateToAuthorizedPage("/Administration/WorkshopPge",20))">Ateliers/Presses</MudMenuItem>
+                            <MudMenuItem @onclick="@(()=>NavigateToAuthorizedPage("/Administration/MachineAsemblagePge",20))">Machines Asemblages</MudMenuItem>
+                         </MudNavGroup>
+
+                    <MudNavGroup Title="Gestion de Produit" Expanded="false">
+                            <MudMenuItem @onclick="@(()=>NavigateToAuthorizedPage("/Administration/ProductFamilyPge",20))">Produits</MudMenuItem>
+                            <MudMenuItem @onclick="@(()=>NavigateToAuthorizedPage("/Administration/ColorProductPge",20))">Couleurs & Produits</MudMenuItem>
+                         </MudNavGroup>
+
+                    <MudNavGroup Title="Gestion de Contenaire" Expanded="false">
+                            <MudMenuItem @onclick="@(()=>NavigateToAuthorizedPage("/Administration/ContainerPge",20))">Contenaires</MudMenuItem>
+                        <MudMenuItem @onclick="@(()=>NavigateToAuthorizedPage("/Administration/TypeContenairePge",20))">Type de contenaire</MudMenuItem>
+
+                        </MudNavGroup>
                     <MudMenuItem @onclick="@(()=>NavigateToAuthorizedPage("/Administration/ShiftPge",20))">Shifts</MudMenuItem>
-                    <MudMenuItem @onclick="@(()=>NavigateToAuthorizedPage("/Administration/ShapePge",20))">Moules</MudMenuItem>
                     <MudMenuItem @onclick="@(()=>NavigateToAuthorizedPage("/Administration/ActionPge",20))">Actions</MudMenuItem>
-                    <MudMenuItem @onclick="@(()=>NavigateToAuthorizedPage("/Administration/JailPge",20))">Contenaires dans Prison</MudMenuItem>
-                    <MudMenuItem @onclick="@(()=>NavigateToAuthorizedPage("/Administration/MaintenancePge",20))">Contenaires dans Maintenance</MudMenuItem>
-                    <MudMenuItem @onclick="@(()=>NavigateToAuthorizedPage("/Administration/ProductFamilyPge",20))">Produits</MudMenuItem>
                     <MudMenuItem @onclick="@(()=>NavigateToAuthorizedPage("/Administration/ColorPge",20))">Couleurs</MudMenuItem>
                     <MudMenuItem @onclick="@(()=>NavigateToAuthorizedPage("/Administration/UserPge",20))">Utilisateurs</MudMenuItem>
-                    <MudMenuItem @onclick="@(()=>NavigateToAuthorizedPage("/Administration/ContainerPge",20))">Contenaires</MudMenuItem>
-                    <MudMenuItem @onclick="@(()=>NavigateToAuthorizedPage("/Administration/CellProductPge",20))">Cellules & Produits</MudMenuItem>
-                    <MudMenuItem @onclick="@(()=>NavigateToAuthorizedPage("/Administration/ColorProductPge",20))">Couleurs & Produits</MudMenuItem>
-                    <MudMenuItem @onclick="@(()=>NavigateToAuthorizedPage("/Administration/WorkshopPge",20))">Ateliers/Presses</MudMenuItem>
-                    <MudMenuItem @onclick="@(()=>NavigateToAuthorizedPage("/Administration/TypeContenairePge",20))">Type de contenaire</MudMenuItem>
-                    <MudMenuItem @onclick="@(()=>NavigateToAuthorizedPage("/Administration/MachineAsemblagePge",20))">Machines Asemblages</MudMenuItem>
 
                     
                 </MudMenu>

@@ -23,10 +23,18 @@ namespace KANTAIM.WEB.Components.ProductfamilyComp
 
             if (validationResults.Count == 0)
             {
-                ProductFamily u = (ProductFamily)ProductFamily;
-                _productFamilyService.UpSert(u);
-                ProductFamily.IsEditing = false;
-                _snackService.Add("Données sauvgardées !", Severity.Success);
+                try
+                {
+                    ProductFamily u = (ProductFamily)ProductFamily;
+                    _productFamilyService.UpSert(u);
+                    ProductFamily.IsEditing = false;
+                    _snackService.Add("Données sauvgardées !", Severity.Success);
+                }
+                catch (Exception ex)
+                {
+
+                    _snackService.Add($"{ex.Message}{ex.InnerException.Message}", Severity.Error);
+                }
             }
             else
             {

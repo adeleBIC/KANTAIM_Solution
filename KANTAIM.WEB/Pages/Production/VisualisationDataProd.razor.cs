@@ -78,11 +78,19 @@ namespace KANTAIM.WEB.Pages.Production
 
                 if (validationResults.Count == 0)
                 {
-                    DataProd u = (DataProd)vm;
-                    _dataProdService.UpSert(u);
-                    vm.IsEditing = false;
+                    try
+                    {
+                        DataProd u = (DataProd)vm;
+                        _dataProdService.UpSert(u);
+                        vm.IsEditing = false;
+                        _snackService.Add("Données sauvgardées !", Severity.Success);
+                    }
+                    catch (Exception ex)
+                    {
 
-                    _snackService.Add("Données sauvgardées !", Severity.Success);
+                        _snackService.Add($"{ex.Message}{ex.InnerException.Message}", Severity.Error);
+                    }
+
                 }
                 else
                 {
@@ -109,9 +117,17 @@ namespace KANTAIM.WEB.Pages.Production
                     {
                         if (item.Id != 0)
                         {
-                            _dataProdService.Delete(item.Id);
-                            RefreshData();
-                            _snackService.Add("Données supprimées !", Severity.Success);
+                            try
+                            {
+                                _dataProdService.Delete(item.Id);
+                                RefreshData();
+                                _snackService.Add("Données supprimées !", Severity.Success);
+                            }
+                            catch (Exception ex)
+                            {
+
+                                _snackService.Add($"{ex.Message}{ex.InnerException.Message}", Severity.Error);
+                            }
                         }
                     }
                 });

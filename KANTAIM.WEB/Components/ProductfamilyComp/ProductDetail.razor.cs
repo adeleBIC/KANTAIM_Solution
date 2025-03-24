@@ -24,7 +24,13 @@ namespace KANTAIM.WEB.Components.ProductfamilyComp
 
         void Add()
         {
-            ProductVM item = new ProductVM() { IsEditing = true };
+            int newNumber = (_productService.GetAll().Max(p => (int?)p.Number) ?? 0) + 1;
+
+            ProductVM item = new ProductVM()
+            {
+                IsEditing = true,
+                Number = newNumber 
+            };
             Products.Insert(0,item);
             //await InvokeAsync(StateHasChanged);
         }
@@ -53,16 +59,25 @@ namespace KANTAIM.WEB.Components.ProductfamilyComp
             {
                 vm.ProductFamilyID = ProductFamily.Id;
                 vm.QRCode = "5#" + vm.Number + "$";
+                
                 ValidationContext validationContext = new ValidationContext(vm);
                 var validationResults = vm.Validate(validationContext).ToList();
 
                 if (validationResults.Count == 0)
                 {
-                    Product u = (Product)vm;
-                    _productService.UpSert(u);
-                    vm.IsEditing = false;
+                    try
+                    {
+                        Product u = (Product)vm;
+                        _productService.UpSert(u);
+                        vm.IsEditing = false;
 
-                    _snackService.Add("Données sauvgardées !", Severity.Success);
+                        _snackService.Add("Données sauvgardées !", Severity.Success);
+                    }
+                    catch (Exception ex)
+                    {
+
+                        _snackService.Add($"{ex.Message}{ex.InnerException.Message}", Severity.Error);
+                    }
                 }
                 else
                 {
@@ -89,12 +104,20 @@ namespace KANTAIM.WEB.Components.ProductfamilyComp
                     {
                         if (item.Id != 0)
                         {
-                            foreach (CellProduct lier in _cellProductService.GetAllPerProduct(item.Id)) {
-                                _cellProductService.Delete(lier.Id);
+                            try
+                            {
+                                    foreach (CellProduct lier in _cellProductService.GetAllPerProduct(item.Id)) {
+                                    _cellProductService.Delete(lier.Id);
+                                }
+                                _productService.Delete(item.Id);
+                                RefreshData();
+                                _snackService.Add("Données supprimées !", Severity.Success);
                             }
-                            _productService.Delete(item.Id);
-                            RefreshData();
-                            _snackService.Add("Données supprimées !", Severity.Success);
+                            catch (Exception ex)
+                            {
+
+                                _snackService.Add($"{ex.Message}{ex.InnerException.Message}", Severity.Error);
+                            }
                         }
                     }
                 });

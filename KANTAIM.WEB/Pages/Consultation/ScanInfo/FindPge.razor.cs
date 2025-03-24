@@ -202,6 +202,8 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
             if (selectedProductFamilyId == 0)
             {
                 refreshCellList = null;
+                selectedProductId = 0;
+                selectedColorId = 0;
                 cellNb = _cellList.Count();
                 contenaireNb = _contenaireList.Count(c => c.CellId!=null && c.CellStock?.WorkshopID == selectedWorkshopId);
             }

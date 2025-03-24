@@ -1,5 +1,5 @@
 ﻿
-@page "/Administration/JailPge"
+@page "/Consulation/JailPge"
 @using KANTAIM.DAL.Model;
 @using KANTAIM.WEB.ViewModels;
 
@@ -36,27 +36,62 @@
     }
 
 </style>
-
-
 <div>
-    <MudText Typo="Typo.h4" style="display: flex;  padding: 0 15px;">Prison Page</MudText>
-    <div style="flex: 1; display: flex; justify-content: center; ">
-        <MudButton Variant="MudBlazor.Variant.Outlined" OnClick="TogglePopover" Color="@Color.Primary" style=" width: 300px;">
-            List
+    <MudText Typo="Typo.h4" style="display: flex; padding: 0 15px;">Prison Page</MudText>
+    <div style="flex: 1; display: flex; justify-content: center;">
+        <MudButton Variant="MudBlazor.Variant.Outlined" OnClick="TogglePopover" Color="Color.Primary"
+                   style="width: 300px; " id="btnPopover">
+            List de Contenaires
         </MudButton>
     </div>
 </div>
 
-<MudPopover Open="@isPopoverOpen" OnClose="ClosePopover">
-    <MudPaper Class="p-4"
-              Style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-                     width: 300px; max-height: 600px; display: flex; flex-direction: column;
-                     background-color: white; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);">
+@if (isPopoverOpen)
+{
+    <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.5); z-index: 1000;"
+         @onclick="TogglePopover">
+        <MudPopover Open="true" Anchor="#btnPopover"
+                    AnchorOrigin="Origin.TopCenter"
+                    TransformOrigin="Origin.TopCenter"
+                    Style="display: flex; justify-content: center; align-items: center;">
+            <MudPaper Class="p-4"
+                      Style="width: 300px; height: 95vh; max-height: 95vh; display: flex; flex-direction: column;
+                             background-color: white; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); overflow-y: auto; margin-top:50px;">
 
+                <MudList Dense Style="flex: 1; overflow-y: auto; margin-top: 10px">
+                    @foreach (var contenaire in contenairesNames)
+                    {
+                        <MudListItem Style="@(selectedContenaire?.Number == contenaire.Number ? "border: 2px solid orange;" : "")"
+                                     OnClick="() => SelectContenaire(contenaire)">
+                            Contenaire - @contenaire.Number
+                        </MudListItem>
+                    }
+                </MudList>
+
+                <MudButton Variant="MudBlazor.Variant.Filled" Color="Color.Warning"
+                           Style="margin-top: 10px; width: 100%;"
+                           OnClick="MiseEnPrison">
+                    Mise en Prison
+                </MudButton>
+            </MudPaper>
+        </MudPopover>
+    </div>
+}
+@* 
+
+<MudPopover Open="@isPopoverOpen" OnClose="ClosePopover"
+            AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter"
+            Anchor="#btnPopover">
+    <MudPaper Class="p-4"
+              Style="width: 300px; max-height: 600px; display: flex; flex-direction: column;
+                     background-color: white; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);">
         <MudList Dense Style="flex: 1; overflow-y: auto; max-height: 500px;">
             @foreach (var contenaire in contenairesNames)
             {
-                <MudListItem Style="@(selectedContenaire?.Number == contenaire.Number ? "background-color: #f0f0f0;" : "")" OnClick="() => SelectContenaire(contenaire)">Contenaire - @contenaire.Number</MudListItem>
+                <MudListItem Style="@(selectedContenaire?.Number == contenaire.Number ? "border: 2px solid orange;" : "")"
+                             OnClick="() => SelectContenaire(contenaire)">
+                    Contenaire - @contenaire.Number
+                </MudListItem>
             }
         </MudList>
 
@@ -67,6 +102,7 @@
         </MudButton>
     </MudPaper>
 </MudPopover>
+ *@
 
 @if (Containers != null)
 {

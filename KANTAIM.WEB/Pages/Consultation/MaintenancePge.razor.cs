@@ -1,8 +1,8 @@
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::System.Threading.Tasks;
-using global::Microsoft.AspNetCore.Components;
+using KANTAIM.DAL.Services;
+using Microsoft.AspNetCore.Components;
+using MudBlazor;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components;
 using System.Net.Http;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.Web.Virtualization;
 using Microsoft.JSInterop;
-using KANTAIM.WEB;
 using KANTAIM.WEB.Shared;
 using MudBlazor;
 using KANTAIM.DAL;
@@ -20,12 +19,13 @@ using KANTAIM.DAL.Services;
 using KANTAIM.WEB.ViewModels;
 using System.ComponentModel.DataAnnotations;
 using KANTAIM.WEB.Ressources;
-using static KANTAIM.WEB.Pages.Administration.JailPge;
-using Microsoft.EntityFrameworkCore.Query.Internal;
+using System.Linq.Dynamic.Core;
+using MudBlazor.Charts;
 
-namespace KANTAIM.WEB.Pages.Administration
+namespace KANTAIM.WEB.Pages.Consultation
 {
-    public partial class JailPge
+    public partial class MaintenancePge
+
     {
         [Inject] public ContenaireService _contenaireService { get; set; }
         [Inject] public LogService _logService { get; set; }
@@ -35,11 +35,10 @@ namespace KANTAIM.WEB.Pages.Administration
         [Inject] public CellService _cellService { get; set; }
 
         public IEnumerable<ContainerWithEvents> Containers { get; set; }
-        
+
         public Dictionary<int, string> ContainerStatus { get; set; }
         public Dictionary<int, string> CellStatus { get; set; }
         private string _searchString;
-
 
         bool isPopoverOpen = false;
         List<Container> contenairesNames = new List<Container>();
@@ -53,16 +52,19 @@ namespace KANTAIM.WEB.Pages.Administration
         {
             selectedContenaire = contenaire;
         }
-        void MiseEnPrison()
+        void MiseEnMaintenance()
         {
             if (selectedContenaire != null)
             {
                 var logRescent = _logService.GetByContenaireNumber(selectedContenaire.Number);
                 if (logRescent != null)
                 {
-                    selectedContenaire.InJail = true;
+                    selectedContenaire.InMaintenance = true;
+                    selectedContenaire.FillStatus = StatusContainer.Empty;
+                    selectedContenaire.ContainerAction = _actionService.GetByStatus(OperationContainer.Undefinded);// En vidange;
+                    selectedContenaire.ActionID = OperationContainer.Initisalisation;
                     _contenaireService.UpSert(selectedContenaire);
-                    selectedContenaire.CellStock = _cellService.GetAll().Where(c => c.IsJail == true).FirstOrDefault();
+                    selectedContenaire.CellStock = _cellService.GetAll().Where(c => c.IsMaintenance == true).FirstOrDefault();
                     upDateCellState(selectedContenaire.CellStock);
 
                     Log logUpdate = new Log()
@@ -82,19 +84,22 @@ namespace KANTAIM.WEB.Pages.Administration
                         FillStatus = selectedContenaire.FillStatus
                     };
                     _logService.UpSert(logRescent);
-                    _snackService.Add("Mise en Prison !", Severity.Success);
+                    _snackService.Add("Mise en Maintenance !", Severity.Success);
                     RefreshData();
                 }
-                
+                else
+                {
+                    _snackService.Add("Vérifier le contenaire !", Severity.Error);
+                }
             }
-        }
-        public record ContainerWithEvents(Container container, string prodTime, string stockTime);
 
+        }
+        public record ContainerWithEvents(Container container, string stockTime);
 
 
         protected override async Task OnInitializedAsync()
         {
-            contenairesNames = _contenaireService.GetAll().Where(c => c.InJail == false).ToList();
+            contenairesNames = _contenaireService.GetAll().Where(c => c.InMaintenance == false).ToList();
             CellStatus = new StatusCell().Status;
             ContainerStatus = new StatusContainer().Status;
             Containers = new List<ContainerWithEvents> { };
@@ -103,21 +108,21 @@ namespace KANTAIM.WEB.Pages.Administration
         void RefreshData()
         {
             Containers = _contenaireService.GetAll()
-            .Where(u => u.InJail == true)
+            .Where(u => u.InMaintenance == true)
             .Select(u =>
             {
                 int id;
                 // Récupérer ProdTime et StockTime depuis _logService
-                if(u.ContainerType != null && (u.BigContainer == null || !u.ContainerType.IsContainable))
+                if (u.ContainerType != null && (u.BigContainer == null || !u.ContainerType.IsContainable))
                 {
                     id = u.Id;
-                } else
+                }
+                else
                 {
                     id = u.BigContainer.Id;
                 }
-                var prodTime = _logService.GetByContenaireIdAction(id, OperationContainer.Initisalisation)?.EventTime ?? DateTime.MinValue;
                 var stockTime = _logService.GetByContenaireIdAction(id, OperationContainer.Store)?.EventTime ?? DateTime.MinValue;
-                return new ContainerWithEvents(u, prodTime.ToShortTimeString() + "   " + prodTime.ToShortDateString(), stockTime.ToShortTimeString() + "   " + stockTime.ToShortDateString());
+                return new ContainerWithEvents(u, stockTime.ToShortTimeString() + "   " + stockTime.ToShortDateString());
             })
             .ToList();
         }
@@ -134,10 +139,9 @@ namespace KANTAIM.WEB.Pages.Administration
             return false;
         };
 
-
-        void upDateCellState(DAL.Model.Cell cell)
+        void upDateCellState(Cell cell)
         {
-            if (_contenaireService.CountCellsInJail(cell.Id) == 0)
+            if (_contenaireService.CountCellsInMaintenance(cell.Id) == 0)
             {
                 cell.Status = StatusCell.Empty;
             }
@@ -149,20 +153,14 @@ namespace KANTAIM.WEB.Pages.Administration
             _cellService.Upsert(cell);
 
         }
+
+
         public void OnViderClicked(Container c)
         {
             c.FillStatus = StatusContainer.Empty;
-            c.InJail = false;
+            c.InMaintenance = false;
             c.ContainerAction = _actionService.GetByStatus(OperationContainer.Undefinded);// En vidange;
             c.ActionID = OperationContainer.Initisalisation;
-            _contenaireService.UpSert(c);
-            upDateCellState(c.CellStock);
-            RefreshData();
-        }
-
-        public void OnSortirClicked(Container c)
-        {
-            c.InJail = false;
             _contenaireService.UpSert(c);
             upDateCellState(c.CellStock);
             RefreshData();

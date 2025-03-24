@@ -643,51 +643,29 @@ namespace KANTAIM.APK.Components.Pages
             await DialogService.ShowAsync<BacDialog>("Bacs associés à la palette", parameters, options);
         }
 
-        //public List<ContainerInfo> bacList { get; set; }
+        void upDateCellState(DAL.Model.Cell cell)
+        {
+            if(cell != null)
+            {
+                if (_contenaireService.CountCells(cell.Id) == 0)
+                {
+                    cell.Status = StatusCell.Empty;
+                }
+                else
+                {
+                    cell.Status = StatusCell.InFill;
+                }
 
-        //public class ContainerInfo
-        //{
-        //    public Container container { get; set; }
-        //    public DateTime EventTime { get; set; }
-        //}
+                _cellService.Upsert(cell);
+            }
+            
 
-        //async Task OpenDialogAsync()
-        //{
-        //    if (isPalette)
-        //    {
-        //        bacList = _contenaireService.GetAll()
-        //                    .Where(c => c.ContainerID == ContainerScanner.Id)
-        //                    .Select(c => new ContainerInfo
-        //                    {
-        //                        container = c,
-        //                        EventTime = _logService.GetByContenaireId(c.Id).EventTime
-        //                    })
-        //                    .ToList();
-        //    }
-        //    var parameters = new DialogParameters
-        //        {
-        //            { "BacList", bacList }
-        //        };
-
-
-        //    var options = new DialogOptions { CloseOnEscapeKey = true };
-
-        //    try
-        //    {
-        //        var task = DialogService.ShowAsync<BacDialog>("Bacs associés à la palette", parameters, options);
-        //        await task;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.Error.Write("MyAppTag", "Exception occurred: " + ex.Message);
-        //        await DialogService.ShowAsync<BacDialog>("Bacs associés à la palette");
-        //    }
-        //}
-
+        }
 
         void Exit(int action)
         {
-            if(action == 3)
+            var oldCellule = ContainerScanner?.CellStock;
+            if (action == 3)
                 shipment = true;
             if(ContainerScanner != null && cellScanner != null)
             {
@@ -790,6 +768,7 @@ namespace KANTAIM.APK.Components.Pages
                 }
             }
             upDateCellState();
+            upDateCellState(oldCellule);
             bienStock = true;
            }
     }
