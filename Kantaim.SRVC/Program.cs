@@ -10,6 +10,12 @@ IHost host = Host.CreateDefaultBuilder(args)
     {
         services.AddSingleton(typeof(Repository<>));
         services.AddSingleton<CurrentPressCounterService>();
+        services.AddSingleton<DataProdService>();
+        services.AddSingleton<WorkshopService>();
+        services.AddSingleton<PressService>();
+        services.AddSingleton<ShapeService>();
+        services.AddSingleton<ProductService>();
+        services.AddSingleton<ProductFamilyService>();
         services.AddSingleton<ShiftService>();
 
         services.AddTransient<OpcUaService>();

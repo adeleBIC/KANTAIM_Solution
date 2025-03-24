@@ -87,8 +87,8 @@ namespace KANTAIM.DAL.Services
         {
             if (!cache) ResetCache();
 
-            var currentTime = DateTime.Now.TimeOfDay;
-            var dayOfWeek = DateTime.Now.DayOfWeek;
+            var currentTime = dateProd.TimeOfDay;
+            var dayOfWeek = dateProd.DayOfWeek;
 
             // Récupération des heures de début de chaque shift selon le jour actuel
             var shifts = Cache
@@ -206,6 +206,342 @@ namespace KANTAIM.DAL.Services
             return nextShiftTomorrow;
         }
 
+        public TimeSpan?[] GetShiftsForDay(DayOfWeek dayOfWeek, bool cache)
+        {
+            if (!cache) ResetCache();
+
+            // Extraire les heures de début des shifts pour le jour donné
+            var shifts = Cache
+                .Select(shift => dayOfWeek switch
+                {
+                    DayOfWeek.Monday => shift.Monday?.TimeOfDay,
+                    DayOfWeek.Tuesday => shift.Tuesday?.TimeOfDay,
+                    DayOfWeek.Wednesday => shift.Wednesday?.TimeOfDay,
+                    DayOfWeek.Thursday => shift.Thursday?.TimeOfDay,
+                    DayOfWeek.Friday => shift.Friday?.TimeOfDay,
+                    DayOfWeek.Saturday => shift.Saturday?.TimeOfDay,
+                    DayOfWeek.Sunday => shift.Sunday?.TimeOfDay,
+                    _ => null
+                })
+                .Where(x => x.HasValue) // Garder uniquement les valeurs non nulles
+                .OrderBy(x => x) // Trier par ordre chronologique
+                .Take(3) // Prendre seulement les 3 premiers shifts du jour
+                .ToArray();
+
+            return shifts;
+        }
+
+        public DateTime? GetCurrentShiftDate(DateTime dateProd, bool cache)
+        {
+            if (!cache) ResetCache();
+
+            var currentTime = dateProd.TimeOfDay;
+            var dayOfWeek = dateProd.DayOfWeek;
+
+            var shifts = Cache
+                .Select(shift => new
+                {
+                    ShiftNumber = shift.ShiftNumber,
+                    StartTime = dayOfWeek switch
+                    {
+                        DayOfWeek.Monday => shift.Monday?.TimeOfDay,
+                        DayOfWeek.Tuesday => shift.Tuesday?.TimeOfDay,
+                        DayOfWeek.Wednesday => shift.Wednesday?.TimeOfDay,
+                        DayOfWeek.Thursday => shift.Thursday?.TimeOfDay,
+                        DayOfWeek.Friday => shift.Friday?.TimeOfDay,
+                        DayOfWeek.Saturday => shift.Saturday?.TimeOfDay,
+                        DayOfWeek.Sunday => shift.Sunday?.TimeOfDay,
+                        _ => null
+                    },
+                    NextStartTime = GetNextShiftStartTime(shift, dayOfWeek)
+                })
+                .Where(x => x.StartTime.HasValue)
+                .OrderBy(x => x.StartTime)
+                .ToList();
+
+            foreach (var shift in shifts)
+            {
+                var startTime = shift.StartTime.Value;
+                var endTime = shift.NextStartTime ?? TimeSpan.FromHours(24); // Fin à 23:59 si aucun shift suivant
+
+                // ✅ Gestion du chevauchement jour suivant
+                if (endTime < startTime)
+                {
+                    // Si le shift chevauche le lendemain
+                    if (currentTime >= startTime || currentTime < endTime)
+                    {
+                        var shiftDate = (currentTime >= startTime)
+                            ? dateProd.Date
+                            : dateProd.AddDays(-1).Date; // Si on est après minuit, le shift a commencé la veille
+
+                        Console.WriteLine($"Shift actif : {shift.ShiftNumber} - Date réelle : {shiftDate:dd/MM/yyyy}");
+                        return shiftDate;
+                    }
+                }
+                else
+                {
+                    // ✅ Cas classique dans la journée
+                    if (currentTime >= startTime && currentTime < endTime)
+                    {
+                        Console.WriteLine($"Shift actif : {shift.ShiftNumber} - Date réelle : {DateTime.Now:dd/MM/yyyy}");
+                        return dateProd.Date;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public int GetPreviousDayShift(DateTime dateProd, bool cache)
+        {
+            if (!cache) ResetCache();
+
+            var currentTime = dateProd.TimeOfDay;
+            var dayOfWeek = dateProd.DayOfWeek;
+
+            Console.WriteLine($"➡️ DateProd : {dateProd} | Heure actuelle : {currentTime}");
+
+            var shifts = Cache
+                .Select(shift => new
+                {
+                    ShiftNumber = shift.ShiftNumber,
+                    StartTime = dayOfWeek switch
+                    {
+                        DayOfWeek.Monday => shift.Monday?.TimeOfDay,
+                        DayOfWeek.Tuesday => shift.Tuesday?.TimeOfDay,
+                        DayOfWeek.Wednesday => shift.Wednesday?.TimeOfDay,
+                        DayOfWeek.Thursday => shift.Thursday?.TimeOfDay,
+                        DayOfWeek.Friday => shift.Friday?.TimeOfDay,
+                        DayOfWeek.Saturday => shift.Saturday?.TimeOfDay,
+                        DayOfWeek.Sunday => shift.Sunday?.TimeOfDay,
+                        _ => null
+                    },
+                    NextStartTime = GetNextShiftStartTime(shift, dayOfWeek)
+                })
+                .Where(x => x.StartTime.HasValue)
+                .OrderBy(x => x.StartTime)
+                .ToList();
+
+            Console.WriteLine($"🔎 Shifts disponibles aujourd'hui :");
+            foreach (var shift in shifts)
+            {
+                Console.WriteLine($"  - Shift {shift.ShiftNumber} : {shift.StartTime} ➡️ {shift.NextStartTime}");
+            }
+
+            if (!shifts.Any())
+                return -1;
+
+            var firstShift = shifts.First();
+            var lastShift = shifts.Last();
+
+            // ✅ Si l'heure est avant le premier shift → Prendre le dernier shift (même chevauché)
+            if (currentTime < firstShift.StartTime)
+            {
+                Console.WriteLine($"🚨 Heure avant le premier shift → Retour au dernier shift de la veille");
+
+                var lastShiftOfYesterday = GetLastShiftOfPreviousDay(dateProd);
+
+                // 🔥 Si le dernier shift chevauche la journée suivante, on veut remonter au précédent
+                if (lastShiftOfYesterday == lastShift.ShiftNumber)
+                {
+                    var previousShift = (shifts.Count > 1) ? shifts[^2].ShiftNumber : lastShift.ShiftNumber;
+                    Console.WriteLine($"✅ Shift précédent (après chevauchement) : {previousShift}");
+                    return previousShift;
+                }
+                else
+                {
+                    Console.WriteLine($"✅ Shift précédent (veille complète) : {lastShiftOfYesterday}");
+                    return lastShiftOfYesterday;
+                }
+            }
+
+
+            // ✅ Si l'heure est après le dernier shift → Retour au dernier shift du jour
+            if (currentTime >= lastShift.StartTime)
+            {
+                Console.WriteLine($"🚨 Heure après le dernier shift → Retour au dernier shift du jour");
+                var previousShift = (shifts.Count > 1) ? shifts[shifts.Count - 2] : lastShift;
+                Console.WriteLine($"✅ Shift précédent (fin de journée) : {previousShift.ShiftNumber}");
+                return previousShift.ShiftNumber;
+            }
+
+            // ✅ Si l'heure est pendant un shift → Retourner le shift précédent
+            for (int i = 0; i < shifts.Count; i++)
+            {
+                var shift = shifts[i];
+                var startTime = shift.StartTime.Value;
+                var endTime = shift.NextStartTime ?? TimeSpan.FromHours(24);
+
+                if (endTime < startTime) // Cas de chevauchement
+                {
+                    if (currentTime >= startTime || currentTime < endTime)
+                    {
+                        var previousShift = (i == 0) ? GetLastShiftOfPreviousDay(dateProd) : shifts[i - 1].ShiftNumber;
+                        Console.WriteLine($"✅ Cas de chevauchement : Shift précédent = {previousShift}");
+                        return previousShift;
+                    }
+                }
+                else
+                {
+                    if (currentTime >= startTime && currentTime < endTime)
+                    {
+                        var previousShift = (i == 0) ? GetLastShiftOfPreviousDay(dateProd) : shifts[i - 1].ShiftNumber;
+                        Console.WriteLine($"✅ Shift trouvé : Shift précédent = {previousShift}");
+                        return previousShift;
+                    }
+                }
+            }
+
+            Console.WriteLine($"🚨 Aucun shift trouvé → Dernier shift par défaut : {lastShift.ShiftNumber}");
+            return lastShift.ShiftNumber;
+        }
+
+        private int GetLastShiftOfPreviousDay(DateTime dateProd)
+        {
+            var previousDay = dateProd.AddDays(-1).DayOfWeek;
+
+            var lastShiftYesterday = Cache
+                .Select(shift => new
+                {
+                    ShiftNumber = shift.ShiftNumber,
+                    StartTime = previousDay switch
+                    {
+                        DayOfWeek.Monday => shift.Monday?.TimeOfDay,
+                        DayOfWeek.Tuesday => shift.Tuesday?.TimeOfDay,
+                        DayOfWeek.Wednesday => shift.Wednesday?.TimeOfDay,
+                        DayOfWeek.Thursday => shift.Thursday?.TimeOfDay,
+                        DayOfWeek.Friday => shift.Friday?.TimeOfDay,
+                        DayOfWeek.Saturday => shift.Saturday?.TimeOfDay,
+                        DayOfWeek.Sunday => shift.Sunday?.TimeOfDay,
+                        _ => null
+                    }
+                })
+                .Where(x => x.StartTime.HasValue)
+                .OrderByDescending(x => x.StartTime)
+                .FirstOrDefault();
+
+            if (lastShiftYesterday != null)
+            {
+                Console.WriteLine($"✅ Dernier shift de la veille : {lastShiftYesterday.ShiftNumber}");
+                return lastShiftYesterday.ShiftNumber;
+            }
+
+            Console.WriteLine($"❌ Aucun shift trouvé pour la veille !");
+            return -1;
+        }
+
+
+
+        public DateTime? GetPreviousShiftDate(DateTime dateProd, bool cache)
+        {
+            if (!cache) ResetCache();
+
+            var currentTime = dateProd.TimeOfDay;
+            var dayOfWeek = dateProd.DayOfWeek;
+
+            var shifts = Cache
+                .Select(shift => new
+                {
+                    ShiftNumber = shift.ShiftNumber,
+                    StartTime = dayOfWeek switch
+                    {
+                        DayOfWeek.Monday => shift.Monday?.TimeOfDay,
+                        DayOfWeek.Tuesday => shift.Tuesday?.TimeOfDay,
+                        DayOfWeek.Wednesday => shift.Wednesday?.TimeOfDay,
+                        DayOfWeek.Thursday => shift.Thursday?.TimeOfDay,
+                        DayOfWeek.Friday => shift.Friday?.TimeOfDay,
+                        DayOfWeek.Saturday => shift.Saturday?.TimeOfDay,
+                        DayOfWeek.Sunday => shift.Sunday?.TimeOfDay,
+                        _ => null
+                    },
+                    NextStartTime = GetNextShiftStartTime(shift, dayOfWeek)
+                })
+                .Where(x => x.StartTime.HasValue)
+                .OrderBy(x => x.StartTime)
+                .ToList();
+
+            if (!shifts.Any())
+                return null;
+
+            // ✅ Si l'heure est avant le premier shift → Retourner le dernier shift de la veille
+            var firstShift = shifts.First();
+            if (currentTime < firstShift.StartTime)
+            {
+                var previousDay = dateProd.AddDays(-1).DayOfWeek;
+
+                var lastShiftYesterday = Cache
+                    .Select(shift => new
+                    {
+                        ShiftNumber = shift.ShiftNumber,
+                        StartTime = previousDay switch
+                        {
+                            DayOfWeek.Monday => shift.Monday?.TimeOfDay,
+                            DayOfWeek.Tuesday => shift.Tuesday?.TimeOfDay,
+                            DayOfWeek.Wednesday => shift.Wednesday?.TimeOfDay,
+                            DayOfWeek.Thursday => shift.Thursday?.TimeOfDay,
+                            DayOfWeek.Friday => shift.Friday?.TimeOfDay,
+                            DayOfWeek.Saturday => shift.Saturday?.TimeOfDay,
+                            DayOfWeek.Sunday => shift.Sunday?.TimeOfDay,
+                            _ => null
+                        }
+                    })
+                    .Where(x => x.StartTime.HasValue)
+                    .OrderByDescending(x => x.StartTime)
+                    .FirstOrDefault();
+
+                if (lastShiftYesterday != null)
+                {
+                    var shiftDate = dateProd.AddDays(-1).Date;
+                    Console.WriteLine($"Shift précédent (veille) - Date réelle : {shiftDate:dd/MM/yyyy}");
+                    return shiftDate;
+                }
+            }
+
+            // ✅ Si l'heure est dans un shift → Retourner la date du shift précédent
+            for (int i = 0; i < shifts.Count; i++)
+            {
+                var shift = shifts[i];
+                var startTime = shift.StartTime.Value;
+                var endTime = shift.NextStartTime ?? TimeSpan.FromHours(24);
+
+                if (endTime < startTime) // Gestion du chevauchement de jour
+                {
+                    if (currentTime >= startTime || currentTime < endTime)
+                    {
+                        var previousShift = (i == 0) ? shifts.Last() : shifts[i - 1];
+                        var shiftDate = (previousShift.StartTime.Value > startTime)
+                            ? dateProd.AddDays(-1).Date
+                            : dateProd.Date;
+
+                        Console.WriteLine($"Shift précédent (actif) - Date réelle : {shiftDate:dd/MM/yyyy}");
+                        return shiftDate;
+                    }
+                }
+                else
+                {
+                    if (currentTime >= startTime && currentTime < endTime)
+                    {
+                        var previousShift = (i == 0) ? shifts.Last() : shifts[i - 1];
+                        var shiftDate = dateProd.Date;
+
+                        // ✅ Si le shift précédent chevauche la veille, on corrige la date
+                        if (previousShift.StartTime.Value > startTime)
+                        {
+                            shiftDate = dateProd.AddDays(-1).Date;
+                        }
+
+                        Console.WriteLine($"Shift précédent (actif) - Date réelle : {shiftDate:dd/MM/yyyy}");
+                        return shiftDate;
+                    }
+                }
+            }
+
+            // ✅ Si l'heure est après le dernier shift → Retourner le dernier shift du jour
+            var lastShift = shifts.Last();
+            var lastShiftDate = dateProd.Date;
+            Console.WriteLine($"Shift précédent (dernier shift du jour) - Date réelle : {lastShiftDate:dd/MM/yyyy}");
+            return lastShiftDate;
+        }
 
     }
 }

@@ -23,6 +23,7 @@ namespace KANTAIM.DAL.Services
             return ctx.CurrentPressCounters.Include(c => c.Press).ToList();
         }
         public CurrentPressCounter? GetById(int id) => GetAll().SingleOrDefault(c => c.Id == id);
+        public CurrentPressCounter? GetByPressId(int id) => GetAll().SingleOrDefault(c => c.PressID == id);
 
         public void UpSert(CurrentPressCounter item) => _repo.UpSert(item);
         public void Delete(int id) => _repo.Delete(id);
