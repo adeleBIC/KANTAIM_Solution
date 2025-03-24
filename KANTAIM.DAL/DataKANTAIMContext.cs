@@ -29,6 +29,7 @@ namespace KANTAIM.DAL
         public virtual DbSet<Press> Press { get; set; }
         public virtual DbSet<Product> Product { get; set; }
         public virtual DbSet<Shape> Shapes { get; set; }
+        public virtual DbSet<CurrentPressCounter> CurrentPressCounters { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -42,7 +43,7 @@ namespace KANTAIM.DAL
                     optionsBuilder.UseSqlServer("Server=MONSSQL03;Database=DATASCADAMOULAGE;User Id=UserMLV;Password=BicUserMLV20;MultipleActiveResultSets=True;Encrypt=false;TrustServerCertificate=False;MultiSubnetFailover=True");
                     
                 }
-                else // Supposons que c'est Web
+                else
                 {
                     IConfigurationRoot config = new ConfigurationBuilder()
                         .AddJsonFile("appsettings.json")
@@ -56,7 +57,7 @@ namespace KANTAIM.DAL
                 }
 #if DEBUG
                 //optionsBuilder.UseSqlServer("Data Source=.\\SQLEXPRESS;Initial Catalog=DATASCADAMOULAGE;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
-                //optionsBuilder.UseSqlServer("Server=MONSSQL03;Database=DATASCADAMOULAGE;User Id=UserMLV;Password=BicUserMLV20;MultipleActiveResultSets=True;Encrypt=false;TrustServerCertificate=False;MultiSubnetFailover=True");
+                optionsBuilder.UseSqlServer("Server=MONSSQL03;Database=DATASCADAMOULAGE;User Id=UserMLV;Password=BicUserMLV20;MultipleActiveResultSets=True;Encrypt=false;TrustServerCertificate=False;MultiSubnetFailover=True");
 #endif
 
             }
