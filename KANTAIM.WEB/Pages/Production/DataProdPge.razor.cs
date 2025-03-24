@@ -88,7 +88,7 @@ namespace KANTAIM.WEB.Pages.Production
                     Press press = _dataProdService.GetPressById(vm.PressID);
                     vm.TRS = Math.Round((vm.Counter / (press.Shape.TotalMark * ((vm.Opentime * 3600) * (decimal)(1 / press.Shape.Cycle))) * 100), 2);
                     vm.ObjOK = (vm.TRS >= vm.Objective);
-                    vm.NumWeekshift = _shiftService.GetWeekShift((DataProd)vm);
+                    vm.NumWeekshift = _shiftService.GetWeekShift(vm.DateProd,vm.NumDayShift,true);
                     vm.ModelUpdate();
 
                     DataProd u = (DataProd)vm;
