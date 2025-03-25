@@ -37,7 +37,7 @@ namespace Kantaim.SRVC
                 {
                     //Assignation des fins de shifts
                     DateTime now = DateTime.Now;
-                    now = new DateTime(2025, 03, 25, 14, 30, 30);
+                    //now = new DateTime(2025, 03, 25, 14, 30, 30);
 
                     _shiftService.ResetCache();
 
