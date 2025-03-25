@@ -34,38 +34,6 @@ namespace Kantaim.OPC.Services
 
             return await ConnectAsync(_endpointUrl);
         }
-        //private async Task ConnectAsync(string endpointUrl)
-        //{
-        //    var config = new ApplicationConfiguration
-        //    {
-        //        ApplicationName = "BlazorOpcUaClient",
-        //        ApplicationType = ApplicationType.Client,
-        //        SecurityConfiguration = new SecurityConfiguration
-        //        {
-        //            ApplicationCertificate = new CertificateIdentifier(),
-        //            AutoAcceptUntrustedCertificates = true
-        //        },
-        //        TransportConfigurations = new TransportConfigurationCollection(),
-        //        TransportQuotas = new TransportQuotas { OperationTimeout = 15000 },
-        //        ClientConfiguration = new ClientConfiguration { DefaultSessionTimeout = 60000 }
-        //    };
-
-        //    await config.Validate(ApplicationType.Client);
-
-        //    var endpoint = CoreClientUtils.SelectEndpoint(endpointUrl, useSecurity: false);
-        //    var endpointConfiguration = EndpointConfiguration.Create(config);
-        //    var endpointDescription = new ConfiguredEndpoint(null, endpoint, endpointConfiguration);
-
-        //    _session = await Session.Create(
-        //        config,
-        //        endpointDescription,
-        //        false,
-        //        false,
-        //        config.ApplicationName,
-        //        60000,
-        //        new UserIdentity(new AnonymousIdentityToken()),
-        //        null);
-        //}
 
         public async Task<bool> ConnectAsync(string endpointUrl)
         {
@@ -118,34 +86,6 @@ namespace Kantaim.OPC.Services
                 throw new Exception($"Erreur de connexion OPC UA : {ex.Message}", ex);
             }
         }
-
-
-
-        //public async Task<string> ReadNodeValueAsync(string nodeId)
-        //{
-        //    var nodeToRead = new ReadValueId
-        //    {
-        //        NodeId = new NodeId(nodeId),
-        //        AttributeId = Attributes.Value
-        //    };
-
-        //    var nodesToRead = new ReadValueIdCollection { nodeToRead };
-        //    var requestHeader = new RequestHeader();
-
-        //    var response = await _session.ReadAsync(
-        //        requestHeader,
-        //        0,
-        //        TimestampsToReturn.Neither,
-        //        nodesToRead,
-        //        CancellationToken.None);
-
-        //    if (response.Results[0].StatusCode == Opc.Ua.StatusCodes.Good)
-        //    {
-        //        return response.Results[0].Value?.ToString();
-        //    }
-
-        //    return $"Error: {response.Results[0].StatusCode}";
-        //}
 
         public async Task<string> ReadNodeValueAsync(string nodeId)
         {

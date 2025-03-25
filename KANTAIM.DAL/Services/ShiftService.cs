@@ -50,36 +50,62 @@ namespace KANTAIM.DAL.Services
             // Use shifttotal as needed here
         }
 
-        public int GetWeekShift(DateTime dateProd, int NumDayShift, bool cache)
+        //public int GetWeekShift(DateTime dateProd, int NumDayShift, bool cache)
+        //{
+        //    if(!cache) ResetCache();
+
+        //    int weekShift = 0;
+        //    string[] Week = { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
+        //    foreach (var shift in Cache)
+        //    {
+        //        foreach (var dayOfWeek in Week)
+        //        {
+        //            var propertyInfo = shift.GetType().GetProperty(dayOfWeek);
+        //            if (propertyInfo != null)
+        //            {
+        //                if (Enum.TryParse(dayOfWeek, out DayOfWeek shiftDayOfWeek))
+        //                {
+        //                    if (shiftDayOfWeek > dateProd.DayOfWeek)
+        //                    {
+        //                        var value = propertyInfo.GetValue(shift);
+        //                        if (value != null)
+        //                        {
+        //                            weekShift++;
+        //                        }
+        //                    }
+        //                    else
+        //                        break;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    weekShift += NumDayShift;
+        //    return weekShift;
+        //}
+
+        public int GetWeekShift(DateTime dateProd, int numDayShift, bool cache)
         {
-            if(!cache) ResetCache();
+            if (!cache) ResetCache();
+
+            // Jour de la semaine (Lundi = 0, Dimanche = 6)
+            int dayOfWeek = (int)dateProd.DayOfWeek;
+
+            // Décalage pour que Lundi = 1, Dimanche = 7
+            int correctedDayOfWeek = (dayOfWeek == 0) ? 7 : dayOfWeek;
 
             int weekShift = 0;
-            string[] Week = { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
-            foreach (var shift in Cache)
+
+            // Parcourir les jours précédents pour cumuler les shifts
+            for (int i = 1; i < correctedDayOfWeek; i++)
             {
-                foreach (var dayOfWeek in Week)
-                {
-                    var propertyInfo = shift.GetType().GetProperty(dayOfWeek);
-                    if (propertyInfo != null)
-                    {
-                        if (Enum.TryParse(dayOfWeek, out DayOfWeek shiftDayOfWeek))
-                        {
-                            if (shiftDayOfWeek > dateProd.DayOfWeek)
-                            {
-                                var value = propertyInfo.GetValue(shift);
-                                if (value != null)
-                                {
-                                    weekShift++;
-                                }
-                            }
-                            else
-                                break;
-                        }
-                    }
-                }
+                // Récupérer le nombre de shifts pour chaque jour précédent
+                var shifts = GetShiftsForDay((DayOfWeek)(i % 7), cache);
+                weekShift += shifts.Count(s => s.HasValue); // Compter les shifts valides
             }
-            weekShift += NumDayShift;
+
+            // Ajouter le numéro de shift du jour
+            weekShift += numDayShift;
+
             return weekShift;
         }
 

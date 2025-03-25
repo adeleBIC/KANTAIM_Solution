@@ -35,11 +35,9 @@ namespace Kantaim.SRVC
 
                 try
                 {
-
-                    
                     //Assignation des fins de shifts
                     DateTime now = DateTime.Now;
-                    now = new DateTime(2025, 03, 24, 14, 30, 30);
+                    now = new DateTime(2025, 03, 25, 14, 30, 30);
 
                     _shiftService.ResetCache();
 
@@ -54,7 +52,6 @@ namespace Kantaim.SRVC
                         _logger.LogInformation($"✅ Import finished");
                         await Task.Delay(700000, stoppingToken);
                     }
-                    
                 }
                 catch (Exception ex)
                 {
@@ -104,11 +101,8 @@ namespace Kantaim.SRVC
 
             try
             {
-
-                //int dayShift = _shiftService.GetDayShift(now,true);
                 int prevDayShift = _shiftService.GetPreviousDayShift(dateprod, true);
                 int prevWeekShift = _shiftService.GetWeekShift(dateprod, prevDayShift, true);
-                //DateTime? dateProd = _shiftService.GetCurrentShiftDate(now, true);
                 DateTime? datePrevProd = _shiftService.GetPreviousShiftDate(dateprod, true) ?? dateprod;
 
                 foreach (PressCounter pc in listCounter)
@@ -127,23 +121,25 @@ namespace Kantaim.SRVC
                     int realCounter = (int)((counter.CurrentCounter - counter.PreviousCounter) * pc.Press.Shape.UsedMark);
                     decimal realTRS = Math.Round((realCounter / (pc.Press.Shape.TotalMark * ((pc.Press.Shape.OpenTime * 3600) * (decimal)(1 / pc.Press.Shape.Cycle))) * 100), 2);
 
-                    DataProd data = new DataProd()
+                    if (realTRS < 120 && realCounter > 1000)
                     {
-                        NumDayShift = prevDayShift,
-                        NumWeekShift = prevWeekShift,
-                        Counter = realCounter,
-                        TRS = realTRS,
-                        OpenTime = pc.Press.Shape.OpenTime,
-                        Objective = pc.Press.Shape.Objective,
-                        ObjOk = realTRS > pc.Press.Shape.Objective,
-                        DateProd = datePrevProd.Value,
-                        DateExtract = dateprod,
-                        PressID = pc.PressId,
-                        ProductID = pc.Press.Shape.ProductID
+                        DataProd data = new DataProd()
+                        {
+                            NumDayShift = prevDayShift,
+                            NumWeekShift = prevWeekShift,
+                            Counter = realCounter,
+                            TRS = realTRS,
+                            OpenTime = pc.Press.Shape.OpenTime,
+                            Objective = pc.Press.Shape.Objective,
+                            ObjOk = realTRS > pc.Press.Shape.Objective,
+                            DateProd = datePrevProd.Value,
+                            DateExtract = dateprod,
+                            PressID = pc.PressId,
+                            ProductID = pc.Press.Shape.ProductID
+                        };
 
-                    };
-
-                    _dataProdService.UpSert(data);
+                        _dataProdService.UpSert(data);
+                    }
                 }
             }
             catch (Exception ex)
