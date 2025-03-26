@@ -101,6 +101,7 @@ namespace Kantaim.SRVC
 
             try
             {
+                int dayShift = _shiftService.GetDayShift(dateprod, true);
                 int prevDayShift = _shiftService.GetPreviousDayShift(dateprod, true);
                 int prevWeekShift = _shiftService.GetWeekShift(dateprod, prevDayShift, true);
                 DateTime? datePrevProd = _shiftService.GetPreviousShiftDate(dateprod, true) ?? dateprod;
@@ -113,8 +114,9 @@ namespace Kantaim.SRVC
                     {
                         counter.PreviousCounter = counter.CurrentCounter;
                         counter.CurrentCounter = pc.Value;
+                        if (dayShift == 1) counter.StartJourneyCounter = pc.Value;
                     }
-                    else counter = new CurrentPressCounter() { PressID = pc.PressId, CurrentCounter = pc.Value, PreviousCounter = 0 };
+                    else counter = new CurrentPressCounter() { PressID = pc.PressId, CurrentCounter = pc.Value, PreviousCounter = 0, StartJourneyCounter = 0 };
 
                     _currentPressCounterService.UpSert(counter);
 

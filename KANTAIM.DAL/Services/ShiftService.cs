@@ -325,7 +325,7 @@ namespace KANTAIM.DAL.Services
             var currentTime = dateProd.TimeOfDay;
             var dayOfWeek = dateProd.DayOfWeek;
 
-            Console.WriteLine($"➡️ DateProd : {dateProd} | Heure actuelle : {currentTime}");
+            //Console.WriteLine($"➡️ DateProd : {dateProd} | Heure actuelle : {currentTime}");
 
             var shifts = Cache
                 .Select(shift => new
@@ -363,11 +363,11 @@ namespace KANTAIM.DAL.Services
             // ✅ Si l'heure est avant le premier shift → Prendre le dernier shift (même chevauché)
             if (currentTime < firstShift.StartTime)
             {
-                Console.WriteLine($"🚨 Heure avant le premier shift → Retour au dernier shift de la veille");
+                //Console.WriteLine($"🚨 Heure avant le premier shift → Retour au dernier shift de la veille");
 
                 var lastShiftOfYesterday = GetLastShiftOfPreviousDay(dateProd);
 
-                // 🔥 Si le dernier shift chevauche la journée suivante, on veut remonter au précédent
+                // Si le dernier shift chevauche la journée suivante, on veut remonter au précédent
                 if (lastShiftOfYesterday == lastShift.ShiftNumber)
                 {
                     var previousShift = (shifts.Count > 1) ? shifts[^2].ShiftNumber : lastShift.ShiftNumber;
@@ -382,16 +382,16 @@ namespace KANTAIM.DAL.Services
             }
 
 
-            // ✅ Si l'heure est après le dernier shift → Retour au dernier shift du jour
+            // Si l'heure est après le dernier shift → Retour au dernier shift du jour
             if (currentTime >= lastShift.StartTime)
             {
-                Console.WriteLine($"🚨 Heure après le dernier shift → Retour au dernier shift du jour");
+                //Console.WriteLine($"🚨 Heure après le dernier shift → Retour au dernier shift du jour");
                 var previousShift = (shifts.Count > 1) ? shifts[shifts.Count - 2] : lastShift;
-                Console.WriteLine($"✅ Shift précédent (fin de journée) : {previousShift.ShiftNumber}");
+                //Console.WriteLine($"✅ Shift précédent (fin de journée) : {previousShift.ShiftNumber}");
                 return previousShift.ShiftNumber;
             }
 
-            // ✅ Si l'heure est pendant un shift → Retourner le shift précédent
+            // Si l'heure est pendant un shift → Retourner le shift précédent
             for (int i = 0; i < shifts.Count; i++)
             {
                 var shift = shifts[i];
@@ -403,7 +403,7 @@ namespace KANTAIM.DAL.Services
                     if (currentTime >= startTime || currentTime < endTime)
                     {
                         var previousShift = (i == 0) ? GetLastShiftOfPreviousDay(dateProd) : shifts[i - 1].ShiftNumber;
-                        Console.WriteLine($"✅ Cas de chevauchement : Shift précédent = {previousShift}");
+                        //Console.WriteLine($"✅ Cas de chevauchement : Shift précédent = {previousShift}");
                         return previousShift;
                     }
                 }
@@ -412,7 +412,7 @@ namespace KANTAIM.DAL.Services
                     if (currentTime >= startTime && currentTime < endTime)
                     {
                         var previousShift = (i == 0) ? GetLastShiftOfPreviousDay(dateProd) : shifts[i - 1].ShiftNumber;
-                        Console.WriteLine($"✅ Shift trouvé : Shift précédent = {previousShift}");
+                        //Console.WriteLine($"✅ Shift trouvé : Shift précédent = {previousShift}");
                         return previousShift;
                     }
                 }

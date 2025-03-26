@@ -19,6 +19,8 @@ namespace KANTAIM.DAL.Model
 
         public long CurrentCounter { get; set; }
 
+        public long StartJourneyCounter { get; set; }
+
         [Required]
         [Column("FKTPressID")]
         public int PressID { get; set; }
