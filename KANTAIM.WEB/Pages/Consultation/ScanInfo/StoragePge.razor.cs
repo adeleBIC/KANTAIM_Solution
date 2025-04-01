@@ -124,7 +124,7 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
         {
             foreach (Container container in _contenaireService.GetAll().Where(c => c.CellStock != null))
             {
-                var logRescent = _logService.GetByContenaireByOperationStatus(container.Id, OperationContainer.Store);
+                var logRescent = _logService.GetByContenaireByOperationStatus(container.Id, OperationContainer.Store, OperationContainer.Transfer);
                 if (logRescent != null && logRescent.Product != null && logRescent.Product.Number == selectedProduct.Number)
                 {
                     if (!cells.Any(c => c.Cell.Id == container.CellStock.Id))

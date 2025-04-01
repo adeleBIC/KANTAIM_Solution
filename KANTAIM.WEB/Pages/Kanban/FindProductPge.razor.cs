@@ -121,7 +121,7 @@ namespace KANTAIM.WEB.Pages.Kanban
             cells = new List<CellLog>();
             foreach (Container container in _contenaireService.GetAll().Where(c => c.CellStock != null))
             {
-                logRescent = _logService.GetByContenaireByOperationStatus(container.Id, OperationContainer.Store);
+                logRescent = _logService.GetByContenaireByOperationStatus(container.Id, OperationContainer.Store, OperationContainer.Transfer);
                 if (logRescent != null && logRescent.ProductID == ProductScanner.Id)
                 {
                     if (ColorChoose == null || logRescent.ProdColorID == ColorChoose.Id)

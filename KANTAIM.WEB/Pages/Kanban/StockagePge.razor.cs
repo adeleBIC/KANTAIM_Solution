@@ -354,7 +354,7 @@ namespace KANTAIM.WEB.Pages.Kanban
             cellList = new List<CellLog>();
             foreach (Container container in _contenaireService.GetAll().Where(c => c.CellStock != null && c.ContainerType.IsContainable == false)) // recherche tous les contenaire qui est stockés dans la cellule, find all the contenaire who in currutly in the cell
             {
-                cellLog = _logService.GetByContenaireByOperationStatus(container.Id, OperationContainer.Store);
+                cellLog = _logService.GetByContenaireByOperationStatus(container.Id, OperationContainer.Store, OperationContainer.Transfer);
                 DAL.Model.Cell? cellAct = _cellService.GetById(cellLog?.CellID ?? 0);
                 if (cellAct != null && cellAct.IsJail != true && cellAct.IsMaintenance != true && cellAct.ForEmpty != true && cellAct.IsPhantom != true && cellAct.Status != StatusCell.Full && _cellProductService.FindLink(cellAct.Id, product.Id) && cellAct.Id != ContainerScanner?.CellId)
                 {
@@ -465,7 +465,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                         {
                             foreach (Container container in cellScanner.Containers)
                             {
-                                containerLog = _logService.GetByContenaireByOperationStatus(container.Id, OperationContainer.Store);
+                                containerLog = _logService.GetByContenaireByOperationStatus(container.Id, OperationContainer.Store, OperationContainer.Transfer);
                                 if (containerLog?.ProductID != product.Id || containerLog.ProdColorID != colorOfProduct.Id)
                                 {
                                     _snackService.Add("Attention le produit déjà stocké n'est pas identique.", Severity.Error);
@@ -509,7 +509,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                 if (type == 1 && ContenaireType == 3)
                 {
                     PaletteScanner = _contenaireService.GetContainerByNumber(PaletteNumber);
-                    paletteLog = _logService.GetByContenaireByOperationStatus(PaletteScanner.Id, OperationContainer.Store);
+                    paletteLog = _logService.GetByContenaireByOperationStatus(PaletteScanner.Id, OperationContainer.Store, OperationContainer.Transfer);
                     containerLog = _logService.GetByContenaireId(ContainerScanner.Id);
                     if (paletteLog.Product != null && paletteLog.ProductID != containerLog.ProductID)
                     {

@@ -54,6 +54,7 @@ namespace KANTAIM.DAL.Services
         public Log? GetByContenaireIdAction(int id, int operation) => GetAll().OrderByDescending(u => u.EventTime).FirstOrDefault(c => c.ContainerID == id && c.Operation == operation);
         public Log? GetByContenaireNumber(int number) => GetAll().OrderByDescending(u => u.EventTime).FirstOrDefault(c => c.Container.Number == number);
         public Log? GetByContenaireByOperationStatus(int contId, int opeStatus) => GetAll().Where(u=>u.Operation == opeStatus).OrderByDescending(u => u.EventTime).FirstOrDefault(c => c.ContainerID == contId);
+        public Log? GetByContenaireByOperationStatus(int contId, int opeStatusStore, int opeStatusTransfer) => GetAll().Where(u => u.Operation == opeStatusStore || u.Operation == opeStatusTransfer).OrderByDescending(u => u.EventTime).FirstOrDefault(c => c.ContainerID == contId);
         public Log? GetByCell(int cellId) => GetAll().Where(u => u.CellID == cellId && u.Container.CellId == cellId).OrderByDescending(u => u.EventTime).FirstOrDefault();
     }
 }
