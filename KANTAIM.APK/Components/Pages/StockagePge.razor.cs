@@ -1,4 +1,5 @@
 using Android.Media;
+using KANTAIM.APK.MessageBus.Messages;
 using KANTAIM.APK.Resources;
 using KANTAIM.APK.Services;
 using KANTAIM.DAL.Model;
@@ -19,9 +20,8 @@ using static System.Collections.Specialized.BitVector32;
 
 namespace KANTAIM.APK.Components.Pages
 {
-    public partial class StockagePge
+    public partial class StockagePge : BasePage
     {
-        [Inject]private IJSRuntime JSRuntime { get; set; }
         [Inject] public ContenaireService _contenaireService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
         [Inject] public LogService _logService { get; set; }
@@ -75,73 +75,7 @@ namespace KANTAIM.APK.Components.Pages
 
         public string? TextValue { get; set; }
 
-        private static StockagePge _instance;
-        private string currentUrl;
-        private string pageUrl;
         private int state;
-
-       
-
-        private string LastKey { get; set; }
-
-        [JSInvokable]
-        public static void CaptureInputStock(string input)
-        {
-            _instance?.HandleInput(input);
-        }
-
-        private async void HandleInput(string input)
-        {
-            if(currentUrl == pageUrl)
-            {
-                if (input == "Enter" )
-                {
-                    switch (state)
-                    {
-                        case 0: 
-                            if(isPalette)
-                            {
-                                BacScan(TextValue);
-                            }
-                            break;
-                        case 2:
-                            if (scanPallete)
-                            {
-                                PalleteScan(TextValue);
-                            }
-                            else
-                            {
-                                cellScan(TextValue);
-                            }
-                            break;
-                        case 3:
-                            ContainerScan(TextValue);
-                            break;
-                        case 4:
-                            if (scanPallete)
-                            {
-                                PalleteScan(TextValue);
-                            }
-                            else
-                            {
-                                cellScan(TextValue);
-                            }
-                            break;
-                    }
-
-                    await InvokeAsync(StateHasChanged);//nouvelle
-                    TextValue = null;
-
-                }
-                else
-                {
-                    TextValue += input;
-                    await InvokeAsync(StateHasChanged);
-
-                }
-            }
-            
-        }
 
         public int State
         {
@@ -158,23 +92,9 @@ namespace KANTAIM.APK.Components.Pages
                 return state;
             }
         }
-        private void OnLocationChanged(object sender, LocationChangedEventArgs e)
-        {
-            // Mettre à jour l'URL actuelle lorsque l'URL change
-            currentUrl = e.Location;
-            // Vous pouvez ajouter ici toute logique que vous souhaitez exécuter lorsque l'URL change
-        }
 
-        public void Dispose()
-        {
-            // Se désabonner de l'événement pour éviter les fuites de mémoire
-            NavigationManager.LocationChanged -= OnLocationChanged;
-        }
         protected override void OnInitialized()
         {
-            currentUrl = NavigationManager.Uri;
-            pageUrl = NavigationManager.Uri;
-            _instance = this;
             switch (Id)
             {
                 //Scanner le contenaire
@@ -186,11 +106,10 @@ namespace KANTAIM.APK.Components.Pages
                     cellScanner = _cellService.GetById(Number);
                     break;
             }
-            NavigationManager.LocationChanged += OnLocationChanged;
         }
         void ContainerScan(string code)
         {
-            string[] parts = _scanService.scanCode(code);
+            string[] parts = _scanService.ParseCode(code);
             if (parts != null)
             {
                 int.TryParse(parts[0], out int type);
@@ -240,7 +159,7 @@ namespace KANTAIM.APK.Components.Pages
 
         void BacScan(string code)
         {
-            string[] parts = _scanService.scanCode(code);
+            string[] parts = _scanService.ParseCode(code);
             if (parts != null)
             {
                 int.TryParse(parts[0], out int type);
@@ -257,7 +176,6 @@ namespace KANTAIM.APK.Components.Pages
                     {
                         _snackService.Add("Scannez un bac s'il vous plaît!", Severity.Error);
                     }
-
                 }
                 else
                 {
@@ -407,7 +325,7 @@ namespace KANTAIM.APK.Components.Pages
 
         void cellScan(string code)
         {
-            string[] parts = _scanService.scanCode(code);
+            string[] parts = _scanService.ParseCode(code);
 
             int.TryParse(parts[0], out int type);
 
@@ -519,7 +437,7 @@ namespace KANTAIM.APK.Components.Pages
 
         void PalleteScan(string code)
         {
-            string[] parts = _scanService.scanCode(code);
+            string[] parts = _scanService.ParseCode(code);
             if (parts != null || parts.Length != 3)
             {
                 int.TryParse(parts[0], out int type);
@@ -620,10 +538,7 @@ namespace KANTAIM.APK.Components.Pages
             bienStock = true;
         }
 
-
-
         public List<Container> bacList { get; set; }
-
 
         async Task OpenDialogAsync()
         {
@@ -772,6 +687,45 @@ namespace KANTAIM.APK.Components.Pages
             upDateCellState(oldCellule);
             bienStock = true;
            }
+
+        public override async void OnMessageReceived(InputMessage msg)
+        {
+            TextValue = msg.Code;
+            switch (state)
+            {
+                case 0:
+                    if (isPalette)
+                    {
+                        BacScan(msg.Code);
+                    }
+                    break;
+                case 2:
+                    if (scanPallete)
+                    {
+                        PalleteScan(msg.Code);
+                    }
+                    else
+                    {
+                        cellScan(msg.Code);
+                    }
+                    break;
+                case 3:
+                    ContainerScan(msg.Code);
+                    break;
+                case 4:
+                    if (scanPallete)
+                    {
+                        PalleteScan(msg.Code);
+                    }
+                    else
+                    {
+                        cellScan(msg.Code);
+                    }
+                    break;
+            }
+            
+            await InvokeAsync(StateHasChanged);
+        }
     }
 }
 

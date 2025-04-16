@@ -1,3 +1,5 @@
+using KANTAIM.APK.MessageBus.Messages;
+using KANTAIM.APK.MessageBus;
 using KANTAIM.APK.Resources;
 using KANTAIM.APK.Services;
 using KANTAIM.DAL.Model;
@@ -16,10 +18,8 @@ using static System.Collections.Specialized.BitVector32;
 
 namespace KANTAIM.APK.Components.Pages
 {
-    public partial class FindProductPge
+    public partial class FindProductPge : BasePage
     {
-
-        [Inject] private IJSRuntime JSRuntime { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
         [Inject] public ProductService _productService { get; set; }
         [Inject] public ColorService _colorService { get; set; }
@@ -48,46 +48,14 @@ namespace KANTAIM.APK.Components.Pages
         public string ContainerValue { get; set; }
         public bool ShowAllCells { get; set; }
 
-        private static FindProductPge _instance;
-        private string currentUrl;
-        private string pageUrl;
         public string? TextValue { get; set; }
-
-        private void OnLocationChanged(object sender, LocationChangedEventArgs e)
-        {
-            // Mettre à jour l'URL actuelle lorsque l'URL change
-            currentUrl = e.Location;
-            // Vous pouvez ajouter ici toute logique que vous souhaitez exécuter lorsque l'URL change
-        }
 
         public void Dispose()
         {
             // Se désabonner de l'événement pour éviter les fuites de mémoire
-            NavigationManager.LocationChanged -= OnLocationChanged;
-        }
-        [JSInvokable]
-        public static void CaptureInputFindProd(string input)
-        {
-            _instance?.HandleInput(input);
+            MessageBus.MessageBus.UnSubscribe<InputMessage>(this);
         }
 
-        private string LastKey { get; set; }
-
-        private void HandleInput(string input)
-        {
-
-            if (input == "Enter" && currentUrl == pageUrl)
-            {
-                ContainerScan(TextValue);
-                StateHasChanged();
-            }
-            else
-            {
-                TextValue += input;
-                StateHasChanged();
-
-            }
-        }
         void ToggleCellList()
         {
             ShowAllCells = !ShowAllCells;
@@ -102,9 +70,8 @@ namespace KANTAIM.APK.Components.Pages
 
         protected override void OnInitialized()
         {
-            currentUrl = NavigationManager.Uri;
-            pageUrl = NavigationManager.Uri;
-            _instance = this;
+            MessageBus.MessageBus.Subscribe<InputMessage>(this);
+
             ProductScanner = _productService.GetByNumber(Number);
             Colors = new List<ProdColor>();
             
@@ -116,8 +83,6 @@ namespace KANTAIM.APK.Components.Pages
             {
                 findCells();
             }
-            //base.OnInitialized();
-            NavigationManager.LocationChanged += OnLocationChanged;
         }
 
         void findCells()
@@ -157,7 +122,7 @@ namespace KANTAIM.APK.Components.Pages
 
         void ContainerScan(string code)
         {
-            string[] parts = _scanService.scanCode(code);
+            string[] parts = _scanService.ParseCode(code);
             if (parts != null)
             {
                 int.TryParse(parts[0], out int type);
@@ -219,6 +184,12 @@ namespace KANTAIM.APK.Components.Pages
             NavigationManager.NavigateTo("/");
         }
 
+        public override async void OnMessageReceived(InputMessage msg)
+        {
+            TextValue = msg.Code;
+            ContainerScan(msg.Code);
 
+            await InvokeAsync(StateHasChanged);
+        }
     }
 }

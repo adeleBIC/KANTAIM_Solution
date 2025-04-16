@@ -85,7 +85,6 @@ namespace KANTAIM.APK.Components.Pages
             }
         }
 
-
         void upDateCellState(DAL.Model.Cell cell)
         {
             if (_contenaireService.CountCells(cell.Id) == 0)

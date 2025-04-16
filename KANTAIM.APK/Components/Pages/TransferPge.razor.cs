@@ -8,12 +8,12 @@ using Microsoft.AspNetCore.Components.Routing;
 using System;
 using KANTAIM.APK.Services;
 using KANTAIM.APK.Resources;
+using KANTAIM.APK.MessageBus.Messages;
 
 namespace KANTAIM.APK.Components.Pages
 {
-    public partial class TransferPge
+    public partial class TransferPge : BasePage
     {
-        [Inject] private IJSRuntime JSRuntime { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
         [Inject] public ContenaireService _contenaireService { get; set; }
         [Inject] public ScanService _scanService { get; set; }
@@ -28,23 +28,9 @@ namespace KANTAIM.APK.Components.Pages
         public bool bienTransfer { get; set; } = false;
         public string? TextValue { get; set; }
         private int state;
-        private static TransferPge _instance;
-        private string currentUrl;
-        private string pageUrl;
+
         [Parameter] public int Number { get; set; }
 
-        private void OnLocationChanged(object sender, LocationChangedEventArgs e)
-        {
-            // Mettre à jour l'URL actuelle lorsque l'URL change
-            currentUrl = e.Location;
-            // Vous pouvez ajouter ici toute logique que vous souhaitez exécuter lorsque l'URL change
-        }
-
-        public void Dispose()
-        {
-            // Se désabonner de l'événement pour éviter les fuites de mémoire
-            NavigationManager.LocationChanged -= OnLocationChanged;
-        }
 
         public int State
         {
@@ -61,82 +47,18 @@ namespace KANTAIM.APK.Components.Pages
         }
         protected override async Task OnInitializedAsync()
         {
-            //RefreshData();
-            currentUrl = NavigationManager.Uri;
-            pageUrl = NavigationManager.Uri;
-            _instance = this;
             if(ContainerScanner == null)
             {
                 ContainerScanner = _contenaireService.GetContainerByNumber(Number);
                 logRescent = _logService.GetByContenaireId(ContainerScanner.Id);
                 state = 2;
             }
-            NavigationManager.LocationChanged += OnLocationChanged;
         }
-        private string LastKey { get; set; }
-
-        [JSInvokable]
-        public static void CaptureInputTransfer(string input)
-        {
-            _instance?.HandleInput(input);
-        }
-
-        private async void HandleInput(string input)
-        {
-            if (currentUrl == pageUrl)
-            {
-                if (input == "Enter")
-                {
-                    switch (state)
-                    {
-                        case 0:
-                            ContainerScanner = _contenaireService.GetContainerByNumber(Number);
-                            logRescent = _logService.GetByContenaireId(ContainerScanner.Id);
-                            break;
-                        case 2:
-                            autreScan(TextValue);
-                            break;
-                    }
-                    TextValue = null;
-                    state = State;
-                    await InvokeAsync(StateHasChanged);
-                    
-
-                }
-                else
-                {
-                    TextValue += input;
-                    state = State;
-                    await InvokeAsync(StateHasChanged);
-
-                }
-            }
-            
-        }
-
-        //void containerScan(string code)
-        //{
-        //    string[] parts = _scanService.scanCode(code);
-        //    if (parts != null)
-        //    {
-        //        int.TryParse(parts[0], out int type);
-        //        if (type != 1)
-        //        {
-        //            _snackService.Add("Svp scanner le QR code du Contenaire.", Severity.Error);
-        //        }
-        //        else
-        //        {
-        //            int.TryParse(parts[1], out int Number);
-        //            ContainerScanner = _contenaireService.GetContainerByNumber(Number);
-        //            logRescent = _logService.GetByContenaireId(ContainerScanner.Id);
-        //        }
-        //    }
-        //}
 
         void autreScan(string code)
 
         {
-            string[] parts = _scanService.scanCode(code);
+            string[] parts = _scanService.ParseCode(code);
             if (parts != null)
             {
                 int.TryParse(parts[0], out int type);
@@ -206,6 +128,23 @@ namespace KANTAIM.APK.Components.Pages
             state = State;
             NavigationManager.NavigateTo($"/");
             _snackService.Add("Bien Transféré !", Severity.Success);
+        }
+
+        public override async void OnMessageReceived(InputMessage msg)
+        {
+            TextValue = msg.Code;
+            switch (state)
+            {
+                case 0:
+                    ContainerScanner = _contenaireService.GetContainerByNumber(Number);
+                    logRescent = _logService.GetByContenaireId(ContainerScanner.Id);
+                    break;
+                case 2:
+                    autreScan(msg.Code);
+                    break;
+            }
+            state = State;
+            await InvokeAsync(StateHasChanged);
         }
     }
 }

@@ -7,7 +7,7 @@ namespace KANTAIM.APK.Components.Layout
 {
     public partial class MainLayout
     {
-        [Inject] IJSRuntime JS { get; set; }
+        //[Inject] IJSRuntime JS { get; set; }
 
         private bool drawerOpen = false;
 
@@ -16,14 +16,14 @@ namespace KANTAIM.APK.Components.Layout
             drawerOpen = !drawerOpen;
         }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            if (firstRender)
-            {
-                await JS.InvokeVoidAsync("addGlobalKeyListener", DotNetObjectReference.Create(this));
-                firstRender = false;
-            }
-        }
+        //protected override async Task OnAfterRenderAsync(bool firstRender)
+        //{
+        //    if (firstRender)
+        //    {
+        //        await JS.InvokeVoidAsync("addGlobalKeyListener", DotNetObjectReference.Create(this));
+        //        firstRender = false;
+        //    }
+        //}
 
         protected override async Task OnInitializedAsync()
         {

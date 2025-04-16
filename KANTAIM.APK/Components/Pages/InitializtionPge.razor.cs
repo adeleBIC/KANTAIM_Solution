@@ -9,12 +9,13 @@ using MudBlazor.Services;
 using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components.Routing;
 using KANTAIM.APK.Services;
+using KANTAIM.APK.MessageBus.Messages;
+using KANTAIM.APK.MessageBus;
 
 namespace KANTAIM.APK.Components.Pages
 {
-    public partial class InitializtionPge
+    public partial class InitializtionPge : BasePage
     {
-        [Inject] private IJSRuntime JSRuntime { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
         [Inject] public ContenaireService _contenaireService { get; set; }
         [Inject] public LogService _logService { get; set; }
@@ -48,11 +49,6 @@ namespace KANTAIM.APK.Components.Pages
 
         public Product? product { get; set; }
 
-        private static InitializtionPge _instance;
-        private string currentUrl;
-        private string pageUrl;
-
-        //private MudTextField<string> scanFieldCont;
 
         public int State
         {
@@ -75,10 +71,6 @@ namespace KANTAIM.APK.Components.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            //RefreshData();
-            currentUrl = NavigationManager.Uri;
-            pageUrl = NavigationManager.Uri;
-            _instance = this;
             switch (Id)
             {
                 case 0:
@@ -102,63 +94,11 @@ namespace KANTAIM.APK.Components.Pages
                 default:
                     break;
             }
-            NavigationManager.LocationChanged += OnLocationChanged;
-        }
-
-        private void OnLocationChanged(object sender, LocationChangedEventArgs e)
-        {
-            // Mettre à jour l'URL actuelle lorsque l'URL change
-            currentUrl = e.Location;
-            // Vous pouvez ajouter ici toute logique que vous souhaitez exécuter lorsque l'URL change
-        }
-
-        public void Dispose()
-        {
-            // Se désabonner de l'événement pour éviter les fuites de mémoire
-            NavigationManager.LocationChanged -= OnLocationChanged;
-        }
-
-        private string LastKey { get; set; }
-
-        [JSInvokable]
-        public static void CaptureInputInit(string input)
-        {
-            _instance?.HandleInput(input);
-        }
-
-        private void HandleInput(string input)
-        {
-
-            if (input == "Enter" && currentUrl == pageUrl)
-            {
-                switch (state)
-                {
-                    case 0:
-                        ContainerScan(TextValue);
-                        break;
-                    case 1:
-                        PaletteScan(TextValue);
-                        break;
-                    case 2:
-                        PressScan(TextValue);
-                        break;
-                }
-
-                StateHasChanged();
-                TextValue = null;
-
-            }
-            else
-            {
-                TextValue += input;
-                StateHasChanged();
-
-            }
         }
 
         void PaletteScan(string code)
         {
-            string[] parts = _scanService.scanCode(code);
+            string[] parts = _scanService.ParseCode(code);
             if (parts != null)
             {
                 int.TryParse(parts[0], out int type);
@@ -232,7 +172,7 @@ namespace KANTAIM.APK.Components.Pages
         }
         void PressScan(string code)
         {
-            string[] parts = _scanService.scanCode(code);
+            string[] parts = _scanService.ParseCode(code);
             if (parts != null)
             {
                 int.TryParse(parts[0], out int type);
@@ -281,7 +221,7 @@ namespace KANTAIM.APK.Components.Pages
         }
         void ContainerScan(string code)
         {
-            string[] parts = _scanService.scanCode(code);
+            string[] parts = _scanService.ParseCode(code);
 
             int.TryParse(parts[0], out int type);
             int.TryParse(parts[1], out int ContainerNumber);
@@ -413,6 +353,25 @@ namespace KANTAIM.APK.Components.Pages
             
             NavigationManager.NavigateTo("/");
             _snackService.Add("Bien initialisé !", Severity.Success);
+        }
+
+        public override async void OnMessageReceived(InputMessage msg)
+        {
+            TextValue = msg.Code;
+            switch (state)
+            {
+                case 0:
+                    ContainerScan(msg.Code);
+                    break;
+                case 1:
+                    PaletteScan(msg.Code);
+                    break;
+                case 2:
+                    PressScan(msg.Code);
+                    break;
+            }
+
+            await InvokeAsync(StateHasChanged);
         }
     }
 }

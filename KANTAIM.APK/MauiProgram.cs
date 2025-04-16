@@ -49,6 +49,7 @@ namespace KANTAIM.APK
             builder.Services.AddSingleton<CellProductService>();
             builder.Services.AddSingleton<ColorProductService>();
             builder.Services.AddSingleton<ScanService>();
+            builder.Services.AddSingleton<JSService>();
 
             builder.Services.AddMudServices(config =>
             {

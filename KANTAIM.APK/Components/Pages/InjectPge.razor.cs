@@ -1,3 +1,4 @@
+using KANTAIM.APK.MessageBus.Messages;
 using KANTAIM.APK.Resources;
 using KANTAIM.APK.Services;
 using KANTAIM.DAL.Model;
@@ -10,9 +11,8 @@ using MudBlazor;
 
 namespace KANTAIM.APK.Components.Pages
 {
-    public partial class InjectPge
+    public partial class InjectPge : BasePage
     {
-        [Inject] private IJSRuntime JSRuntime { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
         [Inject] public ContenaireService _contenaireService { get; set; }
         [Inject] public MachineService _machineService { get; set; }
@@ -37,9 +37,6 @@ namespace KANTAIM.APK.Components.Pages
         public ProdColor? prodColor { get; set; }
 
         public string? TextValue { get; set; }
-        private static InjectPge _instance;
-        private string currentUrl;
-        private string pageUrl;
 
         private int state;
 
@@ -56,9 +53,6 @@ namespace KANTAIM.APK.Components.Pages
         }
         protected override void OnInitialized()
         {
-            currentUrl = NavigationManager.Uri;
-            pageUrl = NavigationManager.Uri;
-            _instance = this;
             switch (Id)
             {
                 //Scanner le contenaire
@@ -79,60 +73,11 @@ namespace KANTAIM.APK.Components.Pages
                     MachineScanner = _machineService.GetByNumber(Number);
                     break;
             }
-            NavigationManager.LocationChanged += OnLocationChanged;
         }
 
-        private void OnLocationChanged(object sender, LocationChangedEventArgs e)
-        {
-            Console.WriteLine($"URL changed to: {e.Location}");
-            // Mettre à jour l'URL actuelle lorsque l'URL change
-            currentUrl = e.Location;
-            // Vous pouvez ajouter ici toute logique que vous souhaitez exécuter lorsque l'URL change
-        }
-
-        //public void Dispose()
-        //{
-        //    // Se désabonner de l'événement pour éviter les fuites de mémoire
-        //    NavigationManager.LocationChanged -= OnLocationChanged;
-        //}
-
-
-        [JSInvokable]
-        public static void CaptureInputInject(string input)
-        {
-            _instance?.HandleInput(input);
-        }
-
-        private async void HandleInput(string input)
-        {
-            if (currentUrl == pageUrl)
-            {
-                if (input == "Enter")
-                {
-                    switch (state)
-                    {
-                        case 2:
-                            machineScan(TextValue);
-                            break;
-                        case 3:
-                            contenaireScan(TextValue);
-                            break;
-                    }
-
-                    await InvokeAsync(StateHasChanged);
-                    TextValue = null;
-                }
-                else
-                {
-                    TextValue += input;
-                    await InvokeAsync(StateHasChanged);
-
-                }
-            } 
-        }
         void contenaireScan(string code)
         {
-            string[] parts = _scanService.scanCode(code);
+            string[] parts = _scanService.ParseCode(code);
 
             int.TryParse(parts[0], out int type);
             if (type != 1)
@@ -160,7 +105,7 @@ namespace KANTAIM.APK.Components.Pages
         void machineScan(string code)
         {
 
-            string[] parts = _scanService.scanCode(code);
+            string[] parts = _scanService.ParseCode(code);
 
             int.TryParse(parts[0], out int type);
             if (type != 2)
@@ -245,6 +190,22 @@ namespace KANTAIM.APK.Components.Pages
             inject = true;
             NavigationManager.NavigateTo($"/");
             _snackService.Add("Réussi !", Severity.Success);
-        }    
+        }
+
+        public override async void OnMessageReceived(InputMessage msg)
+        {
+            TextValue = msg.Code;
+            switch (state)
+            {
+                case 2:
+                    machineScan(msg.Code);
+                    break;
+                case 3:
+                    contenaireScan(msg.Code);
+                    break;
+            }
+
+            await InvokeAsync(StateHasChanged);
+        }
     }
 }
