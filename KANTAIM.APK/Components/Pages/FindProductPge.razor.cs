@@ -50,12 +50,6 @@ namespace KANTAIM.APK.Components.Pages
 
         public string? TextValue { get; set; }
 
-        public void Dispose()
-        {
-            // Se désabonner de l'événement pour éviter les fuites de mémoire
-            MessageBus.MessageBus.UnSubscribe<InputMessage>(this);
-        }
-
         void ToggleCellList()
         {
             ShowAllCells = !ShowAllCells;
@@ -70,8 +64,6 @@ namespace KANTAIM.APK.Components.Pages
 
         protected override void OnInitialized()
         {
-            MessageBus.MessageBus.Subscribe<InputMessage>(this);
-
             ProductScanner = _productService.GetByNumber(Number);
             Colors = new List<ProdColor>();
             
