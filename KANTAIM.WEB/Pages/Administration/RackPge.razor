@@ -1,44 +1,47 @@
-﻿@page "/Administration/UserPge"
+﻿@page "/Administration/RackPge"
 @using KANTAIM.DAL.Model;
 @using KANTAIM.WEB.ViewModels;
 
 <div class="pageTitle">
-    <MudText Typo="Typo.h4">Utilisateur</MudText>
+    <MudText Typo="Typo.h4">Moule</MudText>
 </div>
 
-@if (Users != null)
+@if (Racks != null)
 {
-    <MudDataGrid T="UserVM" RowClassFunc="RowClassFct" Items="@Users" Dense=true Hover=true ReadOnly=false EditMode="MudBlazor.DataGridEditMode.Cell"
-             Virtualize="true" SelectOnRowClick=false MultiSelection=true SelectedItemsChanged="SelectionChanged" Bordered=true
-             Filterable="true" SortMode="SortMode.Multiple" Hideable="false" QuickFilter="@_quickFilter">
+    <MudDataGrid T="RackVM" RowClassFunc="RowClassFct" Items="@Racks" Dense=true Hover=true ReadOnly=false EditMode="MudBlazor.DataGridEditMode.Cell"
+                 Virtualize="true" SelectOnRowClick=false MultiSelection=true SelectedItemsChanged="SelectionChanged" Bordered=true
+                 Filterable="true" SortMode="SortMode.Multiple" Hideable="false" QuickFilter="@_quickFilter">
         <ToolBarContent>
             <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Add" OnClick="AddAsync" Color="Color.Primary"></MudIconButton>
             <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Save" OnClick="SaveAsync" Color="Color.Primary"></MudIconButton>
             <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Delete" OnClick="DeleteAsync" Color="Color.Error"></MudIconButton>
             <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Cancel" OnClick="CancelAsync" Color="Color.Primary"></MudIconButton>
             <MudSpacer />
-            <MudTextField @bind-Value="_searchString" Placeholder="Recherche utilisateur" Adornment="Adornment.Start" Immediate="true"
-                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            <MudTextField @bind-Value="_searchString" Placeholder="Recherche rack" Adornment="Adornment.Start" Immediate="true"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <Columns>
             <SelectColumn ShowInFooter=false />
-            <PropertyColumn Property="x => x.LoginADUser" Title="Nom" />
-
-            <PropertyColumn Property="x => x.UserAccessLvlId" Title="Niveau d'accès">
+            <PropertyColumn Property="x => x.Name" Title="Nom" />
+            <PropertyColumn Property="x => x.WorkshopName" Title="Atelier">
                 <EditTemplate>
-                    <MudSelect T=int @bind-Value=context.Item.UserAccessLvlId>
-                        @foreach (var f in context.Item.UserLvls)
+                    <MudSelect T=int @bind-Value=context.Item.WorkshopID>
+                        @foreach (var f in context.Item.Workshops)
                         {
                             <MudSelectItem T=int Value="@f.Id">@f.Name</MudSelectItem>
                         }
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
-
+            <PropertyColumn Property="x => x.Active" Title="Actif">
+                <EditTemplate>
+                    <MudCheckBox @bind-Checked=context.Item.Active />
+                </EditTemplate>
+            </PropertyColumn>
             <PropertyColumn Property="x => x.Comment" Title="Commentaire" Required=false />
         </Columns>
         <PagerContent>
-            <MudDataGridPager T="UserVM" PageSizeOptions="@(new int[] {15, 30, 50,100})" />
+            <MudDataGridPager T="ShapeVM" PageSizeOptions="@(new int[] {13, 30, 50,100})" />
         </PagerContent>
     </MudDataGrid>
 }

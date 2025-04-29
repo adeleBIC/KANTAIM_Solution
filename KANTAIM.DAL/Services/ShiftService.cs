@@ -1,5 +1,4 @@
-﻿using KANTAIM.DAL.Interface;
-using KANTAIM.DAL.Model;
+﻿using KANTAIM.DAL.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,41 +46,7 @@ namespace KANTAIM.DAL.Services
         public int CalculSecond(DateTime date)
         {
             return date.Hour * 3600 + date.Minute * 60 + date.Second;
-            // Use shifttotal as needed here
         }
-
-        //public int GetWeekShift(DateTime dateProd, int NumDayShift, bool cache)
-        //{
-        //    if(!cache) ResetCache();
-
-        //    int weekShift = 0;
-        //    string[] Week = { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
-        //    foreach (var shift in Cache)
-        //    {
-        //        foreach (var dayOfWeek in Week)
-        //        {
-        //            var propertyInfo = shift.GetType().GetProperty(dayOfWeek);
-        //            if (propertyInfo != null)
-        //            {
-        //                if (Enum.TryParse(dayOfWeek, out DayOfWeek shiftDayOfWeek))
-        //                {
-        //                    if (shiftDayOfWeek > dateProd.DayOfWeek)
-        //                    {
-        //                        var value = propertyInfo.GetValue(shift);
-        //                        if (value != null)
-        //                        {
-        //                            weekShift++;
-        //                        }
-        //                    }
-        //                    else
-        //                        break;
-        //                }
-        //            }
-        //        }
-        //    }
-        //    weekShift += NumDayShift;
-        //    return weekShift;
-        //}
 
         public int GetWeekShift(DateTime dateProd, int numDayShift, bool cache)
         {

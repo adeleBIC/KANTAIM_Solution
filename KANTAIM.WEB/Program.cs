@@ -44,6 +44,9 @@ builder.Services.AddSingleton<LogService>();
 builder.Services.AddSingleton<CellProductService>();
 builder.Services.AddSingleton<ColorProductService>();
 builder.Services.AddSingleton<ScanService>();
+builder.Services.AddSingleton<ProfilService>();
+builder.Services.AddSingleton<RackService>();
+builder.Services.AddSingleton<RackProfilService>();
 
 builder.Services.AddMudServices(config =>
 {

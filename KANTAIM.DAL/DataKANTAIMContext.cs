@@ -30,6 +30,26 @@ namespace KANTAIM.DAL
         public virtual DbSet<Product> Product { get; set; }
         public virtual DbSet<Shape> Shapes { get; set; }
         public virtual DbSet<CurrentPressCounter> CurrentPressCounters { get; set; }
+        public virtual DbSet<Rack> Racks { get; set; }
+        public virtual DbSet<Profil> Profils { get; set; }
+        public virtual DbSet<RackProfil> RackProfils { get; set; }
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<RackProfil>()
+                .HasKey(mp => new { mp.RackId, mp.ProfilId });
+
+            modelBuilder.Entity<RackProfil>()
+                .HasOne(mp => mp.Rack)
+                .WithMany(p => p.RackProfils)
+                .HasForeignKey(mp => mp.RackId);
+
+            modelBuilder.Entity<RackProfil>()
+                .HasOne(mp => mp.Profil)
+                .WithMany(m => m.RackProfils)
+                .HasForeignKey(mp => mp.ProfilId);
+        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

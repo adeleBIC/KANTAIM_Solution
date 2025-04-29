@@ -1,5 +1,4 @@
-﻿using KANTAIM.DAL.Interface;
-using KANTAIM.DAL.Model;
+﻿using KANTAIM.DAL.Model;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
