@@ -6,24 +6,52 @@
 @inherits BasePage
 
 <style>
-
     .title {
         color: #333333;
         text-align: center;
         margin-bottom: 20px;
     }
 
+    .titleProfil {
+        color: red;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    .main-content {
+        flex: 1;
+    }
 </style>
 
-<h3 class="title">
-    Scannez un QR Code svp
-</h3>
+<div class="container">
+    <div class="main-content">
+        <h3 class="title">
+            Scannez un QR Code svp
+        </h3>
 
+        <MudText> @TextValue</MudText>
+    </div>
 
-@* <MudTextField @ref="scanField" Value=@TextValue Margin="Margin.Dense" Variant="Variant.Outlined" Style="height:auto" ValueChanged="(string? newValue) => HandleInput(newValue)" AutoFocus="true" />
-<MudButton  Class="bouton" Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="ClearTextField">Vider le code</MudButton> *@
+    @if (ProfilSelected == null)
+    {
+        <h3 class="titleProfil">
+            Sélectionner un profil avant de scanner svp
+        </h3>
+    }
 
-@* <MudTextField Disabled=true id="myInput" @bind-Value="TextValue" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true"></MudTextField> *@
-<MudText> @TextValue</MudText>
-
-
+    @if(Profils != null)
+    {
+        <MudSelect T="Profil" @bind-Value="ProfilSelected" Label="Profil" Variant="MudBlazor.Variant.Outlined">
+            @foreach (var p in Profils)
+            {
+                <MudSelectItem T="Profil" Value="@(p)">@p.Name</MudSelectItem>
+            }
+        </MudSelect>
+    }
+</div>

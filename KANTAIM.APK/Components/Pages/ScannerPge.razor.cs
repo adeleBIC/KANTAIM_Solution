@@ -16,6 +16,8 @@ namespace KANTAIM.APK.Components.Pages
     public partial class ScannerPge : BasePage
     {
         [Inject] public ScanService _scanService { get; set; }
+        [Inject] public ProfilService _profilService { get; set; }
+        [Inject] public ProfilSessionService _profilSessionService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
         [Inject] ISnackbar _snackService { get; set; }
         [Inject] public ContenaireService _contenaireService { get; set; }
@@ -28,6 +30,9 @@ namespace KANTAIM.APK.Components.Pages
         string? PressName;
         string? ProduitName;
         string? MachineName;
+
+        public List<Profil> Profils { get; set; }
+        public Profil ProfilSelected { get; set; }
 
         //private static ScannerPge _instance;
 
@@ -45,6 +50,8 @@ namespace KANTAIM.APK.Components.Pages
             {
                 Console.WriteLine("Échec de la connexion à la base de données.");
             }
+
+            Profils = _profilService.GetAll().ToList();
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
