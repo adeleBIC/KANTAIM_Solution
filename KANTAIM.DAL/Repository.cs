@@ -50,10 +50,11 @@ namespace KANTAIM.DAL
             ctx.SaveChanges();
         }
 
-        public void UpSert(T model)
+        public int UpSert(T model)
         {
             if (model.Id == 0) Insert(model);
             else Update(model);
+            return model.Id;
         }
     }
 }

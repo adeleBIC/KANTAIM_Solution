@@ -205,7 +205,15 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
                 selectedProductId = 0;
                 selectedColorId = 0;
                 cellNb = _cellList.Count();
-                contenaireNb = _contenaireList.Count(c => c.CellId!=null && c.CellStock?.WorkshopID == selectedWorkshopId);
+                if (_cellList !=null)
+                {
+                    //contenaireNb = _contenaireList.Count(c => c.CellId!=null && c.CellStock?.WorkshopID == selectedWorkshopId);
+                    contenaireNb = _contenaireList.Count(c =>
+                                            c.CellId != null
+                                            && c.CellStock != null
+                                            && c.CellStock.RackCells != null
+                                            && c.CellStock.RackCells.Any(rc => rc.Rack.WorkshopID == selectedWorkshopId));
+                }
             }
             else
             {
@@ -243,35 +251,6 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
                     productNb = SelectedProduct.QuantityPerContainer * contenaireNb;
                 }
             }
-
-            //foreach (Container container in _contenaireService.GetAll().Where(c => c.CellStock != null))
-            //{
-            //    logRescent = _logService.GetByContenaireByOperationStatus(container.Id, OperationContainer.Store);
-            //    if (logRescent != null && logRescent.ProductID == SelectedProduct.Id)
-            //    {
-            //        // Recherche s'il y a déjà un StoreInfo pour cette couleur de produit
-            //        var storeInfo = storeInfos.FirstOrDefault(s => s.ProdColor.Id == logRescent.ProdColor.Id);
-
-            //        if (storeInfo == null)
-            //        {
-            //            // Si aucun StoreInfo n'existe pour cette couleur de produit, crée un nouveau StoreInfo
-            //            storeInfo = new StoreInfo
-            //            {
-            //                ProdColor = logRescent.ProdColor,
-            //                containers = new List<Container> { container },
-            //                ProductCount = 1 // Initialise avec le premier produit trouvé
-            //            };
-            //            storeInfos.Add(storeInfo);
-            //        }
-            //        else
-            //        {
-            //            // Si un StoreInfo existe déjà pour cette couleur, ajoute le conteneur et mets à jour le ProductCount
-            //            storeInfo.containers.Add(container);
-            //            storeInfo.ProductCount++;
-            //        }
-
-            //    }
-            //}
         }
 
 

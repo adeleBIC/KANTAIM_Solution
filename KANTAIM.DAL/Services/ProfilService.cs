@@ -38,10 +38,10 @@ namespace KANTAIM.DAL.Services
         public Profil? GetById(int id) => Cache.SingleOrDefault(c => c.Id == id);
         public void ResetCache() => cache = null;
 
-        public void UpSert(Profil item)
+        public int UpSert(Profil item)
         {
             ResetCache();
-            _repo.UpSert(item);
+            return _repo.UpSert(item);
         }
 
         public void Delete(int id)

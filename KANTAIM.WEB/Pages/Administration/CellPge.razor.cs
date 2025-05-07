@@ -17,6 +17,7 @@ namespace KANTAIM.WEB.Pages.Administration
         [Inject] ISnackbar _snackService { get; set; }
 
         public List<CellVM> Cells { get; set; }
+        public List<Rack> Racks { get; set; }
         public Dictionary<int, string> CellStatus { get; set; }
         private string _searchString;
 
@@ -41,7 +42,7 @@ namespace KANTAIM.WEB.Pages.Administration
 
         void AddAsync()
         {
-            CellVM item = new CellVM(_cellService.GetAllWorkshop()) { IsEditing = true, WorkshopID = _cellService.GetFirstWorkshop().Id }; 
+            CellVM item = new CellVM() { IsEditing = true}; 
             Cells.Insert(0, item);
             //await InvokeAsync(StateHasChanged);
         }
@@ -59,9 +60,39 @@ namespace KANTAIM.WEB.Pages.Administration
                     try
                     {
                         Cell u = (Cell)vm;
-                        _cellService.Upsert(u);
-                        vm.IsEditing = false;
+                        int cId = _cellService.Upsert(u);
+                        
 
+                        foreach (var m in Racks)
+                        {
+                            if (vm.SelectedRackNames?.Contains(m.Name) ?? false)
+                            {
+                                if (vm.Racks == null) vm.Racks = new List<Rack>();
+                                if (!vm.Racks.Any(r => r.Id == m.Id))
+                                {
+
+                                    RackCell rc = new RackCell() { RackId = m.Id, CellId = cId };
+                                    _cellService.InsertRackCell(rc);
+                                    if (vm.RackCells == null) vm.RackCells = new List<RackCell>();
+                                    vm.RackCells.Add(rc);
+                                    vm.Racks.Add(m);
+                                }
+                            }
+                            else
+                            {
+                                Rack rackToRemove = vm.Racks?.FirstOrDefault(r => r.Id == m.Id);
+                                if (rackToRemove != null) _cellService.DeleteRackCell(rackToRemove.Id, cId);
+                                if (rackToRemove != null)
+                                {
+                                    RackCell rc = vm.RackCells?.FirstOrDefault(r => r.RackId == rackToRemove.Id);
+                                    _cellService.DeleteRackCell(rackToRemove.Id, cId);
+                                    vm.RackCells.Remove(rc);
+                                    vm.Racks.Add(rackToRemove);
+                                }
+                            }
+                        }
+
+                        vm.IsEditing = false;
                         _snackService.Add("Données sauvgardées !", Severity.Success);
                     }
                     catch (Exception ex)
@@ -95,6 +126,8 @@ namespace KANTAIM.WEB.Pages.Administration
                     {
                         if (item.Id != 0)
                         {
+                            foreach (RackCell rc in item.RackCells) _cellService.DeleteRackCell(rc.RackId, item.Id);
+
                             _cellService.Delete(item.Id);
                             RefreshData();
                             _snackService.Add("Données supprimées !", Severity.Success);
@@ -118,10 +151,11 @@ namespace KANTAIM.WEB.Pages.Administration
 
         void RefreshData()
         {
-            Cells = _cellService.GetAll().Select(u => new CellVM(u, _cellService.GetAllWorkshop())
+            Cells = _cellService.GetAll().Select(u => new CellVM(u)
             {
                 ContainerCount = _cellService.GetContainerCount(u.Id)
             }).OrderBy(c => c.X).ToList();
+            Racks = _cellService.GetAllRack().ToList();
         }
         void SelectionChanged(HashSet<CellVM> changes)
         {
@@ -129,7 +163,20 @@ namespace KANTAIM.WEB.Pages.Administration
                 u.IsChecked = changes.Contains(u);
         }
 
-        
+        public string GetMultiSelectionRackText(List<string> selectedRackNames)
+        {
+            if (selectedRackNames == null || selectedRackNames.Count == 0)
+                return "Aucun rack sélectionné";
+
+            return string.Join(", ", selectedRackNames);
+        }
+
+        private Task OnSelectedRacksChanged(CellVM cell, IEnumerable<string> selectedRackNames)
+        {
+            cell.SelectedRackNames = selectedRackNames.ToList();
+            cell.IsEditing = true;
+            return Task.CompletedTask;
+        }
     }
 }
 

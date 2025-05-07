@@ -32,7 +32,14 @@ namespace KANTAIM.APK.Components.Pages
         string? MachineName;
 
         public List<Profil> Profils { get; set; }
-        public Profil ProfilSelected { get; set; }
+        private Profil profilSelected;
+
+        public Profil ProfilSelected
+        {
+            get { return profilSelected; }
+            set { profilSelected = value; _profilSessionService.SetProfil(ProfilSelected); }
+        }
+
 
         //private static ScannerPge _instance;
 
@@ -52,6 +59,7 @@ namespace KANTAIM.APK.Components.Pages
             }
 
             Profils = _profilService.GetAll().ToList();
+            ProfilSelected = _profilSessionService.CurrentProfil;
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -72,111 +80,120 @@ namespace KANTAIM.APK.Components.Pages
         {
             TextValue = msg.Code;
             string p = msg.Code;
-            if (!string.IsNullOrEmpty(p))
+
+            if (ProfilSelected != null)
             {
-                // Diviser la chaîne TextValue en morceaux en fonction du délimiteur #
-
-                string[] parts = _scanService.ParseCode(p);
-
-                if (parts != null)
+                if (!string.IsNullOrEmpty(p))
                 {
-                    string part = parts[0];
-                    // Vérifier si la partie n'est pas vide et commence par un chiffre
-                    if (!string.IsNullOrEmpty(part) && char.IsDigit(part[0]))
-                    {
-                        // Récupérer le premier caractère (qui est le numéro du type)
-                        char typeNumber = part[0];
+                    // Diviser la chaîne TextValue en morceaux en fonction du délimiteur #
 
-                        // Utiliser une structure switch pour traiter chaque type différemment
-                        switch (typeNumber)
+                    string[] parts = _scanService.ParseCode(p);
+
+                    if (parts != null)
+                    {
+                        string part = parts[0];
+                        // Vérifier si la partie n'est pas vide et commence par un chiffre
+                        if (!string.IsNullOrEmpty(part) && char.IsDigit(part[0]))
                         {
-                            case '1':
-                                // Traiter le conteneur
-                                string c = parts[1];
-                                if (int.TryParse(c, out int containerNumber))
-                                {
-                                    try
+                            // Récupérer le premier caractère (qui est le numéro du type)
+                            char typeNumber = part[0];
+
+                            // Utiliser une structure switch pour traiter chaque type différemment
+                            switch (typeNumber)
+                            {
+                                case '1':
+                                    // Traiter le conteneur
+                                    string c = parts[1];
+                                    if (int.TryParse(c, out int containerNumber))
                                     {
-                                        Container? containerScanner = _contenaireService.GetContainerByNumber(containerNumber);
-                                        if (containerScanner != null)
+                                        try
                                         {
-                                            switch (containerScanner.ContainerAction.Status)
+                                            Container? containerScanner = _contenaireService.GetContainerByNumber(containerNumber);
+                                            if (containerScanner != null)
                                             {
-                                                case 0:
-                                                    /*Quand on scan un contenaire vide, on l'initialise sur press.*/
-                                                    NavigationManager.NavigateTo($"/InitialisationPge/0/{containerNumber}");
-                                                    break;
-                                                case 1:
-                                                    /*Après initialisation, on choisie son fillstatus, et après on le mise en rack.*/
-                                                    NavigationManager.NavigateTo($"/StockagePge/1/{containerNumber}");
-                                                    break;
-                                                case 2:
-                                                    /*Traite un contenaire qui stock avec produit, on peut sortir stock ou le déplacer.*/
-                                                    NavigationManager.NavigateTo($"/ShipmentPge/1/{containerNumber}");
-                                                    break;
-                                                case 3:
-                                                    /*Après sortie le contenaire avec produit, on vas le mise en Machine*/
-                                                    NavigationManager.NavigateTo($"/InjectPge/1/{containerNumber}", forceLoad: true);
-                                                    break;
-                                                case 4:
-                                                    /*Apres vidange le contenaire est vide, on Mise en rack.*/
-                                                    NavigationManager.NavigateTo($"/StockagePge/1/{containerNumber}");
-                                                    break;
+                                                switch (containerScanner.ContainerAction.Status)
+                                                {
+                                                    case 0:
+                                                        /*Quand on scan un contenaire vide, on l'initialise sur press.*/
+                                                        NavigationManager.NavigateTo($"/InitialisationPge/0/{containerNumber}");
+                                                        break;
+                                                    case 1:
+                                                        /*Après initialisation, on choisie son fillstatus, et après on le mise en rack.*/
+                                                        NavigationManager.NavigateTo($"/StockagePge/1/{containerNumber}");
+                                                        break;
+                                                    case 2:
+                                                        /*Traite un contenaire qui stock avec produit, on peut sortir stock ou le déplacer.*/
+                                                        NavigationManager.NavigateTo($"/ShipmentPge/1/{containerNumber}");
+                                                        break;
+                                                    case 3:
+                                                        /*Après sortie le contenaire avec produit, on vas le mise en Machine*/
+                                                        NavigationManager.NavigateTo($"/InjectPge/1/{containerNumber}", forceLoad: true);
+                                                        break;
+                                                    case 4:
+                                                        /*Apres vidange le contenaire est vide, on Mise en rack.*/
+                                                        NavigationManager.NavigateTo($"/StockagePge/1/{containerNumber}");
+                                                        break;
+                                                }
                                             }
                                         }
+                                        catch (Exception ex)
+                                        {
+                                            _snackService.Add(ex.Message + containerNumber, MudBlazor.Severity.Error);
+                                        }
+
                                     }
-                                    catch (Exception ex)
+                                    break;
+                                case '2':
+                                    _snackService.Add("Impossible de scanner une machine en premier !", MudBlazor.Severity.Error);
+                                    //MachineName = parts[1];
+                                    //if (int.TryParse(MachineName, out int MachineNumber))
+                                    //{
+                                    //    NavigationManager.NavigateTo($"/InjectPge/2/{MachineNumber}");
+                                    //}
+                                    break;
+                                case '3':
+                                    PressName = parts[1];
+                                    if (int.TryParse(PressName, out int PressNumber))
                                     {
-                                        _snackService.Add(ex.Message + containerNumber, MudBlazor.Severity.Error);
+                                        NavigationManager.NavigateTo($"/InitialisationPge/3/{PressNumber}");
                                     }
 
-                                }
-                                break;
-                            case '2':
-                                _snackService.Add("Impossible de scanner une machine en premier !", MudBlazor.Severity.Error);
-                                //MachineName = parts[1];
-                                //if (int.TryParse(MachineName, out int MachineNumber))
-                                //{
-                                //    NavigationManager.NavigateTo($"/InjectPge/2/{MachineNumber}");
-                                //}
-                                break;
-                            case '3':
-                                PressName = parts[1];
-                                if (int.TryParse(PressName, out int PressNumber))
-                                {
-                                    NavigationManager.NavigateTo($"/InitialisationPge/3/{PressNumber}");
-                                }
-
-                                // Traiter la presse
-                                break;
-                            case '4':
-                                // Traiter la cell
-                                //string X = parts[1];
-                                //string Y = parts[2];
-                                _snackService.Add("Impossible de scanner une cellule en premier !", MudBlazor.Severity.Error);
-                                //if (int.TryParse(X, out int x) && int.TryParse(Y, out int y))
-                                //{
-                                //    CellScanner = _cellService.GetByXY(x, y);
-                                //    NavigationManager.NavigateTo($"/StockagePge/4/{CellScanner.Id}");
-                                //    _snackService.Add("Mauvais QRCode scanné !", MudBlazor.Severity.Error);
-                                //}
-                                break;
-                            case '5':
-                                // Recherche le produit
-                                ProduitName = parts[1];
-                                if (int.TryParse(ProduitName, out int ProduitNumber))
-                                {
-                                    NavigationManager.NavigateTo($"/FindProductPge/5/{ProduitNumber}");
-                                }
-                                break;
-                            default:
-                                // Cas par défaut si le numéro du type n'est pas valide
-                                break;
+                                    // Traiter la presse
+                                    break;
+                                case '4':
+                                    // Traiter la cell
+                                    //string X = parts[1];
+                                    //string Y = parts[2];
+                                    _snackService.Add("Impossible de scanner une cellule en premier !", MudBlazor.Severity.Error);
+                                    //if (int.TryParse(X, out int x) && int.TryParse(Y, out int y))
+                                    //{
+                                    //    CellScanner = _cellService.GetByXY(x, y);
+                                    //    NavigationManager.NavigateTo($"/StockagePge/4/{CellScanner.Id}");
+                                    //    _snackService.Add("Mauvais QRCode scanné !", MudBlazor.Severity.Error);
+                                    //}
+                                    break;
+                                case '5':
+                                    // Recherche le produit
+                                    ProduitName = parts[1];
+                                    if (int.TryParse(ProduitName, out int ProduitNumber))
+                                    {
+                                        NavigationManager.NavigateTo($"/FindProductPge/5/{ProduitNumber}");
+                                    }
+                                    break;
+                                default:
+                                    // Cas par défaut si le numéro du type n'est pas valide
+                                    break;
+                            }
                         }
                     }
-                }
 
+                }
             }
+            else
+            {
+                _snackService.Add("Veuillez choisir un profil !", MudBlazor.Severity.Error);
+            }
+
             await InvokeAsync(StateHasChanged);
         }
     }

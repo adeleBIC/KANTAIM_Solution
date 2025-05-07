@@ -25,10 +25,10 @@ namespace KANTAIM.DAL.Model
         public string Name { get; set; }
 
 
-        [Column("FKTWorkshopID")]
-        public int WorkshopID { get; set; }
-        [ForeignKey(nameof(WorkshopID))]
-        public virtual Workshop Workshop { get; set; }
+        //[Column("FKTWorkshopID")]
+        //public int WorkshopID { get; set; }
+        //[ForeignKey(nameof(WorkshopID))]
+        //public virtual Workshop Workshop { get; set; }
 
 
         public int NbMax { get; set; }
@@ -50,6 +50,6 @@ namespace KANTAIM.DAL.Model
 
         public virtual ICollection<Product> Products { get; set; } = new List<Product>();
         public virtual ICollection<Container> Containers { get; set; } = new List<Container>();
-
+        public ICollection<RackCell> RackCells { get; set; }
     }
 }

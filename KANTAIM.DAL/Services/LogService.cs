@@ -37,7 +37,13 @@ namespace KANTAIM.DAL.Services
         public IEnumerable<Log> GetAll()
         {
             using DataKANTAIMContext ctx = new();
-            return ctx.Logs.Include(c => c.Product).Include(c => c.Press).Include(c => c.Shape).Include(c => c.Cell).Include(c => c.ProdColor).Include(c => c.Machine).Include(c => c.Container).ThenInclude(x=>x.ContainerType).ToList();
+            return ctx.Logs.Include(c => c.Product).Include(c => c.Press)
+                                                    .Include(c => c.Shape)
+                                                    .Include(c => c.Cell).ThenInclude(c => c.RackCells).ThenInclude(r => r.Rack)
+                                                    .Include(c => c.ProdColor)
+                                                    .Include(c => c.Machine)
+                                                    .Include(c => c.Container).ThenInclude(x=>x.ContainerType)
+                                                    .ToList();
         }
         public void UpSert(Log item) => _repo.UpSert(item);
 

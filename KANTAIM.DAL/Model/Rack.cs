@@ -29,6 +29,7 @@ namespace KANTAIM.DAL.Model
         public virtual Workshop Workshop { get; set; }
 
         public ICollection<RackProfil> RackProfils { get; set; }
+        public ICollection<RackCell> RackCells { get; set; }
 
     }
 }

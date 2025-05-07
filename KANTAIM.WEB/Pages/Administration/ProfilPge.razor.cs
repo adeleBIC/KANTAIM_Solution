@@ -20,9 +20,9 @@ namespace KANTAIM.WEB.Pages.Administration
 
         protected override async Task OnInitializedAsync()
         {
-            //RefreshData();
-
             await Task.Run(RefreshData);
+            await InvokeAsync(StateHasChanged);
+
         }
 
         // quick filter - filter gobally across multiple columns with the same input
@@ -56,22 +56,36 @@ namespace KANTAIM.WEB.Pages.Administration
                     try
                     {
                         Profil u = (Profil)vm;
-                        _profilService.UpSert(u);
-                        vm.IsEditing = false;
+                        int pId = _profilService.UpSert(u);
 
                         foreach (var m in Racks)
                         {
-                            if (vm.SelectedRackNames.Contains(m.Name))
+                            if (vm.SelectedRackNames?.Contains(m.Name) ?? false)
                             {
-                                if (!vm.Racks.Any(r => r.Id == m.Id)) _profilService.InsertRackProfil(new RackProfil() { RackId = m.Id, ProfilId = vm.Id });
+                                if (vm.Racks == null) vm.Racks = new List<Rack>();
+                                if (!vm.Racks.Any(r => r.Id == m.Id))
+                                {
+                                    RackProfil rp = new RackProfil() { RackId = m.Id, ProfilId = pId };
+                                    _profilService.InsertRackProfil(rp);
+                                    if (vm.RackProfils == null) vm.RackProfils = new List<RackProfil>();
+                                    vm.RackProfils.Add(rp);
+                                    vm.Racks.Add(m);
+                                }
                             }
                             else
                             {
-                                Rack rackToRemove = vm.Racks.FirstOrDefault(r => r.Id == m.Id);
-                                if (rackToRemove != null) _profilService.DeleteRackProfil(rackToRemove.Id,vm.Id);
+                                Rack rackToRemove = vm.Racks?.FirstOrDefault(r => r.Id == m.Id);
+                                if (rackToRemove != null)
+                                {
+                                    RackProfil rp = vm.RackProfils?.FirstOrDefault(r => r.RackId == rackToRemove.Id);
+                                    _profilService.DeleteRackProfil(rackToRemove.Id, pId);
+                                    vm.RackProfils.Remove(rp);
+                                    vm.Racks.Add(rackToRemove);
+                                }
                             }
                         }
 
+                        vm.IsEditing = false;
                         _snackService.Add("Données sauvgardées !", Severity.Success);
                     }
                     catch (Exception ex)
@@ -91,7 +105,7 @@ namespace KANTAIM.WEB.Pages.Administration
                     _snackService.Add(txt, Severity.Error);
                 }
             }
-            RefreshData();
+            //RefreshData();
             await InvokeAsync(StateHasChanged);
         }
 
@@ -107,6 +121,8 @@ namespace KANTAIM.WEB.Pages.Administration
                     {
                         if (item.Id != 0)
                         {
+                            foreach (RackProfil rp in item.RackProfils) _profilService.DeleteRackProfil(rp.RackId, item.Id);
+
                             _profilService.Delete(item.Id);
                             RefreshData();
                             _snackService.Add("Données supprimées !", Severity.Success);

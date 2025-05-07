@@ -27,12 +27,31 @@
             <PropertyColumn Property="x => x.Y" Title="Y" />
             <PropertyColumn Property="x => x.Name" Title="Nom" />
         @*     <PropertyColumn Property="x => x.Workshop.Name" Title="Atelier" /> *@
-            <PropertyColumn Property="x => x.Workshop" Title="Atelier">
+            @* <PropertyColumn Property="x => x.Workshop" Title="Atelier">
                 <EditTemplate>
                     <MudSelect T=int @bind-Value=context.Item.WorkshopID>
                         @foreach (var f in context.Item.workshops)
                         {
                             <MudSelectItem T=int Value="@f.Id">@f.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </EditTemplate>
+            </PropertyColumn> *@
+            <PropertyColumn Property="x => x.SelectedRackNames" Title="Racks">
+                <EditTemplate>
+                    <MudSelect T="string"
+                               SelectedValues="context.Item.SelectedRackNames"
+                               SelectedValuesChanged="@(new Func<IEnumerable<string>, Task>(v => OnSelectedRacksChanged(context.Item, v)))"
+                               MultiSelection="true"
+                               MultiSelectionTextFunc="@(new Func<List<string>, string>(GetMultiSelectionRackText))"
+                               Variant="MudBlazor.Variant.Outlined"
+                               Style="margin-bottom:5px;margin-top:5px">
+                        @if (Racks != null)
+                        {
+                            @foreach (var f in Racks.Where(p => p.Active))
+                            {
+                                <MudSelectItem T="string" Value="@f.Name">@f.Name</MudSelectItem>
+                            }
                         }
                     </MudSelect>
                 </EditTemplate>

@@ -16,7 +16,7 @@ namespace KANTAIM.WEB.ViewModels
             this.model = model;
             name = model.Name;
             active = model.Active;
-            rackProfils = model.RackProfils;
+            rackProfils = model.RackProfils.ToList();
             comment = model.Comment;
 
             Racks = new List<Rack>(RackProfils.Select(x => x.Rack).ToList());
@@ -54,15 +54,15 @@ namespace KANTAIM.WEB.ViewModels
             set { comment = value; IsEditing = true; }
         }
 
-        private IEnumerable<RackProfil> rackProfils;
+        private List<RackProfil> rackProfils;
         [Label("Commentaire")]
-        public IEnumerable<RackProfil> RackProfils
+        public List<RackProfil> RackProfils
         {
             get { return rackProfils; }
             set { rackProfils = value; IsEditing = true; }
         }
 
-        public IEnumerable<Rack> Racks { get; set; }
+        public List<Rack> Racks { get; set; }
 
         public string RacksName
         {
@@ -78,12 +78,13 @@ namespace KANTAIM.WEB.ViewModels
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (string.IsNullOrWhiteSpace(name)) yield return new ValidationResult("Le nom est obligatoire", new string[] { "Name" });
+            if (SelectedRackNames == null || SelectedRackNames.Count() == 0) yield return new ValidationResult("Au moins un rack est obligatoire", new string[] { "Rack" });
             else
             {
                 model.Name = name;
                 model.Comment = comment;
                 model.Active = active;
-                model.RackProfils = rackProfils.ToList();
+                //model.RackProfils = rackProfils.ToList();
             }
         }
     }

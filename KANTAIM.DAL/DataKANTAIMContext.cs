@@ -33,6 +33,7 @@ namespace KANTAIM.DAL
         public virtual DbSet<Rack> Racks { get; set; }
         public virtual DbSet<Profil> Profils { get; set; }
         public virtual DbSet<RackProfil> RackProfils { get; set; }
+        public virtual DbSet<RackCell> RackCells { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -49,6 +50,19 @@ namespace KANTAIM.DAL
                 .HasOne(mp => mp.Profil)
                 .WithMany(m => m.RackProfils)
                 .HasForeignKey(mp => mp.ProfilId);
+
+            modelBuilder.Entity<RackCell>()
+                .HasKey(mp => new { mp.RackId, mp.CellId });
+
+            modelBuilder.Entity<RackCell>()
+                .HasOne(mp => mp.Rack)
+                .WithMany(p => p.RackCells)
+                .HasForeignKey(mp => mp.RackId);
+
+            modelBuilder.Entity<RackCell>()
+                .HasOne(mp => mp.Cell)
+                .WithMany(m => m.RackCells)
+                .HasForeignKey(mp => mp.CellId);
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
