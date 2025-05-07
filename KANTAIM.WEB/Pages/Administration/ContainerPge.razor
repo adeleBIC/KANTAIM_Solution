@@ -76,6 +76,28 @@
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
+            <PropertyColumn Property="x => x.ProductId" Title="Produit" Required=false>
+                <EditTemplate>
+                    <MudSelect T=int? @bind-Value=context.Item.ProductId>
+                        <MudSelectItem T=int? Value="null">None</MudSelectItem>
+                        @foreach (var f in context.Item.Products)
+                        {
+                            <MudSelectItem T=int? Value="@f.Id">@f.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.ColorId" Title="Couleur" Required=false>
+                <EditTemplate>
+                    <MudSelect T=int? @bind-Value=context.Item.ColorId>
+                            <MudSelectItem T=int? Value="null">None</MudSelectItem>
+                        @foreach (var f in context.Item.Colors)
+                        {
+                            <MudSelectItem T=int? Value="@f.Id">@f.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </EditTemplate>
+            </PropertyColumn>
            @*  <PropertyColumn Property="x => x.Status" Title="Status" /> *@
             <PropertyColumn Property="x => x.QRCode" Title="QRCode" Required=false />
            

@@ -25,8 +25,9 @@ namespace KANTAIM.APK.Components.Pages
         [Inject] public ColorService _colorService { get; set; }
         [Inject] public ContenaireService _contenaireService { get; set; }
         [Inject] public ColorProductService _colorProductServiceService { get; set; }
-        [Inject] public LogService _logService { get; set; }
-        [Inject] public CellService _cellService { get; set; }
+        [Inject] public ProfilSessionService _profilSessionService { get; set; }
+        //[Inject] public LogService _logService { get; set; }
+        //[Inject] public CellService _cellService { get; set; }
         [Inject] ISnackbar _snackService { get; set; }
         [Inject] public ScanService _scanService { get; set; }
 
@@ -43,9 +44,9 @@ namespace KANTAIM.APK.Components.Pages
         public Log logRescent { get; set; }
         public Container? ContainerScanner { get; set; }
         public DAL.Model.Cell? cellPropose { get; set; }
-        public Product? containerProduct { get; set; }
-        public ProdColor? containerProdColor { get; set; }
-        public string ContainerValue { get; set; }
+        //public Product? containerProduct { get; set; }
+        //public ProdColor? containerProdColor { get; set; }
+        //public string ContainerValue { get; set; }
         public bool ShowAllCells { get; set; }
 
         public string? TextValue { get; set; }
@@ -61,9 +62,11 @@ namespace KANTAIM.APK.Components.Pages
             public DateTime EventTime { get; set; }
         }
 
+        private Profil profilSelected;
 
         protected override void OnInitialized()
         {
+            profilSelected = _profilSessionService.CurrentProfil;
             ProductScanner = _productService.GetByNumber(Number);
             Colors = new List<ProdColor>();
             
@@ -80,17 +83,17 @@ namespace KANTAIM.APK.Components.Pages
         void findCells()
         {
             cells = new List<CellLog>();
-            foreach (Container container in _contenaireService.GetAll().Where(c => c.CellStock != null))
+            foreach (Container container in _contenaireService.GetAllByOperationStatus(ActionStatus.Store)
+    .                                                           Where(c => c.ProductId == ProductScanner.Id
+                                                                         && c.CellStock != null
+                                                                         && c.CellStock.RackCells != null
+                                                                         && c.CellStock.RackCells.Any(rc => profilSelected.RackProfils.Any(rp => rp.RackId == rc.RackId))))
             {
-                logRescent = _logService.GetByContenaireByOperationStatus(container.Id, OperationContainer.Store, OperationContainer.Transfer);
-                if (logRescent != null && logRescent.ProductID == ProductScanner.Id)
+                if (ColorChoose == null || container.ProdColorId == ColorChoose.Id)
                 {
-                    if (ColorChoose == null || logRescent.ProdColorID == ColorChoose.Id)
+                    if (!cells.Any(c => c.Cell.Id == container.CellStock.Id))
                     {
-                        if (!cells.Any(c => c.Cell.Id == container.CellStock.Id))
-                        {
-                            cells.Add(new CellLog { Cell = container.CellStock, EventTime = logRescent.EventTime });
-                        }
+                        cells.Add(new CellLog { Cell = container.CellStock, EventTime = logRescent.EventTime });
                     }
                 }
             }
@@ -124,10 +127,10 @@ namespace KANTAIM.APK.Components.Pages
                     {
 
                         ContainerScanner = _contenaireService.GetContainerByNumber(containerNumber);
-                        logRescent = _logService.GetByContenaireId(ContainerScanner.Id);
-                        containerProduct = _productService.GetById(logRescent.ProductID);
-                        containerProdColor = _colorService.GetById(logRescent.ProdColorID);
-                        if (containerProduct != ProductScanner || containerProdColor != ColorChoose)
+                        //logRescent = _logService.GetByContenaireId(ContainerScanner.Id);
+                        //containerProduct = _productService.GetById(logRescent.ProductID);
+                        //containerProdColor = _colorService.GetById(logRescent.ProdColorID);
+                        if (ContainerScanner.ProductId != ProductScanner.Id || ContainerScanner.ProdColorId != ColorChoose.Id)
                         {
                             _snackService.Add("Svp vérifiez le produit dans le contenaire et le produit que vous voulez rechercher !", Severity.Error);
                             TextValue = null;

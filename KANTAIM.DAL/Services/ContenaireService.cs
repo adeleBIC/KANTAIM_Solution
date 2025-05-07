@@ -15,22 +15,36 @@ namespace KANTAIM.DAL.Services
         Repository<ContainerType> _repoContainerType;
         Repository<ContainerAction> _repoAction;
         Repository<Cell> _repoCell;
-        public ContenaireService(Repository<Container> repo, Repository<Container> repoContainer, Repository<ContainerType> repoContainerType, Repository<Cell> repoCell, Repository<ContainerAction> repoAction)
+        Repository<ProdColor> _repoColor;
+        Repository<Product> _repoProduct;
+        public ContenaireService(Repository<Container> repo, Repository<Container> repoContainer, Repository<ContainerType> repoContainerType, Repository<Cell> repoCell, Repository<ContainerAction> repoAction, Repository<ProdColor> repoColor, Repository<Product> repoProduct)
         {
             _repo = repo;
             _repoContainer = repoContainer;
             _repoContainerType = repoContainerType;
             _repoAction = repoAction;
             _repoCell = repoCell;
+            _repoColor = repoColor;
+            _repoProduct = repoProduct;
         }
 
         public IEnumerable<Container> GetAll()
         {
             using DataKANTAIMContext ctx = new();
-            return ctx.Containers.Include(c => c.BigContainer).Include(c => c.ContainerType).Include(c => c.CellStock).Include(c => c.ContainerAction).ToList();
+            return ctx.Containers.Include(c => c.BigContainer)
+                                    .Include(c => c.ContainerType)
+                                    .Include(c => c.CellStock).ThenInclude(rc=>rc.RackCells).ThenInclude(r => r.Rack)
+                                    .Include(c => c.ContainerAction)
+                                    .Include(c => c.Product)
+                                    .Include(c => c.ProdColor)
+                                    .ToList();
         }
+        public IEnumerable<Container> GetAllByOperationStatus(int status1) => GetAll().Where(u => u.CellStock != null && u.ContainerAction.Status == status1).ToList();
+        public IEnumerable<Container> GetAllByOperationStatus(int status1, int status2) => GetAll().Where(u => u.CellStock != null && (u.ContainerAction.Status == status1 || u.ContainerAction.Status == status2)).ToList();
         public Container GetContainerById(int ContainerId) => GetAll().SingleOrDefault(u => u.ContainerID == ContainerId);
         public Container GetContainerByNumber(int n) => GetAll().FirstOrDefault(u => u.Number == n);
+        public Container? GetByIdByOperationStatus(int contId, int status1) => GetAll().Where(u => u.ContainerID == contId && u.CellStock != null && u.ContainerAction.Status == status1).FirstOrDefault();
+        public Container? GetByIdByOperationStatus(int contId, int status1, int status2) => GetAll().Where(u => u.ContainerID == contId && u.CellStock != null && (u.ContainerAction.Status == status1 || u.ContainerAction.Status == status2)).FirstOrDefault();
         public IEnumerable<Container> GetByCellId(int CellId) => GetAll().Where(u => u.CellId == CellId );
         public IEnumerable<Container> GetAllBacs(int paletteId) => GetAll().Where(u => u.ContainerID == paletteId);
         public int CountCells(int cellId) => GetAll().Where(u => u.CellId == cellId && !u.ContainerType.IsContainable).Count();
@@ -44,10 +58,12 @@ namespace KANTAIM.DAL.Services
 
         public void Delete(int id) => _repo.Delete(id);
 
-        public IEnumerable<Container> GetAllContainer() => _repoContainer.GetAll();
+        //public IEnumerable<Container> GetAllContainer() => _repoContainer.GetAll();
         public IEnumerable<ContainerType> GetAllContainerType() => _repoContainerType.GetAll();
         public IEnumerable<Cell> GetAllCell() => _repoCell.GetAll();
         public IEnumerable<ContainerAction> GetAllAction() => _repoAction.GetAll();
+        public IEnumerable<ProdColor> GetAllColor() => _repoColor.GetAll();
+        public IEnumerable<Product> GetAllProd() => _repoProduct.GetAll();
 
 
     }

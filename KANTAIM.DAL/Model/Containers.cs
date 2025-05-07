@@ -50,5 +50,15 @@ namespace KANTAIM.DAL.Model
         public int? CellId { get; set; }
         [ForeignKey(nameof(CellId))]
         public virtual Cell? CellStock { get; set; }
+
+        [Column("FKTProductID")]
+        public int? ProductId { get; set; }
+        [ForeignKey(nameof(ProductId))]
+        public virtual Product? Product { get; set; }
+
+        [Column("FKTColorID")]
+        public int? ProdColorId { get; set; }
+        [ForeignKey(nameof(ProdColorId))]
+        public virtual ProdColor? ProdColor { get; set; }
     }
 }

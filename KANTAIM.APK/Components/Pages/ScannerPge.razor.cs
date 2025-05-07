@@ -27,9 +27,9 @@ namespace KANTAIM.APK.Components.Pages
         //public KANTAIM.DAL.Model.Cell CellScanner { get; set; }
         public string? TextValue { get; set; }
 
-        string? PressName;
-        string? ProduitName;
-        string? MachineName;
+        //string? PressName;
+        //string? ProduitName;
+        //string? MachineName;
 
         public List<Profil> Profils { get; set; }
         private Profil profilSelected;
@@ -145,14 +145,9 @@ namespace KANTAIM.APK.Components.Pages
                                     break;
                                 case '2':
                                     _snackService.Add("Impossible de scanner une machine en premier !", MudBlazor.Severity.Error);
-                                    //MachineName = parts[1];
-                                    //if (int.TryParse(MachineName, out int MachineNumber))
-                                    //{
-                                    //    NavigationManager.NavigateTo($"/InjectPge/2/{MachineNumber}");
-                                    //}
                                     break;
                                 case '3':
-                                    PressName = parts[1];
+                                    string? PressName = parts[1];
                                     if (int.TryParse(PressName, out int PressNumber))
                                     {
                                         NavigationManager.NavigateTo($"/InitialisationPge/3/{PressNumber}");
@@ -161,20 +156,11 @@ namespace KANTAIM.APK.Components.Pages
                                     // Traiter la presse
                                     break;
                                 case '4':
-                                    // Traiter la cell
-                                    //string X = parts[1];
-                                    //string Y = parts[2];
                                     _snackService.Add("Impossible de scanner une cellule en premier !", MudBlazor.Severity.Error);
-                                    //if (int.TryParse(X, out int x) && int.TryParse(Y, out int y))
-                                    //{
-                                    //    CellScanner = _cellService.GetByXY(x, y);
-                                    //    NavigationManager.NavigateTo($"/StockagePge/4/{CellScanner.Id}");
-                                    //    _snackService.Add("Mauvais QRCode scanné !", MudBlazor.Severity.Error);
-                                    //}
                                     break;
                                 case '5':
                                     // Recherche le produit
-                                    ProduitName = parts[1];
+                                    string? ProduitName = parts[1];
                                     if (int.TryParse(ProduitName, out int ProduitNumber))
                                     {
                                         NavigationManager.NavigateTo($"/FindProductPge/5/{ProduitNumber}");

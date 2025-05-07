@@ -44,10 +44,12 @@ namespace KANTAIM.WEB.Pages.Administration
         void RefreshData()
         {
             Containers = _contenaireService.GetAll().Select(u => new ContainerVM(u,
-                    _contenaireService.GetAllContainer(),
-                    _contenaireService.GetAllContainerType(),
-                    _contenaireService.GetAllCell(),
-                    _contenaireService.GetAllAction())).ToList();
+                                                                    _contenaireService.GetAll(),
+                                                                    _contenaireService.GetAllContainerType(),
+                                                                    _contenaireService.GetAllCell(),
+                                                                    _contenaireService.GetAllAction(),
+                                                                    _contenaireService.GetAllProd(),
+                                                                    _contenaireService.GetAllColor())).ToList();
         }
 
         // quick filter - filter gobally across multiple columns with the same input
@@ -64,7 +66,12 @@ namespace KANTAIM.WEB.Pages.Administration
 
         void AddAsync()
         {
-            ContainerVM item = new ContainerVM(_contenaireService.GetAllContainer(), _contenaireService.GetAllContainerType(), _contenaireService.GetAllCell(), _contenaireService.GetAllAction()) { IsEditing = true };
+            ContainerVM item = new ContainerVM(_contenaireService.GetAll(),
+                                                _contenaireService.GetAllContainerType(),
+                                                _contenaireService.GetAllCell(),
+                                                _contenaireService.GetAllAction(),
+                                                _contenaireService.GetAllProd(),
+                                                _contenaireService.GetAllColor()) { IsEditing = true };
             Containers.Insert(0, item);
         }
 

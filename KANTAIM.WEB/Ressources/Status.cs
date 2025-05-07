@@ -68,4 +68,26 @@
             Operations.Add(Canceled, "Annulé");
         }
     }
+
+    public class ActionStatus
+    {
+        public const int Empty = 0;
+        public const int InFilled = 1;
+        public const int Store = 2;
+        public const int OutStock = 3;
+        public const int InDischarge = 4;
+        public const int Canceled = 99;
+
+        public Dictionary<int, string> Operations = new Dictionary<int, string>();
+
+        public ActionStatus()
+        {
+            Operations.Add(Empty, "Vide");
+            Operations.Add(InFilled, "En remplissage");
+            Operations.Add(Store, "Stocké avec produit");
+            Operations.Add(OutStock, "Sortie stock");
+            Operations.Add(InDischarge, "En vidange");
+            Operations.Add(Canceled, "Annulé");
+        }
+    }
 }

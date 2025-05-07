@@ -11,19 +11,25 @@ namespace KANTAIM.WEB.ViewModels
         public List<Container> Containers { get; set; }
         public List<ContainerType> ContainerTypes { get; set; }
         public List<ContainerAction> Actions { get; set; }
+        public List<Product> Products { get; set; }
+        public List<ProdColor> Colors { get; set; }
         public List<Cell> Cells { get; set; }
 
-        public ContainerVM(IEnumerable<Container> containers, IEnumerable<ContainerType> containerTypes, IEnumerable<Cell> cells, IEnumerable<ContainerAction> actions) : this(new Container(), containers, containerTypes, cells, actions) { }
-        public ContainerVM(Container model, IEnumerable<Container> containers, IEnumerable<ContainerType> containerTypes, IEnumerable<Cell> cells, IEnumerable<ContainerAction> actions)
+        public ContainerVM(IEnumerable<Container> containers, IEnumerable<ContainerType> containerTypes, IEnumerable<Cell> cells, IEnumerable<ContainerAction> actions, IEnumerable<Product> products, IEnumerable<ProdColor> colors) : this(new Container(), containers, containerTypes, cells, actions, products, colors) { }
+        public ContainerVM(Container model, IEnumerable<Container> containers, IEnumerable<ContainerType> containerTypes, IEnumerable<Cell> cells, IEnumerable<ContainerAction> actions, IEnumerable<Product> products, IEnumerable<ProdColor> colors)
         {
             this.model = model;
             this.Containers = containers.ToList();
             this.ContainerTypes = containerTypes.ToList();
             this.Cells = cells.ToList();
             this.Actions = actions.ToList();
+            this.Products = products.ToList();
+            this.Colors = colors.ToList();
 
             actionID = model.ActionID;
-            
+            productId = model.ProductId;
+            colorId = model.ProdColorId;
+
             number = model.Number;
             containerID = model.ContainerID;
             containerTypeID = model.ContainerTypeID;
@@ -78,12 +84,28 @@ namespace KANTAIM.WEB.ViewModels
             set { number = value; IsEditing = true; }
         }
 
-        [Label("FKTActionID")]
+        [Label("Action")]
         private int actionID;
         public int ActionID
         {
             get { return actionID; }
             set { actionID = value; IsEditing = true; }
+        }
+
+        [Label("Produit")]
+        private int? productId;
+        public int? ProductId
+        {
+            get { return productId; }
+            set { productId = value; IsEditing = true; }
+        }
+
+        [Label("Couleur")]
+        private int? colorId;
+        public int? ColorId
+        {
+            get { return colorId; }
+            set { colorId = value; IsEditing = true; }
         }
 
         [Label("FillStatus")]
@@ -153,6 +175,8 @@ namespace KANTAIM.WEB.ViewModels
                 model.ContainerTypeID = containerTypeID;
                 model.CellId = cellID;
                 model.ActionID = actionID;
+                model.ProductId = productId;
+                model.ProdColorId = colorId;
                 model.FillStatus = fillStatus;
                 model.Status = status;
                 model.InJail = inJail;

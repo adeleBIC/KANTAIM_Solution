@@ -75,7 +75,7 @@
         <MudText> @TextValue</MudText>
         @* <MudTextField @bind-Value="CellValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="cellScan"></MudTextField> *@
         <div class="button-group">
-            <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>{maintenance=false;}">Retour</MudButton>
+            <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>{MaintenanceBool=false;}">Retour</MudButton>
         </div>
         break;
     case 3: @if (ContainerScanner == null)
@@ -88,7 +88,7 @@
         }
         else
         {
-            @if (cellScanner.IsJail == true)
+            @if (CellScanner.IsJail == true)
             {
                 <div class="display-container">
 
@@ -96,10 +96,10 @@
                         Prison
                     </h3>
                     <h3 class="redtitle">
-                        @cellScanner.Name
+                        @CellScanner.Name
                     </h3>
                     <div class="button-group">
-                        <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>cellScanner=null">Retour</MudButton>
+                        <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>CellScanner=null">Retour</MudButton>
                         <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="()=>Exit(2)">Valider</MudButton>
                     </div>
                 </div>
@@ -112,17 +112,17 @@
                         Rack de stockage choisi
                     </h3>
                     <h3 class="title">
-                        @cellScanner.Name
+                        @CellScanner.Name
                     </h3>
-                    @if (cellScanner.IsMaintenance)
+                    @if (CellScanner.IsMaintenance)
                     {
                         <h3 style="color:red;"> Attention vous choisissez une zone maintenance </h3>
                     }
                     <div class="button-group">
-                        <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>cellScanner=null">Retour</MudButton>
-                        @if (cellScanner.IsMaintenance)
+                        <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>CellScanner=null">Retour</MudButton>
+                        @if (CellScanner.IsMaintenance)
                         {
-                            <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="()=>{fillstatus = StatusContainer.Empty;Exit(2); }">Valider</MudButton>
+                            <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="()=>{Fillstatus = StatusContainer.Empty;Exit(2); }">Valider</MudButton>
                         }
                         else
                         {
@@ -144,7 +144,7 @@
             }
 
             <div class="display-container">
-                @if (cellPropose == null)
+                @if (CellPropose == null)
                 {
                     <h3 class="title">
                         Il n'y a plus de place,
@@ -152,7 +152,7 @@
                     </h3>
                     <MudText> @TextValue</MudText>
                     <div class="button-group">
-                        <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>{stock=false;scanPallete=false;fillstatus=0;}">Retour</MudButton>
+                        <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>{Stock=false;ScanPallete=false;Fillstatus=0;}">Retour</MudButton>
                     </div>
                     @* <MudTextField @bind-Value="CellValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="cellScan"></MudTextField> *@
                 }
@@ -166,9 +166,9 @@
                         Stockage proposer en
                     </h3>
                     <h3 class="redtitle">
-                        @cellPropose.Name
+                        @CellPropose.Name
                     </h3>
-                    @if (scanPallete) {
+                    @if (ScanPallete) {
                         <h3 class="title">Scannez la palette s'il vous plait</h3>
                         <MudText> @TextValue</MudText>
                     } else{
@@ -183,7 +183,7 @@
                     {
                         <div class="button-group">
 
-                        <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>{stock=false;scanPallete=false;fillstatus = 0;}">Retour</MudButton>
+                        <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>{Stock=false;ScanPallete=false;Fillstatus = 0;}">Retour</MudButton>
                     </div>
                     }
                 }
@@ -201,19 +201,19 @@
                 @if (Id != 4)
                 {
                     <div class="status-display">
-                        @if(product != null)
+                        @if(Product != null)
                         {
-                           <div class="status-item">Produit: @product.Name</div> 
+                           <div class="status-item">Produit: @Product.Name</div> 
                         }
                         
-                        @if (colorOfProduct != null) 
+                        @if (ColorOfProduct != null) 
                         {
-                            <div class="status-item">Couleur: @colorOfProduct.Name<MudIcon Icon="@Icons.Material.Filled.Circle" Style="@($"color:{colorOfProduct.ColorNumber};")" /></div>
+                            <div class="status-item">Couleur: @ColorOfProduct.Name<MudIcon Icon="@Icons.Material.Filled.Circle" Style="@($"color:{ColorOfProduct.ColorNumber};")" /></div>
                             
 
                         }
 
-                        @if (isPalette)
+                        @if (IsPalette)
                         {
                             <div class="status-item">Nombre de Bac : @_contenaireService.CountBac(ContainerScanner.Id)
                                 <MudButton @onclick="OpenDialogAsync" Variant="Variant.Filled" Color="Color.Primary">
@@ -229,7 +229,7 @@
                     </div>
                 }
             </div>
-            @if (isPalette)
+            @if (IsPalette)
             {
                 <div class="display-container">
                     <h3 class="title">Scanner d'autres bacs s'il vous plait</h3>
