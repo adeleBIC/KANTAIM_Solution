@@ -44,7 +44,7 @@ namespace KANTAIM.APK.Components.Pages
         public List<ProdColor> Colors { get; set; }
         public Container? PaletteScanner { get; set; }
         public Machine? MachineScanner { get; set; }
-        public Log logRescent { get; set; }
+        //public Log logRescent { get; set; }
         public string? TextValue { get; set; }
 
         //public Product? product { get; set; }
@@ -136,7 +136,7 @@ namespace KANTAIM.APK.Components.Pages
                 _snackService.Add("Déjà ajouté !", Severity.Error);
             } else
             {
-                logRescent = _logService.GetByContenaireId(palette.Id);
+                //logRescent = _logService.GetByContenaireId(palette.Id);
                 bac.CellId = palette.CellId;
                 bac.ActionID = palette.ActionID;
                 bac.FillStatus = StatusContainer.Full;
@@ -145,23 +145,25 @@ namespace KANTAIM.APK.Components.Pages
                 bac.InMaintenance = palette.InMaintenance;
                 bac.Comment = palette.Comment;
                 bac.ContainerID = palette.Id;
+                bac.PressId = palette.PressId;
+                bac.LastEvent = DateTime.Now;
                 _contenaireService.UpSert(bac);
 
 
                 Log bacLog = new Log()
                 {
-                    EventTime = DateTime.Now,
+                    EventTime = bac.LastEvent.Value,
                     Operation = OperationContainer.Initisalisation, // Initialisation pour le bac
                     ProductID = palette.ProductId,
-                    Press = logRescent.Press,
-                    PressID = logRescent.PressID,
-                    Shape = logRescent.Shape,
-                    ShapeID = logRescent.ShapeID,
+                    Press = palette.Press,
+                    PressID = palette.PressId,
+                    Shape = palette.Press.Shape,
+                    ShapeID = palette.Press.ShapeID,
                     Container = bac,
                     ContainerID = bac.Id,
                     ProdColor = palette.ProdColor,
                     ProdColorID = palette.ProdColorId,
-                    CellID = logRescent.CellID,
+                    //CellID = logRescent.CellID,
                     FillStatus = StatusContainer.Full
                 };
                 _logService.UpSert(bacLog);
@@ -328,6 +330,8 @@ namespace KANTAIM.APK.Components.Pages
 
                 ContainerScanner.Product = PressScanner.Shape.Product;
                 ContainerScanner.ProductId = PressScanner.Shape.Product.Id;
+                ContainerScanner.Press = PressScanner;
+                ContainerScanner.PressId = PressScanner.Id;
             }
             if(MachineScanner != null)
             {
@@ -352,9 +356,10 @@ namespace KANTAIM.APK.Components.Pages
             ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
             //ContainerScanner.CellStock = null;
             ContainerScanner.CellId = null;
-            if(ContainerScanner.ContainerTypeID == 2) // S'il est un bac, on initialise son fillstatue en plein directement
-                ContainerScanner.Status = 3;
+            if(ContainerScanner.ContainerTypeID == 2) ContainerScanner.Status = 3;// S'il est un bac, on initialise son fillstatue en plein directement
             ContainerScanner.FillStatus = StatusContainer.Undefinded;
+            ContainerScanner.LastEvent = u.EventTime;
+
             _contenaireService.UpSert(ContainerScanner);
 
             upDateCellState(ContainerScanner.CellStock);

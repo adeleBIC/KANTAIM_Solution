@@ -49,7 +49,9 @@ namespace KANTAIM.WEB.Pages.Administration
                                                                     _contenaireService.GetAllCell(),
                                                                     _contenaireService.GetAllAction(),
                                                                     _contenaireService.GetAllProd(),
-                                                                    _contenaireService.GetAllColor())).ToList();
+                                                                    _contenaireService.GetAllColor(),
+                                                                    _contenaireService.GetAllPress())).ToList();
+            
         }
 
         // quick filter - filter gobally across multiple columns with the same input
@@ -71,7 +73,8 @@ namespace KANTAIM.WEB.Pages.Administration
                                                 _contenaireService.GetAllCell(),
                                                 _contenaireService.GetAllAction(),
                                                 _contenaireService.GetAllProd(),
-                                                _contenaireService.GetAllColor()) { IsEditing = true };
+                                                _contenaireService.GetAllColor(),
+                                                _contenaireService.GetAllPress()) { IsEditing = true };
             Containers.Insert(0, item);
         }
 

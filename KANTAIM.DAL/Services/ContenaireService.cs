@@ -17,7 +17,8 @@ namespace KANTAIM.DAL.Services
         Repository<Cell> _repoCell;
         Repository<ProdColor> _repoColor;
         Repository<Product> _repoProduct;
-        public ContenaireService(Repository<Container> repo, Repository<Container> repoContainer, Repository<ContainerType> repoContainerType, Repository<Cell> repoCell, Repository<ContainerAction> repoAction, Repository<ProdColor> repoColor, Repository<Product> repoProduct)
+        Repository<Press> _repoPress;
+        public ContenaireService(Repository<Container> repo, Repository<Container> repoContainer, Repository<ContainerType> repoContainerType, Repository<Cell> repoCell, Repository<ContainerAction> repoAction, Repository<ProdColor> repoColor, Repository<Product> repoProduct, Repository<Press> repoPress)
         {
             _repo = repo;
             _repoContainer = repoContainer;
@@ -26,6 +27,7 @@ namespace KANTAIM.DAL.Services
             _repoCell = repoCell;
             _repoColor = repoColor;
             _repoProduct = repoProduct;
+            _repoPress = repoPress;
         }
 
         public IEnumerable<Container> GetAll()
@@ -37,6 +39,7 @@ namespace KANTAIM.DAL.Services
                                     .Include(c => c.ContainerAction)
                                     .Include(c => c.Product)
                                     .Include(c => c.ProdColor)
+                                    .Include(c => c.Press).ThenInclude(p=>p.Shape)
                                     .ToList();
         }
         public IEnumerable<Container> GetAllByOperationStatus(int status1) => GetAll().Where(u => u.CellStock != null && u.ContainerAction.Status == status1).ToList();
@@ -64,7 +67,6 @@ namespace KANTAIM.DAL.Services
         public IEnumerable<ContainerAction> GetAllAction() => _repoAction.GetAll();
         public IEnumerable<ProdColor> GetAllColor() => _repoColor.GetAll();
         public IEnumerable<Product> GetAllProd() => _repoProduct.GetAll();
-
-
+        public IEnumerable<Press> GetAllPress() => _repoPress.GetAll();
     }
 }

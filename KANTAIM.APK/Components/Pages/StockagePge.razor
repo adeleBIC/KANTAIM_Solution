@@ -152,7 +152,7 @@
                     </h3>
                     <MudText> @TextValue</MudText>
                     <div class="button-group">
-                        <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>{Stock=false;ScanPallete=false;Fillstatus=0;}">Retour</MudButton>
+                        <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>{Stock=false;ScanPallet=false;Fillstatus=0;}">Retour</MudButton>
                     </div>
                     @* <MudTextField @bind-Value="CellValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="cellScan"></MudTextField> *@
                 }
@@ -168,7 +168,7 @@
                     <h3 class="redtitle">
                         @CellPropose.Name
                     </h3>
-                    @if (ScanPallete) {
+                    @if (ScanPallet) {
                         <h3 class="title">Scannez la palette s'il vous plait</h3>
                         <MudText> @TextValue</MudText>
                     } else{
@@ -183,7 +183,7 @@
                     {
                         <div class="button-group">
 
-                        <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>{Stock=false;ScanPallete=false;Fillstatus = 0;}">Retour</MudButton>
+                        <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>{Stock=false;ScanPallet=false;Fillstatus = 0;}">Retour</MudButton>
                     </div>
                     }
                 }
@@ -213,7 +213,7 @@
 
                         }
 
-                        @if (IsPalette)
+                        @if (IsPallet)
                         {
                             <div class="status-item">Nombre de Bac : @_contenaireService.CountBac(ContainerScanner.Id)
                                 <MudButton @onclick="OpenDialogAsync" Variant="Variant.Filled" Color="Color.Primary">
@@ -229,7 +229,7 @@
                     </div>
                 }
             </div>
-            @if (IsPalette)
+            @if (IsPallet)
             {
                 <div class="display-container">
                     <h3 class="title">Scanner d'autres bacs s'il vous plait</h3>

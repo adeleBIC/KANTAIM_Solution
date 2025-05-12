@@ -98,6 +98,17 @@
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
+            <PropertyColumn Property="x => x.PressId" Title="Presse" Required=false>
+                <EditTemplate>
+                    <MudSelect T=int? @bind-Value=context.Item.PressId>
+                        <MudSelectItem T=int? Value="null">None</MudSelectItem>
+                        @foreach (var f in context.Item.Presses)
+                        {
+                            <MudSelectItem T=int? Value="@f.Id">@f.Number</MudSelectItem>
+                        }
+                    </MudSelect>
+                </EditTemplate>
+            </PropertyColumn>
            @*  <PropertyColumn Property="x => x.Status" Title="Status" /> *@
             <PropertyColumn Property="x => x.QRCode" Title="QRCode" Required=false />
            
@@ -110,6 +121,11 @@
                 <EditTemplate>
                     <MudCheckBox @bind-Checked=context.Item.InMaintenance />
                 </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.Lastevent" Title="Date" Class="wide-column">
+                <CellTemplate>
+                    <MudTextField @bind-Value="context.Item.Lastevent" Format="dd/MM/yyyy HH:mm:ss" />
+                </CellTemplate>
             </PropertyColumn>
             <PropertyColumn Property="x => x.Comment" Title="Commentaire" Required=false />
         </Columns>

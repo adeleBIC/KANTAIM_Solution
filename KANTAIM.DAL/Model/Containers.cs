@@ -22,12 +22,14 @@ namespace KANTAIM.DAL.Model
         public int Status { get; set; }
 
         public bool InJail { get; set; }
+
         public bool InMaintenance { get; set; }
-        
 
         [Required]
         [StringLength(50)]
         public string QRcode { get; set; }
+
+        public DateTime? LastEvent { get; set; }
 
         public string? Comment { get; set; }
 
@@ -60,5 +62,10 @@ namespace KANTAIM.DAL.Model
         public int? ProdColorId { get; set; }
         [ForeignKey(nameof(ProdColorId))]
         public virtual ProdColor? ProdColor { get; set; }
+
+        [Column("FKTPressID")]
+        public int? PressId { get; set; }
+        [ForeignKey(nameof(PressId))]
+        public virtual Press? Press { get; set; }
     }
 }

@@ -13,10 +13,11 @@ namespace KANTAIM.WEB.ViewModels
         public List<ContainerAction> Actions { get; set; }
         public List<Product> Products { get; set; }
         public List<ProdColor> Colors { get; set; }
+        public List<Press> Presses { get; set; }
         public List<Cell> Cells { get; set; }
 
-        public ContainerVM(IEnumerable<Container> containers, IEnumerable<ContainerType> containerTypes, IEnumerable<Cell> cells, IEnumerable<ContainerAction> actions, IEnumerable<Product> products, IEnumerable<ProdColor> colors) : this(new Container(), containers, containerTypes, cells, actions, products, colors) { }
-        public ContainerVM(Container model, IEnumerable<Container> containers, IEnumerable<ContainerType> containerTypes, IEnumerable<Cell> cells, IEnumerable<ContainerAction> actions, IEnumerable<Product> products, IEnumerable<ProdColor> colors)
+        public ContainerVM(IEnumerable<Container> containers, IEnumerable<ContainerType> containerTypes, IEnumerable<Cell> cells, IEnumerable<ContainerAction> actions, IEnumerable<Product> products, IEnumerable<ProdColor> colors, IEnumerable<Press> presses) : this(new Container(), containers, containerTypes, cells, actions, products, colors, presses) { }
+        public ContainerVM(Container model, IEnumerable<Container> containers, IEnumerable<ContainerType> containerTypes, IEnumerable<Cell> cells, IEnumerable<ContainerAction> actions, IEnumerable<Product> products, IEnumerable<ProdColor> colors, IEnumerable<Press> presses)
         {
             this.model = model;
             this.Containers = containers.ToList();
@@ -25,10 +26,12 @@ namespace KANTAIM.WEB.ViewModels
             this.Actions = actions.ToList();
             this.Products = products.ToList();
             this.Colors = colors.ToList();
+            this.Presses = presses.ToList();
 
             actionID = model.ActionID;
             productId = model.ProductId;
             colorId = model.ProdColorId;
+            pressId = model.PressId;
 
             number = model.Number;
             containerID = model.ContainerID;
@@ -39,6 +42,7 @@ namespace KANTAIM.WEB.ViewModels
             inJail = model.InJail;
             qRCode = model.QRcode;
             inMaintenance = model.InMaintenance;
+            lastEvent = model.LastEvent;
             comment = model.Comment;
 
         }
@@ -108,6 +112,14 @@ namespace KANTAIM.WEB.ViewModels
             set { colorId = value; IsEditing = true; }
         }
 
+        [Label("Presse")]
+        private int? pressId;
+        public int? PressId
+        {
+            get { return pressId; }
+            set { pressId = value; IsEditing = true; }
+        }
+
         [Label("FillStatus")]
         private int fillStatus;
         public int FillStatus
@@ -150,6 +162,15 @@ namespace KANTAIM.WEB.ViewModels
             set { inMaintenance = value; IsEditing = true; }
         }
 
+        [Required]
+        [Label("EventTime")]
+        private DateTime? lastEvent;
+        public DateTime? Lastevent
+        {
+            get { return lastEvent; }
+            set { lastEvent = value; IsEditing = true; }
+        }
+
         private string? comment;
         [Label("Commentaire")]
         public string? Comment
@@ -177,11 +198,13 @@ namespace KANTAIM.WEB.ViewModels
                 model.ActionID = actionID;
                 model.ProductId = productId;
                 model.ProdColorId = colorId;
+                model.PressId = pressId;
                 model.FillStatus = fillStatus;
                 model.Status = status;
                 model.InJail = inJail;
                 model.QRcode = qRCode;
                 model.InMaintenance = inMaintenance;
+                model.LastEvent = lastEvent;
                 model.Comment = comment;
             }
 
