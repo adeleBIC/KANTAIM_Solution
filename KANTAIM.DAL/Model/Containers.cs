@@ -49,23 +49,28 @@ namespace KANTAIM.DAL.Model
         public virtual ContainerAction ContainerAction { get; set; }
 
         [Column("FKTCellID")]
-        public int? CellId { get; set; }
-        [ForeignKey(nameof(CellId))]
+        public int? CellID { get; set; }
+        [ForeignKey(nameof(CellID))]
         public virtual Cell? CellStock { get; set; }
 
         [Column("FKTProductID")]
-        public int? ProductId { get; set; }
-        [ForeignKey(nameof(ProductId))]
+        public int? ProductID { get; set; }
+        [ForeignKey(nameof(ProductID))]
         public virtual Product? Product { get; set; }
 
         [Column("FKTColorID")]
-        public int? ProdColorId { get; set; }
-        [ForeignKey(nameof(ProdColorId))]
+        public int? ProdColorID { get; set; }
+        [ForeignKey(nameof(ProdColorID))]
         public virtual ProdColor? ProdColor { get; set; }
 
         [Column("FKTPressID")]
-        public int? PressId { get; set; }
-        [ForeignKey(nameof(PressId))]
+        public int? PressID { get; set; }
+        [ForeignKey(nameof(PressID))]
         public virtual Press? Press { get; set; }
+
+        [Column("FKTMachineID")]
+        public int? MachineID { get; set; }
+        [ForeignKey(nameof(PressID))]
+        public virtual Machine? Machine { get; set; }
     }
 }

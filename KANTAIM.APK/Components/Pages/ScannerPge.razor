@@ -30,28 +30,33 @@
 </style>
 
 <div class="container">
-    <div class="main-content">
-        <h3 class="title">
-            Scannez un QR Code svp
-        </h3>
-
-        <MudText> @TextValue</MudText>
-    </div>
-
-    @if (ProfilSelected == null)
-    {
-        <h3 class="titleProfil">
-            Sélectionner un profil avant de scanner svp
-        </h3>
-    }
-
     @if(Profils != null)
     {
+        <div class="main-content">
+            <h3 class="title">
+                Scannez un QR Code svp
+            </h3>
+
+            <MudText> @TextValue</MudText>
+        </div>
+        @if (ProfilSelected == null)
+        {
+            <h3 class="titleProfil">
+                Sélectionner un profil avant de scanner svp
+            </h3>
+        }
+
         <MudSelect T="Profil" @bind-Value="ProfilSelected" Label="Profil" Variant="MudBlazor.Variant.Outlined">
             @foreach (var p in Profils)
             {
                 <MudSelectItem T="Profil" Value="@(p)">@p.Name</MudSelectItem>
             }
         </MudSelect>
+    }
+    else
+    {
+        <h3 class="title">
+            Chargement des profils
+        </h3>
     }
 </div>

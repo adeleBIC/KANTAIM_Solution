@@ -26,6 +26,9 @@ namespace KANTAIM.APK.Components.Pages
             bac.ActionID = bac.ContainerAction.Id;
             bac.BigContainer = null;
             bac.ContainerID = null;
+            bac.PressID = null;
+            bac.ProdColorID = null;
+            bac.ProductID = null;
             _contenaireService.UpSert(bac);
             BacList.Remove(bac);
             // Vous pouvez également ajouter des appels à des services ici pour supprimer dans la base de données

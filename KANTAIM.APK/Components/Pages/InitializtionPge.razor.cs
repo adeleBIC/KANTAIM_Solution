@@ -30,11 +30,6 @@ namespace KANTAIM.APK.Components.Pages
         [Parameter] public int Id { get; set; }
         [Parameter] public int Number { get; set; }
 
-        //public string? ContainerValue { get; set; }
-        //public string? PressValue { get; set; }
-        //public string? ColorValue { get; set; }
-        //public string ContainerFeedback { get; set; } = string.Empty;
-        //public string? PaletteValue { get; set; }
         public Boolean BacInitialisation { get; set; } = false;
         public Boolean Maintenance { get; set; } = false;
         
@@ -46,8 +41,6 @@ namespace KANTAIM.APK.Components.Pages
         public Machine? MachineScanner { get; set; }
         //public Log logRescent { get; set; }
         public string? TextValue { get; set; }
-
-        //public Product? product { get; set; }
 
         private int state;
         public int State
@@ -118,7 +111,6 @@ namespace KANTAIM.APK.Components.Pages
                     if (PaletteScanner.ContainerAction.Status == 0) // On ne peux pas mettre une bac vide dans une palette, on ne peux pas mettre un bac dans une palette qu'il n'as pas été initialisé.
                     {
                         _snackService.Add("Svp initialisez palette d'abord!", Severity.Error);
-                        //PaletteValue = null;
                         PaletteScanner = null;
                     }
                     else
@@ -136,8 +128,7 @@ namespace KANTAIM.APK.Components.Pages
                 _snackService.Add("Déjà ajouté !", Severity.Error);
             } else
             {
-                //logRescent = _logService.GetByContenaireId(palette.Id);
-                bac.CellId = palette.CellId;
+                bac.CellID = palette.CellID;
                 bac.ActionID = palette.ActionID;
                 bac.FillStatus = StatusContainer.Full;
                 bac.Status = palette.Status;
@@ -145,8 +136,12 @@ namespace KANTAIM.APK.Components.Pages
                 bac.InMaintenance = palette.InMaintenance;
                 bac.Comment = palette.Comment;
                 bac.ContainerID = palette.Id;
-                bac.PressId = palette.PressId;
+                bac.PressID = palette.PressID;
                 bac.LastEvent = DateTime.Now;
+                bac.Product = palette.Product;
+                bac.ProductID = palette.ProductID;
+                bac.ProdColor = palette.ProdColor;
+                bac.ProdColorID = palette.ProdColorID;
                 _contenaireService.UpSert(bac);
 
 
@@ -154,15 +149,15 @@ namespace KANTAIM.APK.Components.Pages
                 {
                     EventTime = bac.LastEvent.Value,
                     Operation = OperationContainer.Initisalisation, // Initialisation pour le bac
-                    ProductID = palette.ProductId,
+                    ProductID = palette.ProductID,
                     Press = palette.Press,
-                    PressID = palette.PressId,
+                    PressID = palette.PressID,
                     Shape = palette.Press.Shape,
                     ShapeID = palette.Press.ShapeID,
                     Container = bac,
                     ContainerID = bac.Id,
                     ProdColor = palette.ProdColor,
-                    ProdColorID = palette.ProdColorId,
+                    ProdColorID = palette.ProdColorID,
                     //CellID = logRescent.CellID,
                     FillStatus = StatusContainer.Full
                 };
@@ -329,9 +324,9 @@ namespace KANTAIM.APK.Components.Pages
                 u.ShapeID = PressScanner.Shape.Id;
 
                 ContainerScanner.Product = PressScanner.Shape.Product;
-                ContainerScanner.ProductId = PressScanner.Shape.Product.Id;
+                ContainerScanner.ProductID = PressScanner.Shape.Product.Id;
                 ContainerScanner.Press = PressScanner;
-                ContainerScanner.PressId = PressScanner.Id;
+                ContainerScanner.PressID = PressScanner.Id;
             }
             if(MachineScanner != null)
             {
@@ -341,21 +336,21 @@ namespace KANTAIM.APK.Components.Pages
                 u.MachineID = MachineScanner.Id;
 
                 ContainerScanner.Product = MachineScanner.Product;
-                ContainerScanner.ProductId = MachineScanner.ProductID;
+                ContainerScanner.ProductID = MachineScanner.ProductID;
             }
             if (ColorChoose != null)
             {
                 u.ProdColor = ColorChoose;
                 u.ProdColorID = ColorChoose.Id;
                 ContainerScanner.ProdColor = ColorChoose;
-                ContainerScanner.ProdColorId = ColorChoose.Id;
+                ContainerScanner.ProdColorID = ColorChoose.Id;
             }
             _logService.UpSert(u);
 
             ContainerScanner.ContainerAction = _actionService.GetByStatus(1);
             ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
             //ContainerScanner.CellStock = null;
-            ContainerScanner.CellId = null;
+            ContainerScanner.CellID = null;
             if(ContainerScanner.ContainerTypeID == 2) ContainerScanner.Status = 3;// S'il est un bac, on initialise son fillstatue en plein directement
             ContainerScanner.FillStatus = StatusContainer.Undefinded;
             ContainerScanner.LastEvent = u.EventTime;

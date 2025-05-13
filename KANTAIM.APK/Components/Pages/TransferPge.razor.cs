@@ -9,6 +9,8 @@ using System;
 using KANTAIM.APK.Services;
 using KANTAIM.APK.Resources;
 using KANTAIM.APK.MessageBus.Messages;
+using Java.Util;
+using Java.Nio.Channels;
 
 namespace KANTAIM.APK.Components.Pages
 {
@@ -21,24 +23,20 @@ namespace KANTAIM.APK.Components.Pages
         [Inject] ISnackbar _snackService { get; set; }
         [Inject] public LogService _logService { get; set; }
         public string? ContainerValue { get; set; }
-        public string? autreValue { get; set; }
         public Container? ContainerScanner { get; set; }
-        public Container? AutreScanner { get; set; }
-        public Log logRescent { get; set; }
-        public bool bienTransfer { get; set; } = false;
+        public Container? OtherScanner { get; set; }
+        public bool GoodTransfer { get; set; } = false;
         public string? TextValue { get; set; }
-        private int state;
-
         [Parameter] public int Number { get; set; }
 
-
+        private int state;
         public int State
         {
             get
             {
                 state = 0;
-                if (bienTransfer) state = 3;
-                else if (ContainerScanner != null && AutreScanner != null) state = 1;
+                if (GoodTransfer) state = 3;
+                else if (ContainerScanner != null && OtherScanner != null) state = 1;
                 else if (ContainerScanner != null) state = 2;
                 else state = 0;
 
@@ -50,12 +48,12 @@ namespace KANTAIM.APK.Components.Pages
             if(ContainerScanner == null)
             {
                 ContainerScanner = _contenaireService.GetContainerByNumber(Number);
-                logRescent = _logService.GetByContenaireId(ContainerScanner.Id);
+                //logRescent = _logService.GetByContenaireId(ContainerScanner.Id);
                 state = 2;
             }
         }
 
-        void autreScan(string code)
+        void OtherScan(string code)
 
         {
             string[] parts = _scanService.ParseCode(code);
@@ -69,54 +67,61 @@ namespace KANTAIM.APK.Components.Pages
                 else
                 {
                     int.TryParse(parts[1], out int Number);
-                    AutreScanner = _contenaireService.GetContainerByNumber(Number);
-                    if (AutreScanner.FillStatus != 1)
+                    OtherScanner = _contenaireService.GetContainerByNumber(Number);
+                    if (OtherScanner.FillStatus != 1)
                     {
                         _snackService.Add("Svp vérifier le Contenaire est vide.", Severity.Error);
-                        AutreScanner = null;
+                        OtherScanner = null;
                     }
                 }
             }
         }
 
-        async void transferInformation()
-        { 
-            AutreScanner.CellId = ContainerScanner.CellId;
-            AutreScanner.ActionID = ContainerScanner.ActionID;
-            AutreScanner.FillStatus = StatusContainer.Undefinded;
-            AutreScanner.Status = ContainerScanner.Status;
-            AutreScanner.InJail = ContainerScanner.InJail;
-            AutreScanner.InMaintenance = ContainerScanner.InMaintenance;
-            AutreScanner.Comment = ContainerScanner.Comment;
-            _contenaireService.UpSert(AutreScanner);
-            //ContainerScanner.ActionID = OperationContainer.Inject;
-            //ContainerScanner.ContainerAction = _actionService.GetById(OperationContainer.Inject);
+        async void TransferInformation()
+        {
+            DateTime now = DateTime.Now;
+            OtherScanner.CellID = ContainerScanner.CellID;
+            OtherScanner.ProductID = ContainerScanner.ProductID;
+            OtherScanner.ProdColorID = ContainerScanner.ProdColorID;
+            OtherScanner.PressID = ContainerScanner.PressID;
+            int shapeId = ContainerScanner.Press.ShapeID;
+            OtherScanner.MachineID = ContainerScanner.MachineID;
+            OtherScanner.ActionID = ContainerScanner.ActionID;
+            OtherScanner.FillStatus = StatusContainer.Undefinded;
+            OtherScanner.Status = ContainerScanner.Status;
+            OtherScanner.InJail = ContainerScanner.InJail;
+            OtherScanner.InMaintenance = ContainerScanner.InMaintenance;
+            OtherScanner.Comment = ContainerScanner.Comment;
+            OtherScanner.LastEvent = now;
+            _contenaireService.UpSert(OtherScanner);
+
+            ContainerScanner.ProductID = null;
+            ContainerScanner.ProdColorID = null;
+            ContainerScanner.PressID = null;
+            ContainerScanner.MachineID = null;
+            ContainerScanner.CellID = null;
             ContainerScanner.FillStatus = StatusContainer.Empty;
+            ContainerScanner.LastEvent = now;
             _contenaireService.UpSert(ContainerScanner);
 
             Log u_autre = new Log()
             {
-                EventTime = DateTime.Now,
+                EventTime = now,
                 Operation = OperationContainer.Transfer, // Transfer contenaire
-                ProductID = logRescent.ProductID,
-                Press = logRescent.Press,
-                PressID = logRescent.PressID,
-                Shape = logRescent.Shape,
-                ShapeID = logRescent.ShapeID,
-                Container = AutreScanner,
-                ContainerID = AutreScanner.Id,
-                ProdColor = logRescent.ProdColor,
-                ProdColorID = logRescent.ProdColorID,
-                CellID = logRescent.CellID,
-                MachineID = logRescent.MachineID,
-                Machine = logRescent.Machine,
+                ProductID = OtherScanner.ProductID,
+                PressID = OtherScanner.PressID,
+                ShapeID = shapeId,
+                ContainerID = OtherScanner.Id,
+                ProdColorID = OtherScanner.ProdColorID,
+                CellID = OtherScanner.CellID,
+                MachineID = OtherScanner.MachineID,
                 FillStatus = StatusContainer.Undefinded
             };
             _logService.UpSert(u_autre);
 
             Log u_contenaire = new Log()
             {
-                EventTime = DateTime.Now,
+                EventTime = now,
                 Operation = OperationContainer.Transfer, // Transfer contenaire
                 Container = ContainerScanner,
                 ContainerID = ContainerScanner.Id,
@@ -124,7 +129,7 @@ namespace KANTAIM.APK.Components.Pages
             };
             _logService.UpSert(u_contenaire);
 
-            bienTransfer = true;
+            GoodTransfer = true;
             state = State;
             NavigationManager.NavigateTo($"/");
             _snackService.Add("Bien Transféré !", Severity.Success);
@@ -137,10 +142,9 @@ namespace KANTAIM.APK.Components.Pages
             {
                 case 0:
                     ContainerScanner = _contenaireService.GetContainerByNumber(Number);
-                    logRescent = _logService.GetByContenaireId(ContainerScanner.Id);
                     break;
                 case 2:
-                    autreScan(msg.Code);
+                    OtherScan(msg.Code);
                     break;
             }
             state = State;

@@ -150,7 +150,7 @@ namespace KANTAIM.WEB.Pages.Kanban
 
         async void transferInformation()
         {
-            AutreScanner.CellId = ContainerScanner.CellId;
+            AutreScanner.CellID = ContainerScanner.CellID;
             AutreScanner.ActionID = ContainerScanner.ActionID;
             AutreScanner.FillStatus = ContainerScanner.FillStatus;
             AutreScanner.Status = ContainerScanner.Status;
@@ -168,17 +168,17 @@ namespace KANTAIM.WEB.Pages.Kanban
             {
                 EventTime = DateTime.Now,
                 Operation = OperationContainer.Install, // Mise en contenaire
-                ProductID = logRescent.ProductID,
-                Press = logRescent.Press,
-                PressID = logRescent.PressID,
-                Shape = logRescent.Shape,
-                ShapeID = logRescent.ShapeID,
+                ProductID = AutreScanner.ProductID,
+                Press = AutreScanner.Press,
+                PressID = AutreScanner.PressID,
+                Shape = AutreScanner.Press.Shape,
+                ShapeID = AutreScanner.Press.ShapeID,
                 Container = AutreScanner,
                 ContainerID = AutreScanner.Id,
-                ProdColor = logRescent.ProdColor,
-                ProdColorID = logRescent.ProdColorID,
-                CellID = logRescent.CellID,
-                FillStatus = logRescent.FillStatus
+                ProdColor = AutreScanner.ProdColor,
+                ProdColorID = AutreScanner.ProdColorID,
+                CellID = AutreScanner.CellID,
+                FillStatus = AutreScanner.FillStatus
             };
             _logService.UpSert(u_autre);
 

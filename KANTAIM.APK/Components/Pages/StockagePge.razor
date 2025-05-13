@@ -57,23 +57,13 @@
 
 
 </style>
-
+<MudText> @TextValue</MudText>
 @switch (State)
 {
-    @* case 1:
-        <div class="display-container">
-
-            <h3 class="title">
-                Bien Stocké
-            </h3>
-        </div>
-        break; *@
     case 2 :
         <h3 class="title">
             Svp vider le contenaire et scannez une cellule maintenance
         </h3>
-        <MudText> @TextValue</MudText>
-        @* <MudTextField @bind-Value="CellValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="cellScan"></MudTextField> *@
         <div class="button-group">
             <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>{MaintenanceBool=false;}">Retour</MudButton>
         </div>
@@ -83,8 +73,6 @@
             <h3 class="title">
                 Svp Scannez le contenaire
             </h3>
-            <MudText> @TextValue</MudText>
-            @* <MudTextField @bind-Value="ContainerValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="ContainerScan"></MudTextField> *@
         }
         else
         {
@@ -154,7 +142,6 @@
                     <div class="button-group">
                         <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>{Stock=false;ScanPallet=false;Fillstatus=0;}">Retour</MudButton>
                     </div>
-                    @* <MudTextField @bind-Value="CellValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="cellScan"></MudTextField> *@
                 }
                 else
                 {
@@ -170,15 +157,9 @@
                     </h3>
                     @if (ScanPallet) {
                         <h3 class="title">Scannez la palette s'il vous plait</h3>
-                        <MudText> @TextValue</MudText>
                     } else{
                         <h3 class="title">Scannez la cellule correspondant s'il vous plait</h3>
-                        <MudText> @TextValue</MudText>
                     }
-
-                    @*  <div>
-                        <MudTextField @bind-Value="CellValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="cellScan"></MudTextField>
-                    </div> *@
                     @if (ContainerScanner.FillStatus != StatusContainer.Empty)
                     {
                         <div class="button-group">
@@ -190,9 +171,6 @@
             </div>
         }
         break;
-@*     case 5 :
-        <h3 class="title">Bien Sortie</h3>
-        break; *@
     case 0 : 
         @if (ContainerScanner != null)
         {
@@ -233,9 +211,7 @@
             {
                 <div class="display-container">
                     <h3 class="title">Scanner d'autres bacs s'il vous plait</h3>
-                        @* <MudTextField @bind-Value="BacValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" OnKeyPress="BacScan"></MudTextField> *@
                 </div>
-                <MudText> @TextValue</MudText>
             }
             <div class="display-container">
                 <h3 class="title">Choisissez l'état de remplissage s'il vous plait</h3>

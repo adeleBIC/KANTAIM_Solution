@@ -50,7 +50,8 @@ namespace KANTAIM.WEB.Pages.Administration
                                                                     _contenaireService.GetAllAction(),
                                                                     _contenaireService.GetAllProd(),
                                                                     _contenaireService.GetAllColor(),
-                                                                    _contenaireService.GetAllPress())).ToList();
+                                                                    _contenaireService.GetAllPress(),
+                                                                    _contenaireService.GetAllMachine())).ToList();
             
         }
 
@@ -74,7 +75,8 @@ namespace KANTAIM.WEB.Pages.Administration
                                                 _contenaireService.GetAllAction(),
                                                 _contenaireService.GetAllProd(),
                                                 _contenaireService.GetAllColor(),
-                                                _contenaireService.GetAllPress()) { IsEditing = true };
+                                                _contenaireService.GetAllPress(),
+                                                _contenaireService.GetAllMachine()) { IsEditing = true };
             Containers.Insert(0, item);
         }
 

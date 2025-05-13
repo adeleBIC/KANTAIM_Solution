@@ -10,10 +10,10 @@
         <MudText Typo="Typo.h4">Recherche le produit dans une cellule</MudText>
     </div>
 
-    @if (cellPropose != null)
+    @if (CellPropose != null)
     {
         <div class="content">
-            <h3 class="title">Cellule proposée: @cellPropose.Name</h3>
+            <h3 class="title">Cellule proposée: @CellPropose.Name</h3>
             <div>
                 <MudButton Class="bouton-large" OnClick="ToggleCellList" Variant="MudBlazor.Variant.Filled" Style="margin-top: 20px;">
                     @(ShowAllCells ? "Masquer" : "Afficher autres contenaires")
@@ -23,7 +23,7 @@
             <MudText> @TextValue</MudText>
             </div>
     }
-    else if (cells != null && cells.Count == 0)
+    else if (ContainerFindList != null && ContainerFindList.Count == 0)
     {
         <div class="content">
             Il n'y a pas <b>@ProductScanner.Name</b> en
@@ -35,24 +35,23 @@
         </div>
     }
 
-    @if (cells != null && cells.Count > 0)
+    @if (ContainerFindList != null && ContainerFindList.Count > 0)
     {
         @if (ShowAllCells)
         {
             <div class="content cell-log-container">
-                @foreach (var cellLog in cells.OrderBy(u => u.EventTime))
+                @foreach (var cellLog in ContainerFindList.OrderBy(u => u.LastEvent))
                 {
-                    <h3 class="title">Cellule: @cellLog.Cell.Name (Stockée le: @cellLog.EventTime)</h3>
+                    <h3 class="title">Cellule: @cellLog.CellStock.Name (Stockée le: @cellLog.LastEvent)</h3>
                 }
             </div>
         }
     }
-
-    @if (cells == null)
+    else
     {
         <div class="content">
-            <br>Produit : @ProductScanner.Name
-            <h3>Choisissez la couleur svp</h3>
+        <br>Produit : @ProductScanner.Name
+        <h3>Choisissez la couleur svp</h3>
         </div>
 
         @if (Colors != null)

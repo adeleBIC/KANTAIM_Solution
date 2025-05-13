@@ -66,18 +66,19 @@
             <h3 class="title">Sortie de Rack</h3>
 
                 <div class="status-display">
-                    <div class="status-item">Produit: @product.Name</div>
-                @if (colorOfProduct != null)
+                    <div class="status-item">Produit: @Product.Name</div>
+                @if (ColorOfProduct != null)
                 {
-                    <div class="status-item">Couleur: @colorOfProduct.Name
-                    <MudIcon Icon="@Icons.Material.Filled.Circle" Style="@($"color:{colorOfProduct.ColorNumber};")" />
+                <div class="status-item">
+                    Couleur: @ColorOfProduct.Name
+                    <MudIcon Icon="@Icons.Material.Filled.Circle" Style="@($"color:{ColorOfProduct.ColorNumber};")" />
                     </div>
                 
                 }
 
-            @if (cellStock != null)
+            @if (CellStock != null)
             {
-                <div class="status-item">Cellule: @cellStock.Name</div>
+                <div class="status-item">Cellule: @CellStock.Name</div>
             }
 
             <div class="status-item">@ContainerScanner.ContainerType.Name: @ContainerScanner?.Number</div>
@@ -85,10 +86,11 @@
 
                 <div class="button-group">
             <MudButton Class="bouton"  Color="Color.Secondary" Variant="MudBlazor.Variant.Filled" Href="@($"/StockagePge/1/{ContainerScanner.Number}")" Match="NavLinkMatch.All">Déplacement Contenaire</MudButton>
-            @if(!isPalette) {
+            @if (!IsPalette)
+            {
                 <MudButton Class="bouton" Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="Shipment">Sortie</MudButton>
+                <MudButton Class="bouton" Color="Color.Info" Variant="MudBlazor.Variant.Filled" Href="@($"/InjectPge/1/{ContainerScanner.Number}")" Match="NavLinkMatch.All">Mise en Machine</MudButton>
             }
-            <MudButton Class="bouton" Color="Color.Info" Variant="MudBlazor.Variant.Filled" Href="@($"/InjectPge/1/{ContainerScanner.Number}")" Match="NavLinkMatch.All">Mise en Machine</MudButton>
             </div>
         </div>
 @*         } *@

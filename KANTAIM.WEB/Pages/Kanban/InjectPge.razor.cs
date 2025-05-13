@@ -220,7 +220,7 @@ namespace KANTAIM.WEB.Pages.Kanban
             ContainerScanner.ContainerAction = _actionService.GetByStatus(4);// En vidange
             ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
             ContainerScanner.FillStatus = logRescent.FillStatus;
-            ContainerScanner.CellId = null;
+            ContainerScanner.CellID = null;
             _contenaireService.UpSert(ContainerScanner);
 
             inject = true;

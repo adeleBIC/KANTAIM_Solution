@@ -209,7 +209,7 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
                 {
                     //contenaireNb = _contenaireList.Count(c => c.CellId!=null && c.CellStock?.WorkshopID == selectedWorkshopId);
                     contenaireNb = _contenaireList.Count(c =>
-                                            c.CellId != null
+                                            c.CellID != null
                                             && c.CellStock != null
                                             && c.CellStock.RackCells != null
                                             && c.CellStock.RackCells.Any(rc => rc.Rack.WorkshopID == selectedWorkshopId));
@@ -220,14 +220,14 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
                 if (selectedColorId != 0)
                 {
                     refreshCellList = _cellList.Where(c => {
-                        var logOfCell = _logList.Where(u => u.CellID == c.Id && u.Container.CellId == c.Id)
+                        var logOfCell = _logList.Where(u => u.CellID == c.Id && u.Container.CellID == c.Id)
                                         .OrderByDescending(u => u.EventTime).FirstOrDefault();
                         return logOfCell?.ProdColorID == selectedColorId && logOfCell?.ProductID == selectedProductId;
                     }).ToList();
                 }
                 else if (selectedProductId != 0)
                 {
-                    refreshCellList = _cellList.Where(c => _logList.Where(u => u.CellID == c.Id && u.Container.CellId == c.Id).OrderByDescending(u => u.EventTime).FirstOrDefault()?.ProductID == selectedProductId).ToList();
+                    refreshCellList = _cellList.Where(c => _logList.Where(u => u.CellID == c.Id && u.Container.CellID == c.Id).OrderByDescending(u => u.EventTime).FirstOrDefault()?.ProductID == selectedProductId).ToList();
                 }
                 else
                 {
@@ -235,16 +235,16 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
                     {
                         if (refreshCellList == null)
                         {
-                            refreshCellList = _cellList.Where(c => _logList.Where(u => u.CellID == c.Id && u.Container.CellId == c.Id).OrderByDescending(u => u.EventTime).FirstOrDefault()?.ProductID == produit.Id).ToList();
+                            refreshCellList = _cellList.Where(c => _logList.Where(u => u.CellID == c.Id && u.Container.CellID == c.Id).OrderByDescending(u => u.EventTime).FirstOrDefault()?.ProductID == produit.Id).ToList();
                         }
                         else
                         {
-                            refreshCellList = refreshCellList.Concat(_cellList.Where(c => _logList.Where(u => u.CellID == c.Id && u.Container.CellId == c.Id).OrderByDescending(u => u.EventTime).FirstOrDefault()?.ProductID == produit.Id).ToList()).ToList();
+                            refreshCellList = refreshCellList.Concat(_cellList.Where(c => _logList.Where(u => u.CellID == c.Id && u.Container.CellID == c.Id).OrderByDescending(u => u.EventTime).FirstOrDefault()?.ProductID == produit.Id).ToList()).ToList();
                         }
                     }
                 }
                 cellNb = refreshCellList.Count();
-                contenaireNb = _contenaireList.Count(c => refreshCellList.Any(cell => cell.Id == c.CellId));
+                contenaireNb = _contenaireList.Count(c => refreshCellList.Any(cell => cell.Id == c.CellID));
                 if (SelectedProduct != null)
                 {
 

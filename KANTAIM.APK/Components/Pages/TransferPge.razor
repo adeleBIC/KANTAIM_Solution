@@ -84,11 +84,11 @@
         break;
     case 1 :
         <div class="display-container">
-            <h3 class="title">Transfert du @ContainerScanner.Number vers @AutreScanner.Number</h3>
+            <h3 class="title">Transfert du @ContainerScanner.Number vers @OtherScanner.Number</h3>
         </div>
         <div class="button-group">
-            <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>{AutreScanner=null; state=2;}">Retour</MudButton>
-            <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="()=>transferInformation()">Valider</MudButton>
+            <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>{OtherScanner=null; state=2;}">Retour</MudButton>
+            <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="()=>TransferInformation()">Valider</MudButton>
         </div>
         break;
     case 0 :

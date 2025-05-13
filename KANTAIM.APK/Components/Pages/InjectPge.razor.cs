@@ -18,8 +18,6 @@ namespace KANTAIM.APK.Components.Pages
         [Inject] public MachineService _machineService { get; set; }
         [Inject] public LogService _logService { get; set; }
         [Inject] public ScanService _scanService { get; set; }
-        [Inject] public ProductService _productService { get; set; }
-        [Inject] public ColorService _colorService { get; set; }
         [Inject] public ActionService _actionService { get; set; }
         [Inject] public CellService _cellService { get; set; }
         [Inject] ISnackbar _snackService { get; set; }
@@ -27,14 +25,11 @@ namespace KANTAIM.APK.Components.Pages
         [Parameter] public int Id { get; set; }
         [Parameter] public int Number { get; set; }
         public bool inject { get; set; } = false;
-
-        public string? ContainerValue { get; set; }
-        public string? MachineValue { get; set; }
         public Container? ContainerScanner { get; set; }
         public Machine? MachineScanner { get; set; }
-        public Log logRescent { get; set; }
-        public Product? product { get; set; }
-        public ProdColor? prodColor { get; set; }
+        //public Log logRescent { get; set; }
+        public Product? Product { get; set; }
+        public ProdColor? ProdColor { get; set; }
 
         public string? TextValue { get; set; }
 
@@ -60,12 +55,8 @@ namespace KANTAIM.APK.Components.Pages
                     ContainerScanner = _contenaireService.GetContainerByNumber(Number);
                     if (ContainerScanner != null)
                     {
-                        logRescent = _logService.GetByContenaireId(ContainerScanner.Id);
-                        if (logRescent != null)
-                        {
-                            product = _productService.GetById(logRescent.ProductID ?? 0);
-                            prodColor = _colorService.GetById(logRescent.ProdColorID);
-                        }
+                        Product = ContainerScanner.Product;
+                        ProdColor = ContainerScanner.ProdColor;
                     }
                     break;
                 //Scanner la machine
@@ -90,14 +81,13 @@ namespace KANTAIM.APK.Components.Pages
                 ContainerScanner = _contenaireService.GetContainerByNumber(Container);
                 if (ContainerScanner.ContainerAction.Status != 3)
                 {
-                    _snackService.Add("Svp scanner le QR code de le contenaire qui a sortie de rack avec produits.", Severity.Error);
+                    _snackService.Add("Svp scanner le QR code du contenaire qui a déjà été sorti du rack avec produits.", Severity.Error);
                     ContainerScanner = null;
                 }
                 else
                 {
-                    logRescent = _logService.GetByContenaireId(ContainerScanner.Id);
-                    product = _productService.GetById(logRescent.ProductID.Value);
-                    prodColor = _colorService.GetById(logRescent.ProdColorID);
+                    Product = ContainerScanner.Product;
+                    ProdColor = ContainerScanner.ProdColor;
                 }
 
             }
@@ -116,13 +106,6 @@ namespace KANTAIM.APK.Components.Pages
             {
                 int.TryParse(parts[1], out int MachineNumber);
                 MachineScanner = _machineService.GetByNumber(MachineNumber);
-                /*
-                if (MachineScanner.IsInkjet && MachineScanner.ProductID != logRescent.ProductID)
-                {
-                    _snackService.Add("Le produit dans le contenaire n'est pas correspand avec la machine", Severity.Error);
-                    MachineScanner = null;
-                }
-                */
             }
 
         }
@@ -166,16 +149,16 @@ namespace KANTAIM.APK.Components.Pages
             {
                 EventTime = DateTime.Now,
                 Operation = OperationContainer.Inject, // Mise en machine
-                Product = logRescent.Product,
-                ProductID = logRescent.ProductID,
-                Press = logRescent.Press,
-                PressID = logRescent.PressID,
-                Shape = logRescent.Shape,
-                ShapeID = logRescent.ShapeID,
+                Product = ContainerScanner.Product,
+                ProductID = ContainerScanner.ProductID,
+                Press = ContainerScanner.Press,
+                PressID = ContainerScanner.PressID,
+                Shape = ContainerScanner.Press.Shape,
+                ShapeID = ContainerScanner.Press.ShapeID,
                 Container = ContainerScanner,
                 ContainerID = ContainerScanner.Id,
-                ProdColorID = logRescent.ProdColorID,
-                FillStatus = logRescent.FillStatus,
+                ProdColorID = ContainerScanner.ProdColorID,
+                FillStatus = ContainerScanner.FillStatus,
                 Machine = MachineScanner,
                 MachineID = MachineScanner.Id
             };
@@ -184,8 +167,12 @@ namespace KANTAIM.APK.Components.Pages
             ContainerScanner.ContainerAction = _actionService.GetByStatus(4);// En vidange
             ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
             ContainerScanner.FillStatus = StatusContainer.Undefinded;
-            ContainerScanner.CellId = null;
+            ContainerScanner.CellID = null;
+            ContainerScanner.ContainerID = null;
+            ContainerScanner.MachineID = MachineScanner.Id;
+            ContainerScanner.LastEvent = u.EventTime;
             _contenaireService.UpSert(ContainerScanner);
+
             upDateCellState(cellstock);
             inject = true;
             NavigationManager.NavigateTo($"/");

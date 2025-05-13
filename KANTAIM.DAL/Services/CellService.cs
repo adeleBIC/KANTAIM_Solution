@@ -11,14 +11,12 @@ namespace KANTAIM.DAL.Services
     public class CellService
     {
         Repository<Cell> _repo;
-        Repository<Container> _repoContainer;
         //Repository<Workshop> _repoWorkshop;
         RackService _rackService;
 
-        public CellService(Repository<Cell> repo, Repository<Container> repoContainer, RackService rackService)
+        public CellService(Repository<Cell> repo, RackService rackService)
         {
             this._repo = repo;
-            _repoContainer = repoContainer;
             //_repoWorkshop = repoWorkshop;
             _rackService = rackService;
         }
@@ -26,7 +24,7 @@ namespace KANTAIM.DAL.Services
         public IEnumerable<Cell> GetAll()
         {
             using DataKANTAIMContext ctx = new();
-            return ctx.Cells.Include(c => c.Containers)
+            return ctx.Cells.Include(c => c.Containers).ThenInclude(c => c.ContainerType)
                             .Include(c=>c.RackCells).ThenInclude(r=>r.Rack)
                             .ToList();
         }
@@ -35,14 +33,14 @@ namespace KANTAIM.DAL.Services
         public Cell? GetById(int? id)
         {
             using DataKANTAIMContext ctx = new();
-            return id == null ? null : ctx.Cells.Include(c => c.Containers)
+            return id == null ? null : ctx.Cells.Include(c => c.Containers).ThenInclude(c => c.ContainerType)
                                                 .Include(c => c.RackCells).ThenInclude(r => r.Rack)
                                                 .SingleOrDefault(x => x.Id == id); ;
         }
         public Cell? GetByNumber(string n)
         {
             using DataKANTAIMContext ctx = new();
-            return ctx.Cells.Include(c => c.Containers)
+            return ctx.Cells.Include(c => c.Containers).ThenInclude(c => c.ContainerType)
                             .Include(c => c.RackCells).ThenInclude(r => r.Rack)
                             .SingleOrDefault(x => x.Name == n);
         }
@@ -51,7 +49,7 @@ namespace KANTAIM.DAL.Services
         public Cell? GetByXY(int X, int Y)
         {
             using DataKANTAIMContext ctx = new();
-            return ctx.Cells.Include(c => c.Containers)
+            return ctx.Cells.Include(c => c.Containers).ThenInclude(c => c.ContainerType)
                             .Include(c => c.RackCells).ThenInclude(r => r.Rack)
                             .SingleOrDefault(x => x.X == X && x.Y == Y);
         }
@@ -60,14 +58,15 @@ namespace KANTAIM.DAL.Services
 
         public int GetContainerCount(int cellId)
         {
-            return _repoContainer.GetAll().Count(c => c.CellId == cellId && (c.ContainerTypeID == 1 || c.ContainerTypeID == 3));// conpte juste le contenaire normal et palette
+            using DataKANTAIMContext ctx = new();
+            return ctx.Containers.Include(c=>c.ContainerType).Count(c => c.CellID == cellId && !c.ContainerType.IsContainable);// conpte juste le contenaire normal et palette
         }
 
         public List<Cell> GetByWorkshop(int id)
         {
             using DataKANTAIMContext ctx = new();
             return ctx.Cells
-                      .Include(c => c.Containers)
+                      .Include(c => c.Containers).ThenInclude(c => c.ContainerType)
                       .Include(c => c.RackCells)
                           .ThenInclude(rc => rc.Rack)
                       .Where(c => c.RackCells.Any(rc => rc.Rack.WorkshopID == id))

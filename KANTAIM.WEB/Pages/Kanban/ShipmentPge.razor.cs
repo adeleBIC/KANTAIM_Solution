@@ -116,7 +116,7 @@ namespace KANTAIM.WEB.Pages.Kanban
 
             ContainerScanner.ContainerAction = _actionService.GetByStatus(3);// Sortie stock
             ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
-            ContainerScanner.CellId = null;
+            ContainerScanner.CellID = null;
             if (ContainerScanner.ContainerType.IsContainable == true) //s'il est un bac 
             {
                 int paletteNumber = ContainerScanner.BigContainer.Number;

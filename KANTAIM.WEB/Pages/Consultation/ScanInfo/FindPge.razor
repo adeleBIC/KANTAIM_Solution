@@ -96,13 +96,13 @@
                                         </ChildContent>
                                         <TooltipContent>
                                             <MudText >
-                                                    Nombre: @_contenaireList.Where(u => u.CellId == cell.Id).Count()
+                                                    Nombre: @_contenaireList.Where(u => u.CellID == cell.Id).Count()
                                             </MudText>
                                                 @if (cell != null && cell.Status != StatusCell.Empty)
                                                 {
-                                                    <MudText>Produit: @_logList.Where(u => u.CellID == cell.Id && u.Container.CellId == cell.Id).OrderByDescending(u => u.EventTime).FirstOrDefault()?.Product?.Name</MudText>
-                                                    <MudText>Couleur: @_logList.Where(u => u.CellID == cell.Id && u.Container.CellId == cell.Id).OrderByDescending(u => u.EventTime).FirstOrDefault()?.ProdColor?.Name</MudText>
-                                                    <MudText>Date: @_logList.Where(u => u.CellID == cell.Id && u.Container.CellId == cell.Id).OrderByDescending(u => u.EventTime).FirstOrDefault()?.EventTime.ToString("yyyy-MM-dd HH:mm:ss")</MudText>
+                                                    <MudText>Produit: @_logList.Where(u => u.CellID == cell.Id && u.Container.CellID == cell.Id).OrderByDescending(u => u.EventTime).FirstOrDefault()?.Product?.Name</MudText>
+                                                    <MudText>Couleur: @_logList.Where(u => u.CellID == cell.Id && u.Container.CellID == cell.Id).OrderByDescending(u => u.EventTime).FirstOrDefault()?.ProdColor?.Name</MudText>
+                                                    <MudText>Date: @_logList.Where(u => u.CellID == cell.Id && u.Container.CellID == cell.Id).OrderByDescending(u => u.EventTime).FirstOrDefault()?.EventTime.ToString("yyyy-MM-dd HH:mm:ss")</MudText>
 
                                                 }
                                            @*  <MudText>Produit: @_logList.Where(u => u.CellID == cell.Id).OrderByDescending(u => u.EventTime).FirstOrDefault();</MudText> *@

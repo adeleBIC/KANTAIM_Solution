@@ -178,7 +178,7 @@ namespace KANTAIM.WEB.Pages.Kanban
             } else
             {
                 logRescent = _logService.GetByContenaireId(palette.Id);
-                bac.CellId = palette.CellId;
+                bac.CellID = palette.CellID;
                 bac.ActionID = palette.ActionID;
                 bac.FillStatus = palette.FillStatus;
                 bac.Status = palette.Status;
@@ -374,7 +374,7 @@ namespace KANTAIM.WEB.Pages.Kanban
             ContainerScanner.ContainerAction = _actionService.GetByStatus(1);
             ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
             //ContainerScanner.CellStock = null;
-            ContainerScanner.CellId = null;
+            ContainerScanner.CellID = null;
             if(ContainerScanner.ContainerTypeID == 2) // S'il est un bac, on initialise son fillstatue en plein directement
                 ContainerScanner.Status = 3;
             _contenaireService.UpSert(ContainerScanner);

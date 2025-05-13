@@ -26,8 +26,6 @@ namespace KANTAIM.APK.Components.Pages
         [Inject] public ContenaireService _contenaireService { get; set; }
         [Inject] public ColorProductService _colorProductServiceService { get; set; }
         [Inject] public ProfilSessionService _profilSessionService { get; set; }
-        //[Inject] public LogService _logService { get; set; }
-        //[Inject] public CellService _cellService { get; set; }
         [Inject] ISnackbar _snackService { get; set; }
         [Inject] public ScanService _scanService { get; set; }
 
@@ -35,19 +33,21 @@ namespace KANTAIM.APK.Components.Pages
         [Parameter] public int Id { get; set; }
         [Parameter] public int Number { get; set; }
 
-        private int state;
         public Product? ProductScanner { get; set; }
         public ProdColor? ColorChoose { get; set; }
         public List<ProdColor> Colors { get; set; }
 
-        public List<CellLog> cells { get; set; }
-        public Log logRescent { get; set; }
+        public List<Container> ContainerFindList { get; set; }
         public Container? ContainerScanner { get; set; }
-        public DAL.Model.Cell? cellPropose { get; set; }
-        //public Product? containerProduct { get; set; }
-        //public ProdColor? containerProdColor { get; set; }
-        //public string ContainerValue { get; set; }
+        public DAL.Model.Cell? CellPropose { get; set; }
         public bool ShowAllCells { get; set; }
+        private bool contFind;
+
+        public bool ContFind
+        {
+            get { return (ContainerFindList != null && ContainerFindList.Count > 0); }
+        }
+
 
         public string? TextValue { get; set; }
 
@@ -69,7 +69,7 @@ namespace KANTAIM.APK.Components.Pages
             profilSelected = _profilSessionService.CurrentProfil;
             ProductScanner = _productService.GetByNumber(Number);
             Colors = new List<ProdColor>();
-            
+
             foreach (ColorProduct colorProduct in _colorProductServiceService.GetAllPerProduct(ProductScanner.Id))
             {
                 Colors.Add(_colorService.GetById(colorProduct.ColorID));
@@ -82,37 +82,25 @@ namespace KANTAIM.APK.Components.Pages
 
         void findCells()
         {
-            cells = new List<CellLog>();
-            foreach (Container container in _contenaireService.GetAllByOperationStatus(ActionStatus.Store)
-    .                                                           Where(c => c.ProductId == ProductScanner.Id
-                                                                         && c.CellStock != null
-                                                                         && c.CellStock.RackCells != null
-                                                                         && c.CellStock.RackCells.Any(rc => profilSelected.RackProfils.Any(rp => rp.RackId == rc.RackId))))
-            {
-                if (ColorChoose == null || container.ProdColorId == ColorChoose.Id)
-                {
-                    if (!cells.Any(c => c.Cell.Id == container.CellStock.Id))
-                    {
-                        cells.Add(new CellLog { Cell = container.CellStock, EventTime = logRescent.EventTime });
-                    }
-                }
-            }
-            if (cells != null && cells.Count > 0)
-            {
-                var oldestCellLog = cells.OrderBy(c => c.EventTime).FirstOrDefault();
-                if (oldestCellLog != null)
-                {
-                    cellPropose = oldestCellLog.Cell;
-                }
-            }
-          
+            ContainerFindList = new List<Container>(_contenaireService.GetAllByOperationStatus(ActionStatus.Store)
+                                                                    .Where(c => c.CellStock != null &&
+                                                                    c.ProductID == ProductScanner.Id &&
+                                                                    (ColorChoose == null || c.ProdColorID == ColorChoose.Id) &&
+                                                                    c.CellID != ContainerScanner?.CellID &&
+                                                                    c.CellStock.RackCells != null &&
+                                                                    c.CellStock.RackCells.Any(rc => profilSelected.RackProfils.Any(rp => rp.RackId == rc.RackId)))
+                                                                    .OrderBy(c => c.LastEvent));
+
+            if (ContainerFindList != null && ContainerFindList.Count > 0) {CellPropose = ContainerFindList.FirstOrDefault()?.CellStock ?? null; }
+
         }
 
 
-        void ColorSelected(int colorid)
+        async void ColorSelected(int colorid)
         {
             ColorChoose = _colorService.GetById(colorid);
             findCells();
+            await InvokeAsync(StateHasChanged);
         }
 
         void ContainerScan(string code)
@@ -127,10 +115,7 @@ namespace KANTAIM.APK.Components.Pages
                     {
 
                         ContainerScanner = _contenaireService.GetContainerByNumber(containerNumber);
-                        //logRescent = _logService.GetByContenaireId(ContainerScanner.Id);
-                        //containerProduct = _productService.GetById(logRescent.ProductID);
-                        //containerProdColor = _colorService.GetById(logRescent.ProdColorID);
-                        if (ContainerScanner.ProductId != ProductScanner.Id || ContainerScanner.ProdColorId != ColorChoose.Id)
+                        if (ContainerScanner.ProductID != ProductScanner.Id || ContainerScanner.ProdColorID != ColorChoose.Id)
                         {
                             _snackService.Add("Svp vérifiez le produit dans le contenaire et le produit que vous voulez rechercher !", Severity.Error);
                             TextValue = null;
@@ -174,10 +159,7 @@ namespace KANTAIM.APK.Components.Pages
                 }
             }
         }
-        void GoBack()
-        {
-            NavigationManager.NavigateTo("/");
-        }
+        void GoBack() => NavigationManager.NavigateTo("/");
 
         public override async void OnMessageReceived(InputMessage msg)
         {

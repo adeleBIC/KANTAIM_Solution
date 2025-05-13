@@ -268,7 +268,7 @@ namespace KANTAIM.WEB.Pages.Kanban
             }
             else
             {
-                bac.CellId = palette.CellId;
+                bac.CellID = palette.CellID;
                 bac.ActionID = palette.ActionID;
                 bac.FillStatus = palette.FillStatus;
                 bac.Status = palette.Status;
@@ -318,7 +318,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                 }
                 foreach (DAL.Model.Cell cell in cells)
                 {
-                    if (cell.Status != StatusCell.Full && cell.Id != ContainerScanner.CellId)
+                    if (cell.Status != StatusCell.Full && cell.Id != ContainerScanner.CellID)
                     {
                         cellPropose = cell;
 
@@ -356,7 +356,7 @@ namespace KANTAIM.WEB.Pages.Kanban
             {
                 cellLog = _logService.GetByContenaireByOperationStatus(container.Id, OperationContainer.Store, OperationContainer.Transfer);
                 DAL.Model.Cell? cellAct = _cellService.GetById(cellLog?.CellID ?? 0);
-                if (cellAct != null && cellAct.IsJail != true && cellAct.IsMaintenance != true && cellAct.ForEmpty != true && cellAct.IsPhantom != true && cellAct.Status != StatusCell.Full && _cellProductService.FindLink(cellAct.Id, product.Id) && cellAct.Id != ContainerScanner?.CellId)
+                if (cellAct != null && cellAct.IsJail != true && cellAct.IsMaintenance != true && cellAct.ForEmpty != true && cellAct.IsPhantom != true && cellAct.Status != StatusCell.Full && _cellProductService.FindLink(cellAct.Id, product.Id) && cellAct.Id != ContainerScanner?.CellID)
                 {
                     if (cellLog != null && cellLog.ProductID == product.Id)
                     {
@@ -384,7 +384,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                 cells = _cellService.GetAll().Where(u => u.IsJail != true && u.IsMaintenance != true && u.ForEmpty != true && u.IsPhantom != true && u.Status == StatusCell.Empty).ToList();
                 foreach (DAL.Model.Cell cell in cells)
                 {
-                    if (_cellProductService.FindLink(cell.Id, product.Id) && cell.Id != ContainerScanner.CellId)
+                    if (_cellProductService.FindLink(cell.Id, product.Id) && cell.Id != ContainerScanner.CellID)
                     {
 
                         cellPropose = cell;
@@ -553,7 +553,7 @@ namespace KANTAIM.WEB.Pages.Kanban
             ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
             _logService.UpSert(u);
             ContainerScanner.FillStatus = fillstatus;
-            ContainerScanner.CellId = u.CellID;
+            ContainerScanner.CellID = u.CellID;
             _contenaireService.UpSert(ContainerScanner);
             bienStock = true;
         }
@@ -626,7 +626,7 @@ namespace KANTAIM.WEB.Pages.Kanban
             }
             _logService.UpSert(u);
             ContainerScanner.FillStatus = fillstatus;
-            ContainerScanner.CellId = u.CellID;
+            ContainerScanner.CellID = u.CellID;
             _contenaireService.UpSert(ContainerScanner);
 
             if (isPalette)
@@ -638,7 +638,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                     if (cellScanner != null)
                     {
                         item.CellStock = cellScanner;
-                        item.CellId = cellScanner.Id;
+                        item.CellID = cellScanner.Id;
                     }
 
                     item.FillStatus = fillstatus;

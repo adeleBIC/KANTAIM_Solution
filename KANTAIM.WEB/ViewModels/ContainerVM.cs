@@ -14,10 +14,11 @@ namespace KANTAIM.WEB.ViewModels
         public List<Product> Products { get; set; }
         public List<ProdColor> Colors { get; set; }
         public List<Press> Presses { get; set; }
+        public List<Machine> Machines { get; set; }
         public List<Cell> Cells { get; set; }
 
-        public ContainerVM(IEnumerable<Container> containers, IEnumerable<ContainerType> containerTypes, IEnumerable<Cell> cells, IEnumerable<ContainerAction> actions, IEnumerable<Product> products, IEnumerable<ProdColor> colors, IEnumerable<Press> presses) : this(new Container(), containers, containerTypes, cells, actions, products, colors, presses) { }
-        public ContainerVM(Container model, IEnumerable<Container> containers, IEnumerable<ContainerType> containerTypes, IEnumerable<Cell> cells, IEnumerable<ContainerAction> actions, IEnumerable<Product> products, IEnumerable<ProdColor> colors, IEnumerable<Press> presses)
+        public ContainerVM(IEnumerable<Container> containers, IEnumerable<ContainerType> containerTypes, IEnumerable<Cell> cells, IEnumerable<ContainerAction> actions, IEnumerable<Product> products, IEnumerable<ProdColor> colors, IEnumerable<Press> presses, IEnumerable<Machine> machines) : this(new Container(), containers, containerTypes, cells, actions, products, colors, presses, machines) { }
+        public ContainerVM(Container model, IEnumerable<Container> containers, IEnumerable<ContainerType> containerTypes, IEnumerable<Cell> cells, IEnumerable<ContainerAction> actions, IEnumerable<Product> products, IEnumerable<ProdColor> colors, IEnumerable<Press> presses, IEnumerable<Machine> machines)
         {
             this.model = model;
             this.Containers = containers.ToList();
@@ -27,16 +28,18 @@ namespace KANTAIM.WEB.ViewModels
             this.Products = products.ToList();
             this.Colors = colors.ToList();
             this.Presses = presses.ToList();
+            this.Machines = machines.ToList();
 
             actionID = model.ActionID;
-            productId = model.ProductId;
-            colorId = model.ProdColorId;
-            pressId = model.PressId;
+            productID = model.ProductID;
+            colorID = model.ProdColorID;
+            pressID = model.PressID;
+            machineID = model.MachineID;
+            cellID = model.CellID;
+            containerTypeID = model.ContainerTypeID;
+            containerID = model.ContainerID;
 
             number = model.Number;
-            containerID = model.ContainerID;
-            containerTypeID = model.ContainerTypeID;
-            cellID = model.CellId;
             fillStatus = model.FillStatus;
             status = model.Status;
             inJail = model.InJail;
@@ -97,27 +100,35 @@ namespace KANTAIM.WEB.ViewModels
         }
 
         [Label("Produit")]
-        private int? productId;
-        public int? ProductId
+        private int? productID;
+        public int? ProductID
         {
-            get { return productId; }
-            set { productId = value; IsEditing = true; }
+            get { return productID; }
+            set { productID = value; IsEditing = true; }
         }
 
         [Label("Couleur")]
-        private int? colorId;
-        public int? ColorId
+        private int? colorID;
+        public int? ColorID
         {
-            get { return colorId; }
-            set { colorId = value; IsEditing = true; }
+            get { return colorID; }
+            set { colorID = value; IsEditing = true; }
         }
 
         [Label("Presse")]
-        private int? pressId;
-        public int? PressId
+        private int? pressID;
+        public int? PressID
         {
-            get { return pressId; }
-            set { pressId = value; IsEditing = true; }
+            get { return pressID; }
+            set { pressID = value; IsEditing = true; }
+        }
+
+        [Label("Machine")]
+        private int? machineID;
+        public int? MachineID
+        {
+            get { return machineID; }
+            set { machineID = value; IsEditing = true; }
         }
 
         [Label("FillStatus")]
@@ -183,7 +194,7 @@ namespace KANTAIM.WEB.ViewModels
         {
             List<ValidationResult> list = new List<ValidationResult>();
 
-            //if (string.IsNullOrWhiteSpace(QRCode)) list.Add(new ValidationResult("Le QRCode est obligatoire", new string[] { "QRCode" }));
+            //if (string.IsNullOrWhiteSpace(QRCode)) list.Add(new ValIDationResult("Le QRCode est obligatoire", new string[] { "QRCode" }));
             if (Number == 0) list.Add(new ValidationResult("Number obligatoire", new string[] { "Number" }));
             if (Containers.Any(c => c.Number == Number && c.Id != Id))
             {
@@ -194,11 +205,12 @@ namespace KANTAIM.WEB.ViewModels
                 model.Number = number;
                 model.ContainerID = containerID;
                 model.ContainerTypeID = containerTypeID;
-                model.CellId = cellID;
+                model.CellID = cellID;
                 model.ActionID = actionID;
-                model.ProductId = productId;
-                model.ProdColorId = colorId;
-                model.PressId = pressId;
+                model.ProductID = productID;
+                model.ProdColorID = colorID;
+                model.PressID = pressID;
+                model.MachineID = machineID;
                 model.FillStatus = fillStatus;
                 model.Status = status;
                 model.InJail = inJail;
