@@ -12,27 +12,34 @@ namespace KANTAIM.DAL.Services
         ShapeService _shapeService;
         WorkshopService _workshopService;
         private List<Press> cache;
-
+        DevModeService _devModeService;
+        private bool oldDevMode = false;
         public IEnumerable<Press> Cache
         {
             get
             {
-                if (cache == null) cache = _repo.GetAll().ToList();
-                foreach (Press item in cache)
+                if (cache == null || oldDevMode != _devModeService.DevMode)
                 {
-                    item.Shape = _shapeService.GetById(item.ShapeID);
-                    item.Workshop = _workshopService.GetById(item.WorkshopID);
+                    cache = _repo.GetAll().ToList();
+                    foreach (Press item in cache)
+                    {
+                        item.Shape = _shapeService.GetById(item.ShapeID);
+                        item.Workshop = _workshopService.GetById(item.WorkshopID);
+                    }
+                    oldDevMode = _devModeService.DevMode;
                 }
+                
                 return cache;
             }
         }
 
         Repository<Press> _repo;
-        public PressService(Repository<Press> _repo, ShapeService shapeService, WorkshopService workshopService)
+        public PressService(Repository<Press> _repo, ShapeService shapeService, WorkshopService workshopService, DevModeService devModeService)
         {
             this._repo = _repo;
             _shapeService = shapeService;
             _workshopService = workshopService;
+            _devModeService = devModeService;
         }
 
 

@@ -10,6 +10,7 @@ using KANTAIM.DAL;
 using static Android.Renderscripts.ScriptGroup;
 using KANTAIM.APK.MessageBus;
 using KANTAIM.APK.MessageBus.Messages;
+using KANTAIM.APK.Components.Dialog;
 
 namespace KANTAIM.APK.Components.Pages
 {
@@ -20,16 +21,12 @@ namespace KANTAIM.APK.Components.Pages
         [Inject] public ProfilSessionService _profilSessionService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
         [Inject] ISnackbar _snackService { get; set; }
+        [Inject] IDialogService _dialogService { get; set; }
         [Inject] public ContenaireService _contenaireService { get; set; }
-        //[Inject] public CellService _cellService { get; set; }
-        //[Inject] public PressService _pressService { get; set; }
-
-        //public KANTAIM.DAL.Model.Cell CellScanner { get; set; }
+        [Inject] public DevModeService _devModeService { get; set; }
         public string? TextValue { get; set; }
+        private bool PwdOK = false;
 
-        //string? PressName;
-        //string? ProduitName;
-        //string? MachineName;
 
         public List<Profil> Profils { get; set; }
         private Profil profilSelected;
@@ -40,13 +37,9 @@ namespace KANTAIM.APK.Components.Pages
             set { profilSelected = value; _profilSessionService.SetProfil(ProfilSelected); }
         }
 
-
-        //private static ScannerPge _instance;
-
-        //private MudTextField<string> scanField;
-
         protected override async Task OnInitializedAsync()
         {
+            _devModeService.DevMode = false;
             var context = new DataKANTAIMContext();
             bool isConnected = await context.TestConnectionAsync();
             if (isConnected)
@@ -73,7 +66,6 @@ namespace KANTAIM.APK.Components.Pages
         private void ClearTextField()
         {
             TextValue = string.Empty;
-            //scanField.FocusAsync();
         }
 
         public override async void OnMessageReceived(InputMessage msg)
@@ -181,6 +173,26 @@ namespace KANTAIM.APK.Components.Pages
             }
 
             await InvokeAsync(StateHasChanged);
+        }
+
+        private async Task ShowPwd()
+        {
+            var options = new DialogOptions()
+            {
+                BackdropClick = false,
+                MaxWidth = MaxWidth.ExtraSmall,
+                FullWidth = true,
+                NoHeader = true,
+                CloseOnEscapeKey = true
+            };
+
+            var dialog = await _dialogService.ShowAsync<PwdDialog>("Code PIN", options);
+            var result = await dialog.Result;
+
+            if (!result.Canceled && result.Data is bool success && success)
+            {
+                PwdOK = true;
+            }
         }
     }
 

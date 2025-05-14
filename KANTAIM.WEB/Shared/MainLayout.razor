@@ -29,7 +29,7 @@
     <MudThemeProvider Theme="BicTheme" />
     <MudDialogProvider />
     <MudSnackbarProvider />
-    @if (UserLvl > 0)
+    @if (_userService.CurrentUserLvl > 0)
     {
         <MudLayout>
             <MudAppBar Fixed="false" Elevation="0" DisableGutters="true" Class="muudstrap-navbar">

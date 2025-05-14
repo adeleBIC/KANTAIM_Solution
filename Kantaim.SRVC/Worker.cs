@@ -13,14 +13,16 @@ namespace Kantaim.SRVC
         private readonly CurrentPressCounterService _currentPressCounterService;
         private readonly DataProdService _dataProdService;
         private readonly ShiftService _shiftService;
+        private readonly DevModeService _devModeService;
 
-        public Worker(ILogger<Worker> logger, OpcUaService opcUaService, CurrentPressCounterService currentPressCounterService, DataProdService dataProdService, ShiftService shiftService)
+        public Worker(ILogger<Worker> logger, OpcUaService opcUaService, CurrentPressCounterService currentPressCounterService, DataProdService dataProdService, ShiftService shiftService, DevModeService devModeService)
         {
             _logger = logger;
             _opcUaService = opcUaService;
             _currentPressCounterService = currentPressCounterService;
             _dataProdService = dataProdService;
             _shiftService = shiftService;
+            _devModeService = devModeService;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -35,6 +37,7 @@ namespace Kantaim.SRVC
 
                 try
                 {
+                    _devModeService.DevMode = false;
                     //Assignation des fins de shifts
                     DateTime now = DateTime.Now;
                     //now = new DateTime(2025, 03, 25, 14, 30, 30);

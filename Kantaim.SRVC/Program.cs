@@ -2,8 +2,7 @@ using Kantaim.OPC.Services;
 using Kantaim.SRVC;
 using KANTAIM.DAL.Services;
 using KANTAIM.DAL;
-using KANTAIM.DAL.Model;
-using KANTAIM.DAL.Interface;
+
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices(services =>
@@ -17,6 +16,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<ProductService>();
         services.AddSingleton<ProductFamilyService>();
         services.AddSingleton<ShiftService>();
+        services.AddSingleton<DevModeService>();
 
         services.AddTransient<OpcUaService>();
         services.AddHostedService<Worker>();

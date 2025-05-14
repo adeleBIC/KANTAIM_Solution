@@ -27,36 +27,59 @@
     .main-content {
         flex: 1;
     }
+
+    .footer {
+        margin-top: auto;
+        padding: 1rem;
+    }
 </style>
 
-<div class="container">
-    @if(Profils != null)
+<div class="container d-flex flex-column" style="min-height: 100%;">
+    @if (Profils != null)
     {
         <div class="main-content">
-            <h3 class="title">
-                Scannez un QR Code svp
-            </h3>
+            <h3 class="title">Scannez un QR Code svp</h3>
 
-            <MudText> @TextValue</MudText>
-        </div>
-        @if (ProfilSelected == null)
-        {
-            <h3 class="titleProfil">
-                Sélectionner un profil avant de scanner svp
-            </h3>
-        }
+            <MudText>@TextValue</MudText>
 
-        <MudSelect T="Profil" @bind-Value="ProfilSelected" Label="Profil" Variant="MudBlazor.Variant.Outlined">
-            @foreach (var p in Profils)
+            @if (ProfilSelected == null)
             {
-                <MudSelectItem T="Profil" Value="@(p)">@p.Name</MudSelectItem>
+                <h3 class="titleProfil">Sélectionner un profil avant de scanner svp</h3>
             }
-        </MudSelect>
+
+            <MudSelect T="Profil" @bind-Value="ProfilSelected" Label="Profil" Variant="Variant.Outlined">
+                @foreach (var p in Profils)
+                {
+                    <MudSelectItem T="Profil" Value="@(p)">@p.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </div>
+
+        <!-- Spacer qui pousse le bloc suivant vers le bas -->
+        <div style="flex-grow: 1;"></div>
+
+        <!-- Bouton en bas, au-dessus du footer du layout -->
+        <div class="d-flex flex-column align-items-center p-2">
+            <MudButton OnClick="ShowPwd" Variant="Variant.Filled" Color="Color.Primary">
+                Déverrouiller Mode Dev
+            </MudButton>
+
+            @if (PwdOK)
+            {
+                <MudToggleGroup T="bool" Style="margin:10px"
+                                @bind-Value="_devModeService.DevMode"
+                                Outline="true"
+                                CheckMark="true"
+                                Color="Color.Tertiary">
+                    <MudToggleItem Value="@false" Text="Prod" />
+                    <MudToggleItem Value="@true" Text="Dev" />
+                </MudToggleGroup>
+            }
+        </div>
     }
     else
     {
-        <h3 class="title">
-            Chargement des profils
-        </h3>
+        <h3 class="title">Chargement des profils</h3>
     }
 </div>
+

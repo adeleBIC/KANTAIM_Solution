@@ -12,18 +12,20 @@ namespace KANTAIM.DAL.Services
     {
         ProductService _productService;
         PressService _pressService;
-
         Repository<DataProd> _repo;
-        public DataProdService(Repository<DataProd> _repo, ProductService productService, PressService pressService)
+        DevModeService _devModeService;
+        private bool oldDevMode = false;
+        public DataProdService(Repository<DataProd> _repo, ProductService productService, PressService pressService, DevModeService devModeService)
         {
             this._repo = _repo;
             _productService = productService;
             _pressService = pressService;
+            _devModeService = devModeService;
         }
 
         public IEnumerable<DataProd> GetAll()
         {
-            using DataKANTAIMContext ctx = new();
+            using DataKANTAIMContext ctx = new(_devModeService.DevMode);
             return ctx.DataProds.Include(c => c.Product).Include(c => c.Press).ToList();
         }
         public DataProd? GetById(int id) => GetAll().SingleOrDefault(c => c.Id == id);

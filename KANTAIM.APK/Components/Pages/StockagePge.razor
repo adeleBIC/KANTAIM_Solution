@@ -116,7 +116,6 @@
                         {
                             <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="()=>Exit(2)">Valider</MudButton>
                         }
-
                     </div>
                 </div>
             }
@@ -187,8 +186,6 @@
                         @if (ColorOfProduct != null) 
                         {
                             <div class="status-item">Couleur: @ColorOfProduct.Name<MudIcon Icon="@Icons.Material.Filled.Circle" Style="@($"color:{ColorOfProduct.ColorNumber};")" /></div>
-                            
-
                         }
 
                         @if (IsPallet)
@@ -198,12 +195,8 @@
                                     <MudIcon Icon=@Icons.Material.Filled.RemoveRedEye/>
                                     Afficher
                                 </MudButton>
-                                
-
                             </div>
-                            
                         }
-
                     </div>
                 }
             </div>
@@ -230,8 +223,6 @@
                     <MudButton Color="Color.Info" Variant="MudBlazor.Variant.Filled" Href="@($"/TransferPge/{ContainerScanner.Number}")" Match="NavLinkMatch.All">Transfer Contenaire</MudButton>
                 </div>
             }
-            
-            
 
         }
 

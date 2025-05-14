@@ -13,11 +13,13 @@ namespace KANTAIM.DAL.Services
         Repository<Machine> _repo;
         Repository<Product> _products;
         ProductService _productService;
+        DevModeService _devModeService;
+        private bool oldDevMode = false;
         public IEnumerable<Machine> Cache
         {
             get
             {
-                if (cache == null)
+                if (cache == null || oldDevMode != _devModeService.DevMode)
                 {
                     cache = _repo.GetAll().ToList();
   
@@ -29,18 +31,20 @@ namespace KANTAIM.DAL.Services
                         }
                         
                     }
-     
+                    oldDevMode = _devModeService.DevMode;
+
                 }
                 return cache;
             }
         }
 
         
-        public MachineService(Repository<Machine> repo, Repository<Product> repoProductId, ProductService productService)
+        public MachineService(Repository<Machine> repo, Repository<Product> repoProductId, ProductService productService, DevModeService devModeService)
         {
             _repo = repo;
             _productService = productService;
             _products = repoProductId;
+            _devModeService = devModeService;
         }
 
         public IEnumerable<Machine> GetAll() => Cache;

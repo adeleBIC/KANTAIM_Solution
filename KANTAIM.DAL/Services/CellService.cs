@@ -13,17 +13,19 @@ namespace KANTAIM.DAL.Services
         Repository<Cell> _repo;
         //Repository<Workshop> _repoWorkshop;
         RackService _rackService;
-
-        public CellService(Repository<Cell> repo, RackService rackService)
+        DevModeService _devModeService;
+        private bool oldDevMode = false;
+        public CellService(Repository<Cell> repo, RackService rackService, DevModeService devModeService)
         {
             this._repo = repo;
             //_repoWorkshop = repoWorkshop;
             _rackService = rackService;
+            _devModeService = devModeService;
         }
 
         public IEnumerable<Cell> GetAll()
         {
-            using DataKANTAIMContext ctx = new();
+            using DataKANTAIMContext ctx = new(_devModeService.DevMode);
             return ctx.Cells.Include(c => c.Containers).ThenInclude(c => c.ContainerType)
                             .Include(c=>c.RackCells).ThenInclude(r=>r.Rack)
                             .ToList();
@@ -32,14 +34,14 @@ namespace KANTAIM.DAL.Services
         //public IEnumerable<Workshop> GetAllWorkshop() => _repoWorkshop.GetAll();
         public Cell? GetById(int? id)
         {
-            using DataKANTAIMContext ctx = new();
+            using DataKANTAIMContext ctx = new(_devModeService.DevMode);
             return id == null ? null : ctx.Cells.Include(c => c.Containers).ThenInclude(c => c.ContainerType)
                                                 .Include(c => c.RackCells).ThenInclude(r => r.Rack)
                                                 .SingleOrDefault(x => x.Id == id); ;
         }
         public Cell? GetByNumber(string n)
         {
-            using DataKANTAIMContext ctx = new();
+            using DataKANTAIMContext ctx = new(_devModeService.DevMode);
             return ctx.Cells.Include(c => c.Containers).ThenInclude(c => c.ContainerType)
                             .Include(c => c.RackCells).ThenInclude(r => r.Rack)
                             .SingleOrDefault(x => x.Name == n);
@@ -48,7 +50,7 @@ namespace KANTAIM.DAL.Services
         
         public Cell? GetByXY(int X, int Y)
         {
-            using DataKANTAIMContext ctx = new();
+            using DataKANTAIMContext ctx = new(_devModeService.DevMode);
             return ctx.Cells.Include(c => c.Containers).ThenInclude(c => c.ContainerType)
                             .Include(c => c.RackCells).ThenInclude(r => r.Rack)
                             .SingleOrDefault(x => x.X == X && x.Y == Y);
@@ -58,13 +60,13 @@ namespace KANTAIM.DAL.Services
 
         public int GetContainerCount(int cellId)
         {
-            using DataKANTAIMContext ctx = new();
+            using DataKANTAIMContext ctx = new(_devModeService.DevMode);
             return ctx.Containers.Include(c=>c.ContainerType).Count(c => c.CellID == cellId && !c.ContainerType.IsContainable);// conpte juste le contenaire normal et palette
         }
 
         public List<Cell> GetByWorkshop(int id)
         {
-            using DataKANTAIMContext ctx = new();
+            using DataKANTAIMContext ctx = new(_devModeService.DevMode);
             return ctx.Cells
                       .Include(c => c.Containers).ThenInclude(c => c.ContainerType)
                       .Include(c => c.RackCells)
@@ -78,7 +80,7 @@ namespace KANTAIM.DAL.Services
 
         public int InsertRackCell(RackCell model)
         {
-            using DataKANTAIMContext ctx = new();
+            using DataKANTAIMContext ctx = new(_devModeService.DevMode);
             ctx.Entry(model).State = EntityState.Added;
             ctx.SaveChanges();
             return model.RackId;
@@ -86,20 +88,20 @@ namespace KANTAIM.DAL.Services
 
         public void UpdateRackCell(RackCell model)
         {
-            using DataKANTAIMContext ctx = new();
+            using DataKANTAIMContext ctx = new(_devModeService.DevMode);
             ctx.Entry(model).State = EntityState.Modified;
             ctx.SaveChanges();
         }
 
         public void DeleteRackCell(int rId, int cId)
         {
-            using DataKANTAIMContext ctx = new();
+            using DataKANTAIMContext ctx = new(_devModeService.DevMode);
             ctx.Entry(new RackCell() { RackId = rId, CellId = cId }).State = EntityState.Deleted;
             ctx.SaveChanges();
         }
         public IEnumerable<RackCell> GetAllRackCellByCell(int id)
         {
-            using DataKANTAIMContext ctx = new();
+            using DataKANTAIMContext ctx = new(_devModeService.DevMode);
             return ctx.RackCells.Where(m => m.CellId == id).ToList();
         }
 

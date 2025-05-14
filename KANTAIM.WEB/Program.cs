@@ -47,6 +47,7 @@ builder.Services.AddSingleton<ScanService>();
 builder.Services.AddSingleton<ProfilService>();
 builder.Services.AddSingleton<RackService>();
 builder.Services.AddSingleton<RackProfilService>();
+builder.Services.AddSingleton<DevModeService>();
 
 builder.Services.AddMudServices(config =>
 {

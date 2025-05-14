@@ -26,22 +26,27 @@ namespace KANTAIM.WEB.Shared
         [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
         [Inject] ISnackbar _snackService { get; set; }
 
-        public int UserLvl { get; set; }
+        //public int UserLvl { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
             var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            string userName = authState.User.Identity.Name ?? "";
+#if DEBUG
+            //userName = "EU\\MMANIH";
+#endif
 
-            User user = _userService.GetByName(authState.User.Identity.Name ?? "");
+            User user = _userService.GetByName(userName);
+            _userService.SetCurrentUserLvl(userName);
 
-            UserLvl = user?.UserAccessLvl.AccesLvL ?? 0;
+            //UserLvl = user?.UserAccessLvl.AccesLvL ?? 0;
 
             await InvokeAsync(StateHasChanged);
         }
 
         private void NavigateToAuthorizedPage(string page, int lvl)
         {
-            if (UserLvl < lvl)
+            if (_userService.CurrentUserLvl < lvl)
             {
                 _snackService.Add("Niveau d'autorisation insuffisant", Severity.Error);
                 return;

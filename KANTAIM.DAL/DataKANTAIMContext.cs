@@ -10,6 +10,12 @@ namespace KANTAIM.DAL
     public partial class DataKANTAIMContext : DbContext
     {
         static string? cs;
+        private bool _devMode = false; // Set this to true for development mode
+        public DataKANTAIMContext() => _devMode = false;
+        public DataKANTAIMContext(bool devMod)
+        {
+            _devMode = devMod;
+        }
 
         public virtual DbSet<Shift> Shifts { get; set; }
         public virtual DbSet<User> Users { get; set; }
@@ -69,24 +75,21 @@ namespace KANTAIM.DAL
         {
             if (!optionsBuilder.IsConfigured)
             {
-                //Console.WriteLine("Testing...");
-                //bool isConnected = TestConnectionAsync().GetAwaiter().GetResult(); // Blocking for testing purposes
-                //Console.WriteLine($"Database connection: {isConnected}");
                 if (OperatingSystem.IsAndroid())
                 {
-                    optionsBuilder.UseSqlServer("Server=MONSSQL03;Database=DATASCADAMOULAGE;User Id=UserMLV;Password=BicUserMLV20;MultipleActiveResultSets=True;Encrypt=false;TrustServerCertificate=False;MultiSubnetFailover=True");
+                    if (_devMode) optionsBuilder.UseSqlServer("Server=MONSSQL03;Database=DATASCADAMOULAGE_DEV;User Id=UserMLV;Password=BicUserMLV20;MultipleActiveResultSets=True;Encrypt=false;TrustServerCertificate=False;MultiSubnetFailover=True");
+                    else optionsBuilder.UseSqlServer("Server=MONSSQL03;Database=DATASCADAMOULAGE;User Id=UserMLV;Password=BicUserMLV20;MultipleActiveResultSets=True;Encrypt=false;TrustServerCertificate=False;MultiSubnetFailover=True");
 #if DEBUG
-                    optionsBuilder.UseSqlServer("Server=MONSSQL03;Database=DATASCADAMOULAGE_DEV;User Id=UserMLV;Password=BicUserMLV20;MultipleActiveResultSets=True;Encrypt=false;TrustServerCertificate=False;MultiSubnetFailover=True");
-#endif
-
-
+                optionsBuilder.UseSqlServer("Server=MONSSQL03;Database=DATASCADAMOULAGE_DEV;User Id=UserMLV;Password=BicUserMLV20;MultipleActiveResultSets=True;Encrypt=false;TrustServerCertificate=False;MultiSubnetFailover=True");
+ #endif
                 }
                 else
                 {
                     IConfigurationRoot config = new ConfigurationBuilder()
                         .AddJsonFile("appsettings.json")
                         .Build();
-                    cs = config["connectionStrings:DataKANTAIMContext"];
+                    if (_devMode) cs = config["connectionStrings:DataKANTAIMContextDEV"];
+                    else cs = config["connectionStrings:DataKANTAIMContext"];
                 }
 
                 if (cs != null)
@@ -95,7 +98,8 @@ namespace KANTAIM.DAL
                 }
 #if DEBUG
                 //optionsBuilder.UseSqlServer("Data Source=.\\SQLEXPRESS;Initial Catalog=DATASCADAMOULAGE;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
-                optionsBuilder.UseSqlServer("Server=MONSSQL03;Database=DATASCADAMOULAGE_DEV;User Id=UserMLV;Password=BicUserMLV20;MultipleActiveResultSets=True;Encrypt=false;TrustServerCertificate=False;MultiSubnetFailover=True");
+                //optionsBuilder.UseSqlServer("Server=MONSSQL03;Database=DATASCADAMOULAGE;User Id=UserMLV;Password=BicUserMLV20;MultipleActiveResultSets=True;Encrypt=false;TrustServerCertificate=False;MultiSubnetFailover=True");
+                //optionsBuilder.UseSqlServer("Server=MONSSQL03;Database=DATASCADAMOULAGE_DEV;User Id=UserMLV;Password=BicUserMLV20;MultipleActiveResultSets=True;Encrypt=false;TrustServerCertificate=False;MultiSubnetFailover=True");
 #endif
 
             }

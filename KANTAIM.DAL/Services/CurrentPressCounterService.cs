@@ -11,14 +11,17 @@ namespace KANTAIM.DAL.Services
     public class CurrentPressCounterService
     {
         Repository<CurrentPressCounter> _repo;
-        public CurrentPressCounterService(Repository<CurrentPressCounter> _repo )
+        DevModeService _devModeService;
+        private bool oldDevMode = false;
+        public CurrentPressCounterService(Repository<CurrentPressCounter> _repo, DevModeService devModeService)
         {
             this._repo = _repo;
+            _devModeService = devModeService;
         }
 
         public IEnumerable<CurrentPressCounter> GetAll()
         {
-            using DataKANTAIMContext ctx = new();
+            using DataKANTAIMContext ctx = new(_devModeService.DevMode);
             return ctx.CurrentPressCounters.Include(c => c.Press).ToList();
         }
         public CurrentPressCounter? GetById(int id) => GetAll().SingleOrDefault(c => c.Id == id);
@@ -29,13 +32,13 @@ namespace KANTAIM.DAL.Services
 
         public IEnumerable<Press> GetAllPressInclude()
         {
-            using DataKANTAIMContext ctx = new();
+            using DataKANTAIMContext ctx = new(_devModeService.DevMode);
             return ctx.Press.Include(c => c.Shape).ThenInclude(C=>C.Product).ToList();
         }
 
         public Press GetPressByIdInclude(int id)
         {
-            using DataKANTAIMContext ctx = new();
+            using DataKANTAIMContext ctx = new(_devModeService.DevMode);
             return ctx.Press.Include(c => c.Shape).ThenInclude(C => C.Product).SingleOrDefault(p => p.Id == id);
         }
     }

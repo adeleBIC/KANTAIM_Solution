@@ -12,21 +12,27 @@ namespace KANTAIM.DAL.Services
     {
         WorkshopService _workshopService;
         private List<Rack> cache;
-
+        DevModeService _devModeService;
+        private bool oldDevMode = false;
         public IEnumerable<Rack> Cache
         {
             get
             {
-                if (cache == null) cache = _repo.GetAll().ToList();
+                if (cache == null || oldDevMode != _devModeService.DevMode)
+                {
+                    cache = _repo.GetAll().ToList();
+                    oldDevMode = _devModeService.DevMode;
+                }
                 return cache;
             }
         }
 
         Repository<Rack> _repo;
-        public RackService(Repository<Rack> repo, WorkshopService workshopService)
+        public RackService(Repository<Rack> repo, WorkshopService workshopService, DevModeService devModeService)
         {
             _repo = repo;
             _workshopService = workshopService;
+            _devModeService = devModeService;
         }
 
         public IEnumerable<Rack> GetAll() => Cache;
@@ -47,7 +53,7 @@ namespace KANTAIM.DAL.Services
 
         public int InsertRackProfil(RackProfil model)
         {
-            using DataKANTAIMContext ctx = new();
+            using DataKANTAIMContext ctx = new(_devModeService.DevMode);
             ctx.Entry(model).State = EntityState.Added;
             ctx.SaveChanges();
             return model.RackId;
@@ -55,20 +61,20 @@ namespace KANTAIM.DAL.Services
 
         public void UpdateRackProfil(RackProfil model)
         {
-            using DataKANTAIMContext ctx = new();
+            using DataKANTAIMContext ctx = new(_devModeService.DevMode);
             ctx.Entry(model).State = EntityState.Modified;
             ctx.SaveChanges();
         }
 
         public void DeleteRackProfil(int rId, int pId)
         {
-            using DataKANTAIMContext ctx = new();
+            using DataKANTAIMContext ctx = new(_devModeService.DevMode);
             ctx.Entry(new RackProfil() { RackId = rId, ProfilId = pId }).State = EntityState.Deleted;
             ctx.SaveChanges();
         }
         public IEnumerable<RackProfil> GetAllRackProfilByRack(int id)
         {
-            using DataKANTAIMContext ctx = new();
+            using DataKANTAIMContext ctx = new(_devModeService.DevMode);
             return ctx.RackProfils.Where(m => m.RackId == id).ToList();
         }
 

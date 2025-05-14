@@ -11,25 +11,32 @@ namespace KANTAIM.DAL.Services
     {
         ProductService _productService;
         private List<Shape> cache;
-
+        DevModeService _devModeService;
+        private bool oldDevMode = false;
         public IEnumerable<Shape> Cache
         {
             get
             {
-                if (cache == null) cache = _repo.GetAll().ToList();
-                foreach (Shape item in cache)
+                if (cache == null || oldDevMode != _devModeService.DevMode)
                 {
-                    item.Product = _productService.GetById(item.ProductID);
+                    cache = _repo.GetAll().ToList();
+                    oldDevMode = _devModeService.DevMode;
+                    foreach (Shape item in cache)
+                    {
+                        item.Product = _productService.GetById(item.ProductID);
+                    }
                 }
+
                 return cache;
             }
         }
 
         Repository<Shape> _repo;
-        public ShapeService(Repository<Shape> _repo, ProductService productService)
+        public ShapeService(Repository<Shape> _repo, ProductService productService, DevModeService devModeService)
         {
             this._repo = _repo;
             _productService = productService;
+            _devModeService = devModeService;
         }
 
         public IEnumerable<Shape> GetAll() => Cache;

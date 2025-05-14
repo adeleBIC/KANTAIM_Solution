@@ -10,17 +10,22 @@ namespace KANTAIM.DAL.Services
     public class UserService
     {
         private List<User> cache;
+        DevModeService _devModeService;
+        private bool oldDevMode = false;
+
+        public int CurrentUserLvl { get; set; }
         public IEnumerable<User> Cache
         {
             get
             {
-                if (cache == null)
+                if (cache == null || oldDevMode != _devModeService.DevMode)
                 {
                     cache = _repo.GetAll().ToList();
                     foreach (User item in cache)
                     {
                         item.UserAccessLvl = _repoUserAccessLvl.GetById(item.UserAccessLvlId);
                     }
+                    oldDevMode = _devModeService.DevMode;
                 }
                 return cache;
             }
@@ -28,15 +33,17 @@ namespace KANTAIM.DAL.Services
 
         Repository<User> _repo;
         Repository<UserAccessLvl> _repoUserAccessLvl;
-        public UserService(Repository<User> repo, Repository<UserAccessLvl> repoUserAccessLvl)
+        public UserService(Repository<User> repo, Repository<UserAccessLvl> repoUserAccessLvl, DevModeService devModeService)
         {
             _repo = repo;
             _repoUserAccessLvl = repoUserAccessLvl;
+            _devModeService = devModeService;
         }
 
         public IEnumerable<User> GetAll() => Cache;
         public IEnumerable<User> GetByLvl(int lvlId) => Cache.Where(u=>u.UserAccessLvlId == lvlId);
         public User? GetByName(string name) => Cache.SingleOrDefault(u => u.LoginADUser.ToLower() == name.ToLower());
+        public void SetCurrentUserLvl(string name) => CurrentUserLvl = GetByName(name)?.UserAccessLvl.AccesLvL ?? 0;
         public User? GetById(int id) => Cache.SingleOrDefault(c => c.Id == id);
 
         public void ResetCache() => cache = null;

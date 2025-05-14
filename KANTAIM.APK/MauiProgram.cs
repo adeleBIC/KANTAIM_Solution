@@ -54,6 +54,7 @@ namespace KANTAIM.APK
             builder.Services.AddSingleton<RackService>();
             builder.Services.AddSingleton<RackProfilService>();
             builder.Services.AddSingleton<ProfilSessionService>();
+            builder.Services.AddSingleton<DevModeService>();
 
             builder.Services.AddMudServices(config =>
             {

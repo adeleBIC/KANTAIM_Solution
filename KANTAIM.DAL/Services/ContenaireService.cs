@@ -19,7 +19,10 @@ namespace KANTAIM.DAL.Services
         Repository<Product> _repoProduct;
         Repository<Press> _repoPress;
         Repository<Machine> _repoMachine;
-        public ContenaireService(Repository<Container> repo, Repository<Container> repoContainer, Repository<ContainerType> repoContainerType, Repository<Cell> repoCell, Repository<ContainerAction> repoAction, Repository<ProdColor> repoColor, Repository<Product> repoProduct, Repository<Press> repoPress, Repository<Machine> repoMachine)
+        DevModeService _devModeService;
+        private bool oldDevMode = false;
+
+        public ContenaireService(Repository<Container> repo, Repository<Container> repoContainer, Repository<ContainerType> repoContainerType, Repository<Cell> repoCell, Repository<ContainerAction> repoAction, Repository<ProdColor> repoColor, Repository<Product> repoProduct, Repository<Press> repoPress, Repository<Machine> repoMachine, DevModeService devModeService)
         {
             _repo = repo;
             _repoContainer = repoContainer;
@@ -30,11 +33,12 @@ namespace KANTAIM.DAL.Services
             _repoProduct = repoProduct;
             _repoPress = repoPress;
             _repoMachine = repoMachine;
+            _devModeService = devModeService;
         }
 
         public IEnumerable<Container> GetAll()
         {
-            using DataKANTAIMContext ctx = new();
+            using DataKANTAIMContext ctx = new(_devModeService.DevMode);
             return ctx.Containers.Include(c => c.BigContainer)
                                     .Include(c => c.ContainerType)
                                     .Include(c => c.CellStock).ThenInclude(rc=>rc.RackCells).ThenInclude(r => r.Rack)

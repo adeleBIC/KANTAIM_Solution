@@ -11,21 +11,27 @@ namespace KANTAIM.DAL.Services
     {
         ProductFamilyService _productFamilyService;
         private List<Product> cache;
-
+        DevModeService _devModeService;
+        private bool oldDevMode = false;
         public IEnumerable<Product> Cache
         {
             get
             {
-                if (cache == null) cache = _repo.GetAll().ToList();
+                if (cache == null || oldDevMode != _devModeService.DevMode)
+                {
+                    cache = _repo.GetAll().ToList();
+                    oldDevMode = _devModeService.DevMode;
+                }
                 return cache;
             }
         }
 
         Repository<Product> _repo;
-        public ProductService(Repository<Product> _repo, ProductFamilyService productFamilyService)
+        public ProductService(Repository<Product> _repo, ProductFamilyService productFamilyService, DevModeService devModeService)
         {
             this._repo = _repo;
             _productFamilyService = productFamilyService;
+            _devModeService = devModeService;
         }
 
         public IEnumerable<Product> GetAll() => Cache;

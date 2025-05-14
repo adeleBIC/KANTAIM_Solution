@@ -1,5 +1,6 @@
 using Android.Media;
 using Android.Service.Autofill;
+using KANTAIM.APK.Components.Dialog;
 using KANTAIM.APK.MessageBus.Messages;
 using KANTAIM.APK.Resources;
 using KANTAIM.APK.Services;

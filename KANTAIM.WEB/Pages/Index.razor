@@ -1,10 +1,10 @@
 ﻿@page "/"
+@using KANTAIM.DAL.Services
 
 <head>
     <link rel="icon" type="image/png" href="/css/Images/favicon1.ico">
     <PageTitle>KANTAIM</PageTitle>
 </head>
-
 
 <div id="main">
     <br />
@@ -12,6 +12,23 @@
     <p>Kanban To Assembly INKJET Molding</p>
     <img id="img" src="./css/Images/LogoMLV.png" height="600" />
 </div>
+
+<!-- ToggleGroup fixé en bas à droite -->
+@if (_userService.CurrentUserLvl >= 20)
+{
+    <div id="dev-toggle">
+        <MudToggleGroup T="bool"
+                        @bind-Value="_devModeService.DevMode"
+                        Outline="true"
+                        CheckMark="true"
+                        Color="Color.Tertiary">
+            <MudToggleItem Value="@false" Text="Prod" />
+            <MudToggleItem Value="@true" Text="Dev" />
+        </MudToggleGroup>
+    </div>
+}
+
+
 <style>
     #main {
         padding-bottom: 10px;
@@ -20,4 +37,16 @@
         text-align: center;
         background: no-repeat center;
     }
+
+    #dev-toggle {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+    }
 </style>
+
+@code {
+    [Inject] public DevModeService _devModeService { get; set; }
+    [Inject] public UserService _userService { get; set; }
+}

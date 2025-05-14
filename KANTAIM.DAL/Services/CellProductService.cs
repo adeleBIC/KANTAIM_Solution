@@ -12,22 +12,26 @@ namespace KANTAIM.DAL.Services
     {
         private List<CellProduct> cache;
         Repository<CellProduct> _repo;
+        DevModeService _devModeService;
+        private bool oldDevMode = false;
         public IEnumerable<CellProduct> Cache
         {
             get
             {
-                if (cache == null)
+                if (cache == null || oldDevMode != _devModeService.DevMode)
                 {
-                    using DataKANTAIMContext ctx = new();
+                    using DataKANTAIMContext ctx = new(_devModeService.DevMode);
                     cache = ctx.CellProducts.Include(c=>c.Cell).Include(c => c.Product).ToList();
+                    oldDevMode = _devModeService.DevMode;
                 }
                 return cache;
             }
         }
 
-        public CellProductService(Repository<CellProduct> repo)
+        public CellProductService(Repository<CellProduct> repo, DevModeService devModeService)
         {
             this._repo = repo;
+            _devModeService = devModeService;
         }
 
         public void ResetCache() => cache = null;
@@ -41,12 +45,12 @@ namespace KANTAIM.DAL.Services
 
         public CellProduct GetByCellId(int id)
         {
-            using DataKANTAIMContext ctx = new();
+            using DataKANTAIMContext ctx = new(_devModeService.DevMode);
             return ctx.CellProducts.SingleOrDefault(t => t.CellID == id);
         }
         public CellProduct GetByProdcutId(int id)
         {
-            using DataKANTAIMContext ctx = new();
+            using DataKANTAIMContext ctx = new(_devModeService.DevMode);
             return ctx.CellProducts.SingleOrDefault(t => t.ProductID == id);
         }
 

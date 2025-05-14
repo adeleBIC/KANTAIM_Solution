@@ -10,25 +10,29 @@ namespace KANTAIM.DAL.Services
 {
 
         public class ColorProductService
-    {
+        {
             private List<ColorProduct> cache;
             Repository<ColorProduct> _repo;
+            DevModeService _devModeService;
+            private bool oldDevMode = false;
             public IEnumerable<ColorProduct> Cache
             {
                 get
                 {
-                    if (cache == null)
+                    if (cache == null || oldDevMode != _devModeService.DevMode)
                     {
-                        using DataKANTAIMContext ctx = new();
+                        using DataKANTAIMContext ctx = new(_devModeService.DevMode);
                         cache = ctx.ColorProducts.Include(c => c.Color).Include(c => c.Product).ToList();
+                        oldDevMode = _devModeService.DevMode;
                     }
                     return cache;
                 }
             }
 
-            public ColorProductService(Repository<ColorProduct> repo)
+            public ColorProductService(Repository<ColorProduct> repo, DevModeService devModeService)
             {
                 this._repo = repo;
+                _devModeService = devModeService;
             }
 
             public void ResetCache() => cache = null;
@@ -42,7 +46,7 @@ namespace KANTAIM.DAL.Services
 
             public ColorProduct? GetByColorId(int id)
             {
-                using DataKANTAIMContext ctx = new();
+                using DataKANTAIMContext ctx = new(_devModeService.DevMode);
                 return ctx.ColorProducts.SingleOrDefault(t => t.ColorID == id);
             }
 
@@ -56,7 +60,7 @@ namespace KANTAIM.DAL.Services
 
             public ColorProduct? GetByProdcutId(int id)
             {
-                using DataKANTAIMContext ctx = new();
+                using DataKANTAIMContext ctx = new(_devModeService.DevMode);
                 return ctx.ColorProducts.SingleOrDefault(t => t.ProductID == id);
             }
 

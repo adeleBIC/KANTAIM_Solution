@@ -21,8 +21,9 @@ namespace KANTAIM.DAL.Services
         Repository<Machine> _repoMachine;
         Repository<ProdColor> _repoColor;
         Repository<Cell> _repoCell;
-       
-        public LogService(Repository<Log> repo, Repository<Product> repoProduct, Repository<Container> repoContainer, Repository<Press> repoPress, Repository<Shape> repoShape, Repository<Machine> repoMachine, Repository<ProdColor> repoColor, Repository<Cell> repoCell)
+        DevModeService _devModeService;
+        private bool oldDevMode = false;
+        public LogService(Repository<Log> repo, Repository<Product> repoProduct, Repository<Container> repoContainer, Repository<Press> repoPress, Repository<Shape> repoShape, Repository<Machine> repoMachine, Repository<ProdColor> repoColor, Repository<Cell> repoCell, DevModeService devModeService)
         {
             _repo = repo;
             _repoProduct = repoProduct;
@@ -32,11 +33,12 @@ namespace KANTAIM.DAL.Services
             _repoMachine = repoMachine;
             _repoColor = repoColor;
             _repoCell = repoCell;
+            _devModeService = devModeService;
         }
 
         public IEnumerable<Log> GetAll()
         {
-            using DataKANTAIMContext ctx = new();
+            using DataKANTAIMContext ctx = new(_devModeService.DevMode);
             return ctx.Logs.Include(c => c.Product).Include(c => c.Press)
                                                     .Include(c => c.Shape)
                                                     .Include(c => c.Cell).ThenInclude(c => c.RackCells).ThenInclude(r => r.Rack)

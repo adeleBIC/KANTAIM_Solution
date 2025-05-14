@@ -12,23 +12,26 @@ namespace KANTAIM.DAL.Services
     {
         private List<ProdColor> cache;
         Repository<ProdColor> _repo;
-
+        DevModeService _devModeService;
+        private bool oldDevMode = false;
         public IEnumerable<ProdColor> Cache
         {
             get
             {
-                if(cache == null)
+                if (cache == null || oldDevMode != _devModeService.DevMode)
                 {
                     cache = _repo.GetAll().ToList();
+                    oldDevMode = _devModeService.DevMode;
                 }
                     
                 return cache;
             }
         }
 
-        public ColorService(Repository<ProdColor> repo)
+        public ColorService(Repository<ProdColor> repo, DevModeService devModeService)
         {
             this._repo = repo;
+            _devModeService = devModeService;
         }
 
         public IEnumerable<ProdColor> GetAll() => Cache;

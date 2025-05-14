@@ -10,20 +10,26 @@ namespace KANTAIM.DAL.Services
     public class WorkshopService
     {
         private List<Workshop> cache;
-
+        DevModeService _devModeService;
+        private bool oldDevMode = false;
         public IEnumerable<Workshop> Cache
         {
             get
             {
-                if (cache == null) cache = _repo.GetAll().ToList();
+                if (cache == null || oldDevMode != _devModeService.DevMode)
+                {
+                    cache = _repo.GetAll().ToList();
+                    oldDevMode = _devModeService.DevMode;
+                }
                 return cache;
             }
         }
 
         Repository<Workshop> _repo;
-        public WorkshopService(Repository<Workshop> repo)
+        public WorkshopService(Repository<Workshop> repo, DevModeService devModeService)
         {
             _repo = repo;
+            _devModeService = devModeService;
         }
 
         public IEnumerable<Workshop> GetAll() => Cache;

@@ -10,20 +10,26 @@ namespace KANTAIM.DAL.Services
     public class ShiftService
     {
         private List<Shift> cache;
-
+        DevModeService _devModeService;
+        private bool oldDevMode = false;
         public IEnumerable<Shift> Cache
         {
             get
             {
-                if (cache == null) cache = _repo.GetAll().ToList();
+                if (cache == null || oldDevMode != _devModeService.DevMode)
+                {
+                    cache = _repo.GetAll().ToList();
+                    oldDevMode = _devModeService.DevMode;
+                }
                 return cache;
             }
         }
 
         Repository<Shift> _repo;
-        public ShiftService(Repository<Shift> _repo)
+        public ShiftService(Repository<Shift> _repo, DevModeService devModeService)
         {
             this._repo = _repo;
+            _devModeService = devModeService;
         }
 
         public IEnumerable<Shift> GetAll() => Cache;

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
 
-namespace KANTAIM.APK.Components.Pages
+namespace KANTAIM.APK.Components.Dialog
 {
     public partial class BacDialog
     {
