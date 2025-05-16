@@ -49,6 +49,12 @@ namespace KANTAIM.DAL.Services
                                     .Include(c => c.Machine)
                                     .ToList();
         }
+        public IEnumerable<Container> GetAll(bool withInclude)
+        {
+            if (withInclude) return GetAll();
+            else return _repo.GetAll();
+        }
+
         public IEnumerable<Container> GetAllByOperationStatus(int status1) => GetAll().Where(u => u.CellStock != null && u.ContainerAction.Status == status1).ToList();
         public IEnumerable<Container> GetAllByOperationStatus(int status1, int status2) => GetAll().Where(u => u.CellStock != null && (u.ContainerAction.Status == status1 || u.ContainerAction.Status == status2)).ToList();
         public Container GetContainerById(int ContainerId) => GetAll().SingleOrDefault(u => u.ContainerID == ContainerId);

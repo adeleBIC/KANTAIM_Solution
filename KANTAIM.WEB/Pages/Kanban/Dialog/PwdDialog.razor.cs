@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
-namespace KANTAIM.APK.Components.Dialog
+namespace KANTAIM.WEB.Pages.Kanban.Dialog
 {
     public partial class PwdDialog
     {

@@ -57,6 +57,14 @@ namespace KANTAIM.WEB.ViewModels
 
         public int Id => model.Id;
 
+        [Label("Contenaire")]
+        public string ContainerName
+        {
+            get
+            {
+                return Containers.FirstOrDefault(c => c.Id == containerID)?.Number.ToString() ?? string.Empty;
+            }
+        }
         [Required]
         [Label("FKTContainerID")]
         private int? containerID;
@@ -66,6 +74,14 @@ namespace KANTAIM.WEB.ViewModels
             set { containerID = value; IsEditing = true; }
         }
 
+        [Label("Type")]
+        public string ContainerTypeName
+        {
+            get
+            {
+                return ContainerTypes.FirstOrDefault(c => c.Id == containerTypeID)?.Name ?? string.Empty;
+            }
+        }
         [Label("FKTContainerTypeID")]
         private int? containerTypeID;
         public int? ContainerTypeID
@@ -74,6 +90,14 @@ namespace KANTAIM.WEB.ViewModels
             set { containerTypeID = value; IsEditing = true; }
         }
 
+        [Label("Cellule")]
+        public string CellName
+        {
+            get
+            {
+                return Cells.FirstOrDefault(c => c.Id == cellID)?.Name ?? string.Empty;
+            }
+        }
         [Required]
         [Label("FKTCellID")]
         private int? cellID;
@@ -92,6 +116,14 @@ namespace KANTAIM.WEB.ViewModels
         }
 
         [Label("Action")]
+        public string ActionName
+        {
+            get
+            {
+                return Actions.FirstOrDefault(c => c.Id == actionID)?.Name ?? string.Empty;
+            }
+        }
+        [Label("Action")]
         private int actionID;
         public int ActionID
         {
@@ -99,6 +131,14 @@ namespace KANTAIM.WEB.ViewModels
             set { actionID = value; IsEditing = true; }
         }
 
+        [Label("Produit")]
+        public string ProductName
+        {
+            get
+            {
+                return Products.FirstOrDefault(c => c.Id == productID)?.Name ?? string.Empty;
+            }
+        }
         [Label("Produit")]
         private int? productID;
         public int? ProductID
@@ -108,6 +148,14 @@ namespace KANTAIM.WEB.ViewModels
         }
 
         [Label("Couleur")]
+        public string ColorName
+        {
+            get
+            {
+                return Colors.FirstOrDefault(c => c.Id == colorID)?.Name ?? string.Empty;
+            }
+        }
+        [Label("Couleur")]
         private int? colorID;
         public int? ColorID
         {
@@ -116,6 +164,14 @@ namespace KANTAIM.WEB.ViewModels
         }
 
         [Label("Presse")]
+        public string PressName
+        {
+            get
+            {
+                return Presses.FirstOrDefault(c => c.Id == pressID)?.Number.ToString() ?? string.Empty;
+            }
+        }
+        [Label("Presse")]
         private int? pressID;
         public int? PressID
         {
@@ -123,6 +179,14 @@ namespace KANTAIM.WEB.ViewModels
             set { pressID = value; IsEditing = true; }
         }
 
+        [Label("Machine")]
+        public string MachineName
+        {
+            get
+            {
+                return Machines.FirstOrDefault(c => c.Id == machineID)?.Number.ToString() ?? string.Empty;
+            }
+        }
         [Label("Machine")]
         private int? machineID;
         public int? MachineID

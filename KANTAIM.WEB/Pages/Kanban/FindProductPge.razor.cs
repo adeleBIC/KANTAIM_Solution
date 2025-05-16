@@ -152,7 +152,7 @@ namespace KANTAIM.WEB.Pages.Kanban
 
         void ContainerScan(string code)
         {
-            string[] parts = _scanService.scanCode(code);
+            string[] parts = _scanService.ParseCode(code);
             if (parts != null)
             {
                 int.TryParse(parts[0], out int type);

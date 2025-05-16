@@ -131,7 +131,7 @@ namespace KANTAIM.WEB.Pages.Kanban
         }
         void contenaireScan(string code)
         {
-            string[] parts = _scanService.scanCode(code);
+            string[] parts = _scanService.ParseCode(code);
 
             int.TryParse(parts[0], out int type);
             if (type != 1)
@@ -159,7 +159,7 @@ namespace KANTAIM.WEB.Pages.Kanban
         void machineScan(string code)
         {
 
-            string[] parts = _scanService.scanCode(code);
+            string[] parts = _scanService.ParseCode(code);
 
             int.TryParse(parts[0], out int type);
             if (type != 2)

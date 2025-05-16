@@ -1,14 +1,9 @@
 using KANTAIM.DAL.Services;
-using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using MudBlazor;
 using KANTAIM.APK.Services;
 using KANTAIM.DAL.Model;
-using Microsoft.AspNetCore.Components.Web;
 using KANTAIM.DAL;
-using static Android.Renderscripts.ScriptGroup;
-using KANTAIM.APK.MessageBus;
 using KANTAIM.APK.MessageBus.Messages;
 using KANTAIM.APK.Components.Dialog;
 
@@ -27,6 +22,18 @@ namespace KANTAIM.APK.Components.Pages
         public string? TextValue { get; set; }
         private bool PwdOK = false;
 
+        public bool DevMode
+        {
+            get {
+                return _devModeService.DevMode;
+            }
+            set {
+                _devModeService.DevMode = value;
+                Profils = _profilService.GetAll().ToList();
+            }
+        }
+
+
 
         public List<Profil> Profils { get; set; }
         private Profil profilSelected;
@@ -39,7 +46,7 @@ namespace KANTAIM.APK.Components.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            _devModeService.DevMode = false;
+            DevMode = false;
             var context = new DataKANTAIMContext();
             bool isConnected = await context.TestConnectionAsync();
             if (isConnected)

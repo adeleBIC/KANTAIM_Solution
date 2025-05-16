@@ -33,7 +33,7 @@
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.ContainerTypeID" Title="Type">
+            <PropertyColumn Property="x => x.ContainerTypeName" Title="Type">
                 <EditTemplate>
                     <MudSelect T=int? @bind-Value="context.Item.ContainerTypeID">
                         @foreach (var f in context.Item.ContainerTypes)
@@ -43,7 +43,7 @@
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.ContainerID" Title="Stocké dans">
+            <PropertyColumn Property="x => x.ContainerName" Title="Stocké dans">
                 <EditTemplate>
                     <MudSelect T=int? @bind-Value=context.Item.ContainerID>
                         <MudSelectItem T=int? Value="null">None</MudSelectItem>
@@ -55,7 +55,7 @@
                 </EditTemplate>
             </PropertyColumn>
 
-            <PropertyColumn Property="x => x.CellID" Title="Cellule">
+            <PropertyColumn Property="x => x.CellName" Title="Cellule">
                 <EditTemplate>
                     <MudSelect T=int? @bind-Value=context.Item.CellID>
                         <MudSelectItem T=int? Value="null">None</MudSelectItem>
@@ -66,7 +66,7 @@
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.ActionID" Title="Dernière action" Required=false>
+            <PropertyColumn Property="x => x.ActionName" Title="Dernière action" Required=false>
                 <EditTemplate>
                     <MudSelect T=int @bind-Value=context.Item.ActionID>
                         @foreach (var f in context.Item.Actions)
@@ -76,7 +76,7 @@
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.ProductID" Title="Produit" Required=false>
+            <PropertyColumn Property="x => x.ProductName" Title="Produit" Required=false>
                 <EditTemplate>
                     <MudSelect T=int? @bind-Value=context.Item.ProductID>
                         <MudSelectItem T=int? Value="null">None</MudSelectItem>
@@ -87,7 +87,7 @@
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.ColorID" Title="Couleur" Required=false>
+            <PropertyColumn Property="x => x.ColorName" Title="Couleur" Required=false>
                 <EditTemplate>
                     <MudSelect T=int? @bind-Value=context.Item.ColorID>
                             <MudSelectItem T=int? Value="null">None</MudSelectItem>
@@ -98,7 +98,7 @@
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.PressID" Title="Presse" Required=false>
+            <PropertyColumn Property="x => x.PressName" Title="Presse" Required=false>
                 <EditTemplate>
                     <MudSelect T=int? @bind-Value=context.Item.PressID>
                         <MudSelectItem T=int? Value="null">None</MudSelectItem>
@@ -109,7 +109,7 @@
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.MachineID" Title="Machine" Required=false>
+            <PropertyColumn Property="x => x.MachineName" Title="Machine" Required=false>
                 <EditTemplate>
                     <MudSelect T=int? @bind-Value=context.Item.MachineID>
                         <MudSelectItem T=int? Value="null">None</MudSelectItem>

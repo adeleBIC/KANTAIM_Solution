@@ -43,8 +43,8 @@ namespace KANTAIM.WEB.Pages.Administration
         }
         void RefreshData()
         {
-            Containers = _contenaireService.GetAll().Select(u => new ContainerVM(u,
-                                                                    _contenaireService.GetAll(),
+            Containers = _contenaireService.GetAll(false).Select(u => new ContainerVM(u,
+                                                                    _contenaireService.GetAll(true),
                                                                     _contenaireService.GetAllContainerType(),
                                                                     _contenaireService.GetAllCell(),
                                                                     _contenaireService.GetAllAction(),
@@ -69,7 +69,7 @@ namespace KANTAIM.WEB.Pages.Administration
 
         void AddAsync()
         {
-            ContainerVM item = new ContainerVM(_contenaireService.GetAll(),
+            ContainerVM item = new ContainerVM(_contenaireService.GetAll(false),
                                                 _contenaireService.GetAllContainerType(),
                                                 _contenaireService.GetAllCell(),
                                                 _contenaireService.GetAllAction(),

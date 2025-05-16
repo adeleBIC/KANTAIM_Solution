@@ -23,26 +23,8 @@ namespace KANTAIM.WEB.Shared
     {
         [Inject] public UserService _userService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
-        [Inject] IJSRuntime JS { get; set; }
 
         public List<string> Users { get; set; }
-
-        public string test { get; set; }
-        private bool drawerOpen = false;
-
-        void ToggleDrawer()
-        {
-            drawerOpen = !drawerOpen;
-        }
-
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            if (firstRender)
-            {
-                await JS.InvokeVoidAsync("initializeKeyListener");
-                firstRender = false;
-            }
-        }
 
 
         protected override async Task OnInitializedAsync()
@@ -66,7 +48,6 @@ namespace KANTAIM.WEB.Shared
             }
 
         }
-
 
         MudTheme BicTheme = new MudTheme()
         {

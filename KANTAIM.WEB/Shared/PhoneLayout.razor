@@ -27,45 +27,15 @@
 @if (Users.Contains(context.User.Identity?.Name.ToLower()))
 {
         <MudLayout>
-             <MudAppBar Bottom="true" Fixed="true" Elevation="0" DisableGutters="true" >
-            <div class="bottom-tabs">
-                    <MudButton Color="Color.Inherit" Style="--mud-typography-button-size:25px;--mud-typography-button-weight : bold;" Href="/ScannerPge" Match="NavLinkMatch.Prefix">Page principale</MudButton>
-                   @*  <MudButton Color="Color.Inherit" Style="--mud-typography-button-size:25px;--mud-typography-button-weight : bold;" Href="/MenuPge" Match="NavLinkMatch.All">Menu</MudButton> *@
-            </div>
-                
-            </MudAppBar>
-
-            <MudAppBar Color="Color.Primary" Fixed="false" Dense="true">
-                <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" @onclick="ToggleDrawer" />
-                <MudSpacer />
-
-                <div class="logintag">
-                    <LoginDisplay />
+            <MudAppBar Bottom="true" Fixed="true" Elevation="0" DisableGutters="true">
+                <div class="bottom-tabs">
+                    <MudButton Color="Color.Inherit" Style="--mud-typography-button-size:25px;--mud-typography-button-weight : bold;" Href="/" Match="NavLinkMatch.Prefix">Page principale</MudButton>
                 </div>
-            </MudAppBar>
 
-            <MudDrawer @bind-Open="@drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="1">
-                <MudNavMenu>
-                    @* <MudNavLink Href="/ScannerPge">Initialisation Machine</MudNavLink> *@
-                    @* <MudNavLink Href="/ScannerPge">Mise en Rack</MudNavLink> *@
-                    @* <MudNavLink Href="/ScannerPge">Sortie de Rack</MudNavLink> *@
-                    @* <MudNavLink Href="/ScannerPge">Mise en Machine</MudNavLink> *@
-                    @* <MudNavLink Href="/ScannerPge">Déplacement Contenaire</MudNavLink> *@
-                    <MudNavLink Href="/TransferPge">Mise en Contenaire</MudNavLink>
-             </MudNavMenu>
-         </MudDrawer>
-           
+            </MudAppBar>
                 <MudMainContent>
-    @*                 <div class="logintag">
-                        <LoginDisplay />
-                    </div> *@
-                 
                     @Body
-                   
-                    
                 </MudMainContent>
-           
-            
         </MudLayout>
 }
 else

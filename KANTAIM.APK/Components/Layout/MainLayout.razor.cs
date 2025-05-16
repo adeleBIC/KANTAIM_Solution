@@ -7,23 +7,12 @@ namespace KANTAIM.APK.Components.Layout
 {
     public partial class MainLayout
     {
-        //[Inject] IJSRuntime JS { get; set; }
-
         private bool drawerOpen = false;
 
         void ToggleDrawer()
         {
             drawerOpen = !drawerOpen;
         }
-
-        //protected override async Task OnAfterRenderAsync(bool firstRender)
-        //{
-        //    if (firstRender)
-        //    {
-        //        await JS.InvokeVoidAsync("addGlobalKeyListener", DotNetObjectReference.Create(this));
-        //        firstRender = false;
-        //    }
-        //}
 
         protected override async Task OnInitializedAsync()
         {

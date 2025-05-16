@@ -1,108 +1,119 @@
+using KANTAIM.DAL;
 using KANTAIM.DAL.Model;
 using KANTAIM.DAL.Services;
+using KANTAIM.WEB.Components.Pages;
+using KANTAIM.WEB.MessageBus.Messages;
+using KANTAIM.WEB.Pages.Kanban.Dialog;
 using KANTAIM.WEB.Services;
-using KANTAIM.WEB.ViewModels;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Routing;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.JSInterop;
 using MudBlazor;
-using System.ComponentModel.DataAnnotations;
+
 
 namespace KANTAIM.WEB.Pages.Kanban
 {
-    public partial class ScannerPge
+    public partial class ScannerPge : BasePage
     {
         [Inject] public ScanService _scanService { get; set; }
+        [Inject] public ProfilService _profilService { get; set; }
+        [Inject] public ProfilSessionService _profilSessionService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
         [Inject] ISnackbar _snackService { get; set; }
-
-        public Cell CellScanner { get; set; }
-        public string? TextValue { get; set; }
-        public string? ContainerValue { get; set; }
-        public string? PressValue { get; set; }
-        public string? ColorValue { get; set; }
-
-        Container? ContainerScanner;
-        
+        [Inject] IDialogService _dialogService { get; set; }
         [Inject] public ContenaireService _contenaireService { get; set; }
-        
-        [Inject] public CellService _cellService { get; set; }
-        [Inject] public PressService _pressService { get; set; }
+        [Inject] public DevModeService _devModeService { get; set; }
+        public string? TextValue { get; set; }
+        private bool PwdOK = false;
 
-        private string currentUrl;
-        private string pageUrl;
-        string? PressName;
-        string? ProduitName;
-        string? MachineName;
+        public bool DevMode
+        {
+            get
+            {
+                return _devModeService.DevMode;
+            }
+            set
+            {
+                _devModeService.DevMode = value;
+                Profils = _profilService.GetAll().ToList();
+            }
+        }
 
-        private static ScannerPge _instance;
+
+        public List<Profil> Profils { get; set; }
+        private Profil profilSelected;
+
+        public Profil ProfilSelected
+        {
+            get { return profilSelected; }
+            set { profilSelected = value; _profilSessionService.SetProfil(ProfilSelected); }
+        }
 
         protected override async Task OnInitializedAsync()
         {
-            //RefreshData();
-            currentUrl = NavigationManager.Uri;
-            pageUrl = NavigationManager.Uri;
-            _instance = this;
-            NavigationManager.LocationChanged += OnLocationChanged;
-        }
-
-        private void OnLocationChanged(object sender, LocationChangedEventArgs e)
-        {
-            // Mettre à jour l'URL actuelle lorsque l'URL change
-            currentUrl = e.Location;
-            // Vous pouvez ajouter ici toute logique que vous souhaitez exécuter lorsque l'URL change
-        }
-
-        public void Dispose()
-        {
-            // Se désabonner de l'événement pour éviter les fuites de mémoire
-            NavigationManager.LocationChanged -= OnLocationChanged;
-        }
-
-        [JSInvokable]
-        public static void CaptureInput(string input)
-        
-        {
-            _instance?.HandleInput(input);
-        }
-        private async void HandleInput(string input)
-        {
-            if(currentUrl == pageUrl)
+            DevMode = false;
+            var context = new DataKANTAIMContext();
+            bool isConnected = await context.TestConnectionAsync();
+            if (isConnected)
             {
-                if (input == "Enter")
+                Console.WriteLine("Connexion réussie à la base de données.");
+            }
+            else
+            {
+                Console.WriteLine("Échec de la connexion à la base de données.");
+            }
+
+            Profils = _profilService.GetAll().ToList();
+            ProfilSelected = _profilSessionService.CurrentProfil;
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                ClearTextField();
+            }
+        }
+
+        private void ClearTextField()
+        {
+            TextValue = string.Empty;
+        }
+
+        public override async void OnMessageReceived(InputMessage msg)
+        {
+            TextValue = msg.Code;
+            string p = msg.Code;
+
+            if (ProfilSelected != null)
+            {
+                if (!string.IsNullOrEmpty(p))
                 {
-                    string p = TextValue;
-                    if (!string.IsNullOrEmpty(p))
+                    // Diviser la chaîne TextValue en morceaux en fonction du délimiteur #
+
+                    string[] parts = _scanService.ParseCode(p);
+
+                    if (parts != null)
                     {
-                        // Diviser la chaîne TextValue en morceaux en fonction du délimiteur #
-
-                        string[] parts = _scanService.scanCode(p);
-
-                        if (parts != null)
+                        string part = parts[0];
+                        // Vérifier si la partie n'est pas vide et commence par un chiffre
+                        if (!string.IsNullOrEmpty(part) && char.IsDigit(part[0]))
                         {
-                            string part = parts[0];
-                            // Vérifier si la partie n'est pas vide et commence par un chiffre
-                            if (!string.IsNullOrEmpty(part) && char.IsDigit(part[0]))
+                            // Récupérer le premier caractère (qui est le numéro du type)
+                            char typeNumber = part[0];
+
+                            // Utiliser une structure switch pour traiter chaque type différemment
+                            switch (typeNumber)
                             {
-                                // Récupérer le premier caractère (qui est le numéro du type)
-                                char typeNumber = part[0];
-
-                                // Utiliser une structure switch pour traiter chaque type différemment
-                                switch (typeNumber)
-                                {
-                                    case '1':
-                                        // Traiter le conteneur
-                                        string c = parts[1];
-                                        if (int.TryParse(c, out int containerNumber))
+                                case '1':
+                                    // Traiter le conteneur
+                                    string c = parts[1];
+                                    if (int.TryParse(c, out int containerNumber))
+                                    {
+                                        try
                                         {
-
-                                            ContainerScanner = _contenaireService.GetContainerByNumber(containerNumber);
-                                            if (ContainerScanner != null)
+                                            Container? containerScanner = _contenaireService.GetContainerByNumber(containerNumber);
+                                            if (containerScanner != null)
                                             {
-                                                switch (ContainerScanner.ContainerAction.Status)
+                                                switch (containerScanner.ContainerAction.Status)
                                                 {
                                                     case 0:
                                                         /*Quand on scan un contenaire vide, on l'initialise sur press.*/
@@ -118,7 +129,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                                                         break;
                                                     case 3:
                                                         /*Après sortie le contenaire avec produit, on vas le mise en Machine*/
-                                                        NavigationManager.NavigateTo($"/InjectPge/1/{containerNumber}");
+                                                        NavigationManager.NavigateTo($"/InjectPge/1/{containerNumber}", forceLoad: true);
                                                         break;
                                                     case 4:
                                                         /*Apres vidange le contenaire est vide, on Mise en rack.*/
@@ -126,66 +137,72 @@ namespace KANTAIM.WEB.Pages.Kanban
                                                         break;
                                                 }
                                             }
-
                                         }
-                                        break;
-                                    case '2':
-                                        MachineName = parts[1];
-                                        if (int.TryParse(MachineName, out int MachineNumber))
+                                        catch (Exception ex)
                                         {
-                                            NavigationManager.NavigateTo($"/InjectPge/2/{MachineNumber}");
-                                        }
-                                        break;
-                                    case '3':
-                                        PressName = parts[1];
-                                        if (int.TryParse(PressName, out int PressNumber))
-                                        {
-                                            NavigationManager.NavigateTo($"/InitialisationPge/3/{PressNumber}");
-
+                                            _snackService.Add(ex.Message + containerNumber, MudBlazor.Severity.Error);
                                         }
 
-                                        // Traiter la presse
-                                        break;
-                                    case '4':
-                                        // Traiter la cell
-                                        string X = parts[1];
-                                        string Y = parts[2];
+                                    }
+                                    break;
+                                case '2':
+                                    _snackService.Add("Impossible de scanner une machine en premier !", MudBlazor.Severity.Error);
+                                    break;
+                                case '3':
+                                    string? PressName = parts[1];
+                                    if (int.TryParse(PressName, out int PressNumber))
+                                    {
+                                        NavigationManager.NavigateTo($"/InitialisationPge/3/{PressNumber}");
+                                    }
 
-                                        if (int.TryParse(X, out int x) && int.TryParse(Y, out int y))
-                                        {
-                                            CellScanner = _cellService.GetByXY(x, y);
-                                            //NavigationManager.NavigateTo($"/StockagePge/4/{CellScanner.Id}");
-                                        }
-                                        break;
-                                    case '5':
-                                        // Recherche le produit
-                                        ProduitName = parts[1];
-                                        if (int.TryParse(ProduitName, out int ProduitNumber))
-                                        {
-                                            NavigationManager.NavigateTo($"/FindProductPge/5/{ProduitNumber}");
-                                        }
-                                        break;
-                                    default:
-                                        // Cas par défaut si le numéro du type n'est pas valide
-                                        break;
-                                }
+                                    // Traiter la presse
+                                    break;
+                                case '4':
+                                    _snackService.Add("Impossible de scanner une cellule en premier !", MudBlazor.Severity.Error);
+                                    break;
+                                case '5':
+                                    // Recherche le produit
+                                    string? ProduitName = parts[1];
+                                    if (int.TryParse(ProduitName, out int ProduitNumber))
+                                    {
+                                        NavigationManager.NavigateTo($"/FindProductPge/5/{ProduitNumber}");
+                                    }
+                                    break;
+                                default:
+                                    // Cas par défaut si le numéro du type n'est pas valide
+                                    break;
                             }
                         }
-
                     }
 
-                    TextValue = null;
-                    //_snackService.Add("Mauvais QRCode scanné !",MudBlazor.Severity.Error);
-                }
-                else
-                {
-                    TextValue += input;
-                    //StateHasChanged();
-                    await InvokeAsync(StateHasChanged);
                 }
             }
-            
-            
+            else
+            {
+                _snackService.Add("Veuillez choisir un profil !", MudBlazor.Severity.Error);
+            }
+
+            await InvokeAsync(StateHasChanged);
+        }
+
+        private async Task ShowPwd()
+        {
+            var options = new DialogOptions()
+            {
+                DisableBackdropClick = true,
+                MaxWidth = MaxWidth.ExtraSmall,
+                FullWidth = true,
+                NoHeader = true,
+                CloseOnEscapeKey = true
+            };
+
+            var dialog = await _dialogService.ShowAsync<PwdDialog>("Code PIN", options);
+            var result = await dialog.Result;
+
+            if (!result.Canceled && result.Data is bool success && success)
+            {
+                PwdOK = true;
+            }
         }
 
     }

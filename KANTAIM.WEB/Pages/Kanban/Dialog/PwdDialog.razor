@@ -1,0 +1,32 @@
+﻿@using MudBlazor
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.h6" Align="Align.Center">Entrez le mot de passe :</MudText>
+        <MudTextField @bind-Value="_input" InputType="InputType.Password" ReadOnly="true" FullWidth="true" />
+
+        <MudGrid Class="mt-2">
+            @foreach (var row in PadLayout)
+            {
+                <MudItem xs="4" sm="4" md="4" lg="4" xl="4">
+                    @foreach (var key in row)
+                    {
+                        <MudButton OnClick="@(() => AddDigit(key))"
+                                   Style="margin: 6px; width: 48px; height: 48px; border-radius: 50%; min-width: 0;"
+                                   Variant="MudBlazor.Variant.Filled"
+                                   Color="Color.Default"
+                                   DisableElevation="true">
+                            @key
+                        </MudButton>
+                    }
+                </MudItem>
+            }
+        </MudGrid>
+
+        <MudStack Class="mt-2" Row="true" Spacing="2">
+            <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="Clear">Effacer</MudButton>
+            <MudButton Color="Color.Primary" Variant="MudBlazor.Variant.Filled" OnClick="Validate">Valider</MudButton>
+            <MudButton Color="Color.Secondary" Variant="MudBlazor.Variant.Text" OnClick="Cancel">Annuler</MudButton>
+        </MudStack>
+    </DialogContent>
+</MudDialog>

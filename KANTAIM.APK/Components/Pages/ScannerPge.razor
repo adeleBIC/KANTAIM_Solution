@@ -18,14 +18,13 @@
         margin-bottom: 20px;
     }
 
-    .container {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-    }
-
     .main-content {
         flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-content: space-around;
+        justify-content: center;
+        margin: 5px;
     }
 
     .footer {
@@ -34,7 +33,8 @@
     }
 </style>
 
-<div class="container d-flex flex-column" style="min-height: 100%;">
+<div style="display: flex; flex-direction: column; min-height: 85vh;">
+
     @if (Profils != null)
     {
         <div class="main-content">
@@ -47,8 +47,8 @@
                 <h3 class="titleProfil">Sélectionner un profil avant de scanner svp</h3>
             }
 
-            <MudSelect T="Profil" @bind-Value="ProfilSelected" Label="Profil" Variant="Variant.Outlined">
-                @foreach (var p in Profils)
+            <MudSelect T="Profil" @bind-Value="ProfilSelected" Label="Profil" Variant="MudBlazor.Variant.Outlined">
+                @foreach (var p in Profils) 
                 {
                     <MudSelectItem T="Profil" Value="@(p)">@p.Name</MudSelectItem>
                 }
@@ -60,14 +60,12 @@
 
         <!-- Bouton en bas, au-dessus du footer du layout -->
         <div class="d-flex flex-column align-items-center p-2">
-            <MudButton OnClick="ShowPwd" Variant="Variant.Filled" Color="Color.Primary">
-                Déverrouiller Mode Dev
-            </MudButton>
-
+            <MudIconButton Icon="@Icons.Material.Filled.LockPerson" OnClick="ShowPwd" Variant="MudBlazor.Variant.Filled" Color="Color.Primary" />
+            <MudSpacer></MudSpacer>
             @if (PwdOK)
             {
                 <MudToggleGroup T="bool" Style="margin:10px"
-                                @bind-Value="_devModeService.DevMode"
+                                @bind-Value="DevMode"
                                 Outline="true"
                                 CheckMark="true"
                                 Color="Color.Tertiary">

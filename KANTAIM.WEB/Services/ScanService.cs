@@ -4,7 +4,7 @@ namespace KANTAIM.WEB.Services
 {
     public class ScanService
     {
-        public string[] scanCode(string txt)
+        public string[] ParseCode(string txt)
         {
             if(txt != null)
             {

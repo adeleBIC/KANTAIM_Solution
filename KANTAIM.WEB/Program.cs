@@ -48,6 +48,7 @@ builder.Services.AddSingleton<ProfilService>();
 builder.Services.AddSingleton<RackService>();
 builder.Services.AddSingleton<RackProfilService>();
 builder.Services.AddSingleton<DevModeService>();
+builder.Services.AddSingleton<ProfilSessionService>();
 
 builder.Services.AddMudServices(config =>
 {
