@@ -80,7 +80,7 @@ namespace KANTAIM.DAL
                     if (_devMode) optionsBuilder.UseSqlServer("Server=MONSSQL03;Database=DATASCADAMOULAGE_DEV;User Id=UserMLV;Password=BicUserMLV20;MultipleActiveResultSets=True;Encrypt=false;TrustServerCertificate=False;MultiSubnetFailover=True");
                     else optionsBuilder.UseSqlServer("Server=MONSSQL03;Database=DATASCADAMOULAGE;User Id=UserMLV;Password=BicUserMLV20;MultipleActiveResultSets=True;Encrypt=false;TrustServerCertificate=False;MultiSubnetFailover=True");
 #if DEBUG
-                optionsBuilder.UseSqlServer("Server=MONSSQL03;Database=DATASCADAMOULAGE_DEV;User Id=UserMLV;Password=BicUserMLV20;MultipleActiveResultSets=True;Encrypt=false;TrustServerCertificate=False;MultiSubnetFailover=True");
+                //optionsBuilder.UseSqlServer("Server=MONSSQL03;Database=DATASCADAMOULAGE_DEV;User Id=UserMLV;Password=BicUserMLV20;MultipleActiveResultSets=True;Encrypt=false;TrustServerCertificate=False;MultiSubnetFailover=True");
  #endif
                 }
                 else
