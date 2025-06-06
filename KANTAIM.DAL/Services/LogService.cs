@@ -47,6 +47,12 @@ namespace KANTAIM.DAL.Services
                                                     .Include(c => c.Container).ThenInclude(x=>x.ContainerType)
                                                     .ToList();
         }
+
+        public IEnumerable<Log> GetAllWithouInclude()
+        {
+            using DataKANTAIMContext ctx = new(_devModeService.DevMode);
+            return ctx.Logs.ToList();
+        }
         public void UpSert(Log item) => _repo.UpSert(item);
 
         public void Delete(int id) => _repo.Delete(id);

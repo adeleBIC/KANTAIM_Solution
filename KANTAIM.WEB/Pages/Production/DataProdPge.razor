@@ -72,7 +72,7 @@
                 </ToolBarContent>
                 <Columns>
                     <SelectColumn ShowInFooter=false />
-                    <PropertyColumn Property="x => x.PressID" Title="Numero de presse">
+                    <PropertyColumn Property="x => x.PressNumber" Title="Numero de presse">
                         <EditTemplate>
                             <MudSelect T=int @bind-Value=context.Item.PressID>
                                 @foreach (var f in context.Item.Presses.OrderBy(p => p.Number))

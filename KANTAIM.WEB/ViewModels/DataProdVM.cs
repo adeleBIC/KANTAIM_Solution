@@ -59,6 +59,9 @@ namespace KANTAIM.WEB.ViewModels
             set { pressID = value; IsEditing = true; }
         }
 
+        public string PressNumber
+            { get => Presses.FirstOrDefault(p => p.Id == pressID)?.Number.ToString() ?? ""; }
+
         [Required]
         [Label("Produit")]
         private int productID;

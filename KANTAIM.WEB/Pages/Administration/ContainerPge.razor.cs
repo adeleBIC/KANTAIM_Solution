@@ -26,6 +26,7 @@ namespace KANTAIM.WEB.Pages.Administration
     public partial class ContainerPge
     {
         [Inject] public ContenaireService _contenaireService { get; set; }
+        [Inject] public LogService _logService { get; set; }
         [Inject] IDialogService _dialogService { get; set; }
         [Inject] ISnackbar _snackService { get; set; }
 
@@ -131,6 +132,8 @@ namespace KANTAIM.WEB.Pages.Administration
                     {
                         if (item.Id != 0)
                         {
+                            foreach (Log log in _logService.GetAllWithouInclude().Where(l => l.ContainerID == item.Id)) _logService.Delete(log.Id);
+
                             _contenaireService.Delete(item.Id);
                             RefreshData();
                             _snackService.Add("Données supprimées !", Severity.Success);
