@@ -81,7 +81,6 @@ namespace KANTAIM.WEB.Pages.Administration
                             else
                             {
                                 Rack rackToRemove = vm.Racks?.FirstOrDefault(r => r.Id == m.Id);
-                                if (rackToRemove != null) _cellService.DeleteRackCell(rackToRemove.Id, cId);
                                 if (rackToRemove != null)
                                 {
                                     RackCell rc = vm.RackCells?.FirstOrDefault(r => r.RackId == rackToRemove.Id);
