@@ -32,10 +32,14 @@ namespace KANTAIM.WEB.ViewModels
             isMaintenance = model.IsMaintenance;
             comment = model.Comment;
             containers = model.Containers.ToList();
-            rackCells = model.RackCells.ToList();
+            rackCells = model.RackCells?.ToList();
 
-            Racks = new List<Rack>(RackCells.Select(x => x.Rack).ToList());
-            SelectedRackNames = new List<string>(RackCells.Select(x => x.Rack).Select(x => x.Name).ToList());
+            if (RackCells != null)
+            {
+                Racks = new List<Rack>(RackCells?.Select(x => x.Rack).ToList());
+                SelectedRackNames = new List<string>(RackCells?.Select(x => x.Rack).Select(x => x.Name).ToList());
+            }
+
         }
         public bool IsEditing { get; set; }
         public bool IsChecked { get; set; }
