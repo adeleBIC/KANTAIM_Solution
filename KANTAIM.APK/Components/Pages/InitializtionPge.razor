@@ -105,7 +105,7 @@
                 <div class="status-item">@ContainerScanner.ContainerType.Name scanné: @ContainerScanner.Number</div>
                     <MudText> @TextValue</MudText>
                 </div>
-                <h3 class="title">Scanner la presse s'il vous plait</h3>
+                <h3 class="title">Scanner la presse ou la machine INKJET s'il vous plait</h3>
             </div>
             break;
 
@@ -141,7 +141,8 @@
                     <div class="colors-container">
                         @foreach (var c in Colors)
                         {
-                            <MudButton Class="bouton" Style="@($"background:{c.ColorNumber};")" OnClick="()=>ColorSelected(c.Id)" Variant="MudBlazor.Variant.Filled">
+                            var textColor = GetContrastingTextColor(c.ColorNumber);
+                            <MudButton Class="bouton" Style="@($"background:{c.ColorNumber}; color:{textColor};")" OnClick="()=>ColorSelected(c.Id)" Variant="MudBlazor.Variant.Filled">
                                 @c.Name
                             </MudButton>
                         }

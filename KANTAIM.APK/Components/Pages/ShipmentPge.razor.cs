@@ -87,8 +87,8 @@ namespace KANTAIM.APK.Components.Pages
                 ProductID = ContainerScanner.ProductID,
                 Press = ContainerScanner.Press,
                 PressID = ContainerScanner.PressID,
-                Shape = ContainerScanner.Press.Shape,
-                ShapeID = ContainerScanner.Press.ShapeID,
+                Shape = ContainerScanner.Press?.Shape,
+                ShapeID = ContainerScanner.Press?.ShapeID,
                 Container = ContainerScanner,
                 ContainerID = ContainerScanner.Id,
                 

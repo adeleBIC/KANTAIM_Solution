@@ -168,5 +168,18 @@ namespace KANTAIM.APK.Components.Pages
 
             await InvokeAsync(StateHasChanged);
         }
+
+        private string GetContrastingTextColor(string hexColor)
+        {
+            if (string.IsNullOrEmpty(hexColor) || !hexColor.StartsWith("#") || (hexColor.Length != 7 && hexColor.Length != 9)) return "#000000"; // fallback 
+
+            // Extraire les composantes R, G, B
+            var r = Convert.ToInt32(hexColor.Substring(1, 2), 16);
+            var g = Convert.ToInt32(hexColor.Substring(3, 2), 16);
+            var b = Convert.ToInt32(hexColor.Substring(5, 2), 16);
+            var luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+            return luminance > 0.5 ? "#000000" : "#FFFFFF";
+        }
     }
 }

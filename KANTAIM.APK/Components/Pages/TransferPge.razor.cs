@@ -84,7 +84,7 @@ namespace KANTAIM.APK.Components.Pages
             OtherScanner.ProductID = ContainerScanner.ProductID;
             OtherScanner.ProdColorID = ContainerScanner.ProdColorID;
             OtherScanner.PressID = ContainerScanner.PressID;
-            int shapeId = ContainerScanner.Press.ShapeID;
+            int? shapeId = ContainerScanner.Press?.ShapeID;
             OtherScanner.MachineID = ContainerScanner.MachineID;
             OtherScanner.ActionID = ContainerScanner.ActionID;
             OtherScanner.FillStatus = StatusContainer.Undefinded;
