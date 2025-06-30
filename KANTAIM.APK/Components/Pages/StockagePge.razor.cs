@@ -271,6 +271,7 @@ namespace KANTAIM.APK.Components.Pages
                                                                                 .Where(c => c.CellStock != null &&
                                                                                 c.ContainerType.IsContainable == false &&
                                                                                 c.ProductID == Product.Id &&
+                                                                                c.ProdColorID == ColorOfProduct.Id &&
                                                                                 !c.CellStock.IsJail &&
                                                                                 !c.CellStock.IsMaintenance &&
                                                                                 !c.CellStock.ForEmpty &&
