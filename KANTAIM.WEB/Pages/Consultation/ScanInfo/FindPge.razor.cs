@@ -6,6 +6,7 @@ using KANTAIM.WEB.ViewModels;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using static KANTAIM.WEB.Pages.Kanban.FindProductPge;
@@ -219,11 +220,13 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
                 {
                     if (selectedColorId != 0)
                     {
-                        refreshCellList = _cellList.Where(c => c.Containers.Any(c => c.ProdColorID == selectedColorId && c.ProductID == selectedProductId)).ToList();
+                        refreshCellList = _cellList.Where(c => c.Containers.OrderBy(c=>c.Number).Any(c => c.ProdColorID == selectedColorId && c.ProductID == selectedProductId)).ToList();
+                        contenaireNb = refreshCellList.Sum(cell => cell.Containers.Where(c => c.ProdColorID == selectedColorId && c.ProductID == selectedProductId).Count());
                     }
                     else if (selectedProductId != 0)
                     {
                         refreshCellList = _cellList.Where(c => c.Containers.Any(c => c.ProductID == selectedProductId)).ToList();
+                        contenaireNb = refreshCellList.Sum(cell => cell.Containers.Where(c => c.ProductID == selectedProductId).Count());
                     }
                     else
                     {
@@ -232,19 +235,19 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
                             if (refreshCellList == null)
                             {
                                 refreshCellList = _cellList.Where(c => c.Containers.Any(c => c.ProductID == produit.Id)).ToList();
+                                contenaireNb = refreshCellList.Sum(cell => cell.Containers.Where(c => c.ProductID == produit.Id).Count());
                             }
                             else
                             {
                                 refreshCellList = refreshCellList.Concat(_cellList.Where(c => c.Containers.Any(c => c.ProductID == produit.Id)).ToList()).ToList();
-                            }
+                                contenaireNb += refreshCellList.Sum(cell => cell.Containers.Where(c => c.ProductID == produit.Id).Count());
+                            }        
                         }
                     }
                     cellNb = refreshCellList.Count();
-                    //contenaireNb = _contenaireList.Count(c => refreshCellList.Any(cell => cell.Id == c.CellID));
-                    contenaireNb = refreshCellList.Sum(cell => cell.Containers.Count);
+                    
                     if (SelectedProduct != null)
                     {
-
                         productNb = SelectedProduct.QuantityPerContainer * contenaireNb;
                     }
                 }
