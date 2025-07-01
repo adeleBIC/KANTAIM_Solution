@@ -19,8 +19,8 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
         private List<ProductFamily> _productfamilyList { get; set; }
         [Inject] public ProductService _productService { get; set; }
         private List<Product> _productList { get; set; }
-        [Inject] public LogService _logService { get; set; }
-        private List<Log> _logList { get; set; }
+        //[Inject] public LogService _logService { get; set; }
+        //private List<Log> _logList { get; set; }
         [Inject] public ColorProductService _colorProductService { get; set; }
         private List<ColorProduct> _colorProductList { get; set; }
         [Inject] public CellProductService _cellProductService { get; set; }
@@ -50,6 +50,7 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
             set
             {
                 selectedWorkshopId = value;
+                _cellList = _cellService.GetByWorkshop(selectedWorkshopId);
                 ShowInfo();
             }
         }
@@ -75,8 +76,6 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
         }
 
         private Product? SelectedProduct { get; set; }
-        private Log logRescent { get; set; }
-
         private int selectedProductId;
         public int SelectedProductId
         {
@@ -153,7 +152,6 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
         {
             _cellProductList = _cellProductService.GetAll().ToList();
             _contenaireList = _contenaireService.GetAll().ToList();
-            _logList = _logService.GetAll().ToList();
             productfamiliesList = _productfamilyService.GetAll().ToList().Concat(new List<ProductFamily> { prodFamilyDefault });
             productList = _productService.GetAllPerProductFamily(SelectedProductFamilyId);
             productList = productList.Concat(new List<Product> { prodDefault }).ToList();
@@ -165,6 +163,7 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
             SelectedProductId = 0;
             selectedColorId = 0;
             selectedWorkshopId = 1;
+            _cellList = _cellService.GetByWorkshop(selectedWorkshopId);
 
             await Task.Run(ShowInfo);
         }
@@ -195,60 +194,59 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
 
         void ShowInfo()
         {
-            _cellList = _cellService.GetByWorkshop(selectedWorkshopId);
-            cellNb = 0;
-            contenaireNb = 0;
-            productNb = 0;
-            if (selectedProductFamilyId == 0)
+            if (selectedWorkshopId != 0)
             {
-                refreshCellList = null;
-                selectedProductId = 0;
-                selectedColorId = 0;
-                cellNb = _cellList.Count();
-                if (_cellList !=null)
+                cellNb = 0;
+                contenaireNb = 0;
+                productNb = 0;
+                if (selectedProductFamilyId == 0)
                 {
-                    //contenaireNb = _contenaireList.Count(c => c.CellId!=null && c.CellStock?.WorkshopID == selectedWorkshopId);
-                    contenaireNb = _contenaireList.Count(c =>
-                                            c.CellID != null
-                                            && c.CellStock != null
-                                            && c.CellStock.RackCells != null
-                                            && c.CellStock.RackCells.Any(rc => rc.Rack.WorkshopID == selectedWorkshopId));
-                }
-            }
-            else
-            {
-                if (selectedColorId != 0)
-                {
-                    refreshCellList = _cellList.Where(c => {
-                        var logOfCell = _logList.Where(u => u.CellID == c.Id && u.Container.CellID == c.Id)
-                                        .OrderByDescending(u => u.EventTime).FirstOrDefault();
-                        return logOfCell?.ProdColorID == selectedColorId && logOfCell?.ProductID == selectedProductId;
-                    }).ToList();
-                }
-                else if (selectedProductId != 0)
-                {
-                    refreshCellList = _cellList.Where(c => _logList.Where(u => u.CellID == c.Id && u.Container.CellID == c.Id).OrderByDescending(u => u.EventTime).FirstOrDefault()?.ProductID == selectedProductId).ToList();
+                    refreshCellList = null;
+                    selectedProductId = 0;
+                    selectedColorId = 0;
+                    cellNb = _cellList.Count();
+                    if (_cellList != null)
+                    {
+                        //contenaireNb = _contenaireList.Count(c => c.CellId!=null && c.CellStock?.WorkshopID == selectedWorkshopId);
+                        contenaireNb = _contenaireList.Count(c =>
+                                                c.CellID != null
+                                                && c.CellStock != null
+                                                && c.CellStock.RackCells != null
+                                                && c.CellStock.RackCells.Any(rc => rc.Rack.WorkshopID == selectedWorkshopId));
+                    }
                 }
                 else
                 {
-                    foreach (var produit in _productService.GetAllPerProductFamily(selectedProductFamilyId))
+                    if (selectedColorId != 0)
                     {
-                        if (refreshCellList == null)
+                        refreshCellList = _cellList.Where(c => c.Containers.Any(c => c.ProdColorID == selectedColorId && c.ProductID == selectedProductId)).ToList();
+                    }
+                    else if (selectedProductId != 0)
+                    {
+                        refreshCellList = _cellList.Where(c => c.Containers.Any(c => c.ProductID == selectedProductId)).ToList();
+                    }
+                    else
+                    {
+                        foreach (var produit in _productService.GetAllPerProductFamily(selectedProductFamilyId))
                         {
-                            refreshCellList = _cellList.Where(c => _logList.Where(u => u.CellID == c.Id && u.Container.CellID == c.Id).OrderByDescending(u => u.EventTime).FirstOrDefault()?.ProductID == produit.Id).ToList();
-                        }
-                        else
-                        {
-                            refreshCellList = refreshCellList.Concat(_cellList.Where(c => _logList.Where(u => u.CellID == c.Id && u.Container.CellID == c.Id).OrderByDescending(u => u.EventTime).FirstOrDefault()?.ProductID == produit.Id).ToList()).ToList();
+                            if (refreshCellList == null)
+                            {
+                                refreshCellList = _cellList.Where(c => c.Containers.Any(c => c.ProductID == produit.Id)).ToList();
+                            }
+                            else
+                            {
+                                refreshCellList = refreshCellList.Concat(_cellList.Where(c => c.Containers.Any(c => c.ProductID == produit.Id)).ToList()).ToList();
+                            }
                         }
                     }
-                }
-                cellNb = refreshCellList.Count();
-                contenaireNb = _contenaireList.Count(c => refreshCellList.Any(cell => cell.Id == c.CellID));
-                if (SelectedProduct != null)
-                {
+                    cellNb = refreshCellList.Count();
+                    //contenaireNb = _contenaireList.Count(c => refreshCellList.Any(cell => cell.Id == c.CellID));
+                    contenaireNb = refreshCellList.Sum(cell => cell.Containers.Count);
+                    if (SelectedProduct != null)
+                    {
 
-                    productNb = SelectedProduct.QuantityPerContainer * contenaireNb;
+                        productNb = SelectedProduct.QuantityPerContainer * contenaireNb;
+                    }
                 }
             }
         }

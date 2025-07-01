@@ -100,9 +100,10 @@
                                             </MudText>
                                                 @if (cell != null && cell.Status != StatusCell.Empty)
                                                 {
-                                                    <MudText>Produit: @_logList.Where(u => u.CellID == cell.Id && u.Container.CellID == cell.Id).OrderByDescending(u => u.EventTime).FirstOrDefault()?.Product?.Name</MudText>
-                                                    <MudText>Couleur: @_logList.Where(u => u.CellID == cell.Id && u.Container.CellID == cell.Id).OrderByDescending(u => u.EventTime).FirstOrDefault()?.ProdColor?.Name</MudText>
-                                                    <MudText>Date: @_logList.Where(u => u.CellID == cell.Id && u.Container.CellID == cell.Id).OrderByDescending(u => u.EventTime).FirstOrDefault()?.EventTime.ToString("yyyy-MM-dd HH:mm:ss")</MudText>
+                                                    Container container = _contenaireService.GetByCellId(cell.Id).FirstOrDefault();
+                                                    <MudText>Produit: @container?.Product?.Name</MudText>
+                                                    <MudText>Couleur: @container?.ProdColor?.Name</MudText>
+                                                    <MudText>Date: @container?.LastEvent?.ToString("yyyy-MM-dd HH:mm:ss")</MudText>
 
                                                 }
                                            @*  <MudText>Produit: @_logList.Where(u => u.CellID == cell.Id).OrderByDescending(u => u.EventTime).FirstOrDefault();</MudText> *@
