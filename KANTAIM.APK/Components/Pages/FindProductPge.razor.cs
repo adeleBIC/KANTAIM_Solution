@@ -87,6 +87,9 @@ namespace KANTAIM.APK.Components.Pages
                                                                     c.ProductID == ProductScanner.Id &&
                                                                     (ColorChoose == null || c.ProdColorID == ColorChoose.Id) &&
                                                                     c.CellID != ContainerScanner?.CellID &&
+                                                                    !c.CellStock.IsJail &&
+                                                                    !c.CellStock.IsMaintenance &&
+                                                                    !c.CellStock.IsPhantom &&
                                                                     c.CellStock.RackCells != null &&
                                                                     c.CellStock.RackCells.Any(rc => profilSelected.RackProfils.Any(rp => rp.RackId == rc.RackId)))
                                                                     .OrderBy(c => c.LastEvent));
