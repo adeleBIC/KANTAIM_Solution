@@ -124,7 +124,7 @@ namespace KANTAIM.WEB.Pages.Administration
 
         void RefreshData()
         {
-            Colors = _colorService.GetAll().Select(u => new ColorVM(u)).ToList();
+            Colors = _colorService.GetAll().Select(u => new ColorVM(u)).OrderBy(u => u.Priority ?? int.MaxValue).ToList();
         }
         void SelectionChanged(HashSet<ColorVM> changes)
         {

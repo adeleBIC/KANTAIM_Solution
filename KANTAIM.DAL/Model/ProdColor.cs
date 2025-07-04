@@ -24,5 +24,8 @@ namespace KANTAIM.DAL.Model
         [StringLength(50)]
         public string ColorNumber { get; set; }
 
+        [Column("Priority")]
+        public int? Priority { get; set; }
+
     }
 }

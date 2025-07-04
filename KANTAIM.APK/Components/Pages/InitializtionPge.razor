@@ -139,7 +139,7 @@
                             <br> Choisissez la couleur s'il vous plait
                         </div> *@
                     <div class="colors-container">
-                        @foreach (var c in Colors)
+                    @foreach (var c in Colors.OrderBy(u => u.Priority ?? int.MaxValue))
                         {
                             var textColor = GetContrastingTextColor(c.ColorNumber);
                             <MudButton Class="bouton" Style="@($"background:{c.ColorNumber}; color:{textColor};")" OnClick="()=>ColorSelected(c.Id)" Variant="MudBlazor.Variant.Filled">

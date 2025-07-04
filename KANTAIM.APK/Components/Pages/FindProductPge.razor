@@ -57,7 +57,7 @@
         @if (Colors != null)
         {
             <div class="colors-container">
-                @foreach (var color in Colors)
+                @foreach (var color in Colors.OrderBy(u => u.Priority ?? int.MaxValue))
                 {
                     var textColor = GetContrastingTextColor(color.ColorNumber);
                     <MudButton Class="bouton"                            

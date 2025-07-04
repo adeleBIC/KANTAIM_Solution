@@ -16,6 +16,7 @@ namespace KANTAIM.WEB.ViewModels
             this.model = model;
             name = model.Name;
             colorNumber = model.ColorNumber;  
+            priority = model.Priority;
         }
         public bool IsEditing { get; set; }
         public bool IsChecked { get; set; }
@@ -38,6 +39,14 @@ namespace KANTAIM.WEB.ViewModels
             get { return colorNumber; }
             set { colorNumber = value; IsEditing = true; }
         }
+
+        [Label("Priority")]
+        private int? priority;
+        public int? Priority
+        {
+            get { return priority; }
+            set { priority = value; IsEditing = true; }
+        }
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (string.IsNullOrWhiteSpace(colorNumber)) yield return new ValidationResult("Le color number est obligatoire", new string[] { "colorNumber" });
@@ -45,6 +54,7 @@ namespace KANTAIM.WEB.ViewModels
             {
                 model.Name = name;
                 model.ColorNumber = colorNumber;
+                model.Priority = priority;
             }
         }
 

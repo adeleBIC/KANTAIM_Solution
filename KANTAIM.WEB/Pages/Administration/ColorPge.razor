@@ -34,6 +34,7 @@
                     <MudColorPicker DisableToolbar="false" @bind-Text=context.Item.ColorNumber PickerVariant="PickerVariant.Dialog" Style="@($"color: {context.Item.ColorNumber};")" />
                 </EditTemplate>
             </PropertyColumn>
+            <PropertyColumn Property="x => x.Priority" Title="Priorité" />
             
             
         </Columns>
