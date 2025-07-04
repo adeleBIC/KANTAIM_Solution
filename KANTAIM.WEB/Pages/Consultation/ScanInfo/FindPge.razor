@@ -142,20 +142,41 @@
                     </div>
                 </MudPaper>
             }
+            <div style="max-height: 400px; overflow-y: auto; padding: 10px;">
+            <MudExpansionPanels>
 
+                @foreach (var family in productTree)
+                {
+                    <MudExpansionPanel Text="@GetFamilyHeader(family)">
+                        <MudExpansionPanels>
+
+                            @foreach (var product in family.Products)
+                            {
+                                <MudExpansionPanel Text="@GetProductHeader(product)">
+                                    <MudTable Items="product.Colors" Dense="true">
+                                        <HeaderContent>
+                                            <MudTh>Couleur</MudTh>
+                                            <MudTh>Conteneurs</MudTh>
+                                            <MudTh>Qté/Conteneur</MudTh>
+                                            <MudTh>Qté Totale</MudTh>
+                                        </HeaderContent>
+                                        <RowTemplate>
+                                            <MudTd>@context.ProdColor.Name</MudTd>
+                                            <MudTd>@context.TotalContainers</MudTd>
+                                            <MudTd>@context.QuantityPerContainer</MudTd>
+                                            <MudTd>@context.TotalQuantity</MudTd>
+                                        </RowTemplate>
+                                    </MudTable>
+                                </MudExpansionPanel>
+                            }
+
+                        </MudExpansionPanels>
+                    </MudExpansionPanel>
+                }
+
+            </MudExpansionPanels>
+            </div>
         </MudPaper>
-
-
-        <MudDialog @ref="dialog" MaxWidth="400px">
-            <MudDialogTitle>Cellule @selectedCell?.Name</MudDialogTitle>
-            <MudDialogContent>
-                <MudText><b>ID:</b> @selectedCell?.Id</MudText>
-                <MudText><b>NbMax:</b> @selectedCell?.NbMax</MudText>
-            </MudDialogContent>
-            <MudDialogActions>
-                <MudButton OnClick="CloseDialog" Color="Color.Primary">Fermer</MudButton>
-            </MudDialogActions>
-        </MudDialog>
 
     </MudDrawerContainer>
 </MudPaper>

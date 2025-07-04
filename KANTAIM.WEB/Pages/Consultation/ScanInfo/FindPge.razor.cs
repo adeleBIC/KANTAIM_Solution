@@ -45,6 +45,110 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
         private IEnumerable<Workshop> workshopList;
         private int selectedWorkshopId;
 
+        public class ProductColorNode
+        {
+            public ProdColor ProdColor { get; set; }
+            public int TotalContainers { get; set; }
+            public int QuantityPerContainer { get; set; }
+            public int TotalQuantity => TotalContainers * QuantityPerContainer;
+        }
+
+        public class ProductNode
+        {
+            public Product Product { get; set; }
+            public List<ProductColorNode> Colors { get; set; } = new();
+            public int TotalContainers => Colors.Sum(c => c.TotalContainers);
+            public int TotalQuantity => Colors.Sum(c => c.TotalQuantity);
+        }
+
+        public class ProductFamilyNode
+        {
+            public ProductFamily ProductFamily { get; set; }
+            public List<ProductNode> Products { get; set; } = new();
+            public int TotalContainers => Products.Sum(p => p.TotalContainers);
+            public int TotalQuantity => Products.Sum(p => p.TotalQuantity);
+        }
+
+        private List<ProductFamilyNode> productTree = new();
+
+
+private void initialTable()
+{
+    productTree.Clear();
+
+    var allProductFamilies = _productfamilyService.GetAll();
+    var allProducts = _productService.GetAll();
+    var allColorProducts = _colorProductService.GetAll();
+    var allColors = _colorService.GetAll();
+    var containers = _contenaireList
+        .Where(c => c.CellID != null && c.ProductID != null && c.ProdColorID != null)
+        .ToList();
+
+    foreach (var family in allProductFamilies)
+    {
+        var familyNode = new ProductFamilyNode
+        {
+            ProductFamily = family
+        };
+
+        var productsInFamily = allProducts
+            .Where(p => p.ProductFamilyID == family.Id)
+            .ToList();
+
+        foreach (var product in productsInFamily)
+        {
+            var productNode = new ProductNode
+            {
+                Product = product
+            };
+
+            var colorLinks = allColorProducts
+                .Where(cp => cp.ProductID == product.Id)
+                .ToList();
+
+            foreach (var colorLink in colorLinks)
+            {
+                var prodColor = allColors.FirstOrDefault(c => c.Id == colorLink.ColorID);
+                if (prodColor == null) continue;
+
+                // Conteneurs pour ce produit + couleur + atelier sélectionné
+                var colorContainers = containers
+                    .Where(c =>
+                        c.ProductID == product.Id &&
+                        c.ProdColorID == prodColor.Id &&
+                        c.CellStock != null &&
+                        c.CellStock.RackCells != null &&
+                        c.CellStock.RackCells.Any(rc => rc.Rack.WorkshopID == selectedWorkshopId))
+                    .ToList();
+
+                var colorNode = new ProductColorNode
+                {
+                    ProdColor = prodColor,
+                    QuantityPerContainer = product.QuantityPerContainer,
+                    TotalContainers = colorContainers.Count
+                };
+
+                productNode.Colors.Add(colorNode);
+            }
+
+            // Ajouter le produit s’il a au moins une couleur (avec ou sans conteneurs)
+            if (productNode.Colors.Any())
+            {
+                familyNode.Products.Add(productNode);
+            }
+        }
+
+        if (familyNode.Products.Any())
+        {
+            productTree.Add(familyNode);
+        }
+    }
+}
+
+
+
+
+
         public int SelectedWorkshopId
         {
             get { return selectedWorkshopId; }
@@ -165,7 +269,7 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
             selectedColorId = 0;
             selectedWorkshopId = 1;
             _cellList = _cellService.GetByWorkshop(selectedWorkshopId);
-
+            initialTable();
             await Task.Run(ShowInfo);
         }
 
@@ -180,79 +284,90 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
             dialog.Show();
         }
 
-        private void CloseDialog()
+        private string GetFamilyHeader(ProductFamilyNode family)
         {
-            dialog.Close();
+            return $"{family.ProductFamily.Name} (Conteneurs: {family.TotalContainers}, Quantité: {family.TotalQuantity})";
         }
 
-        void RefreshData()
+        private string GetProductHeader(ProductNode product)
         {
-            
+            return $"{product.Product.Name} (Conteneurs: {product.TotalContainers}, Quantité: {product.TotalQuantity})";
         }
+
         private int cellNb;
         private int contenaireNb;
         private int productNb;
 
         void ShowInfo()
         {
-            if (selectedWorkshopId != 0)
+            if (selectedWorkshopId == 0)
+                return;
+
+            cellNb = 0;
+            contenaireNb = 0;
+            productNb = 0;
+
+            refreshCellList = null;
+
+            if (selectedProductFamilyId == 0)
             {
-                cellNb = 0;
-                contenaireNb = 0;
-                productNb = 0;
-                if (selectedProductFamilyId == 0)
+                cellNb = _cellList.Count();
+                contenaireNb = productTree.Sum(f => f.TotalContainers);
+                productNb = productTree.Sum(f => f.TotalQuantity);
+            }
+            else
+            {
+                var familyNode = productTree.FirstOrDefault(f => f.ProductFamily.Id == selectedProductFamilyId);
+                if (familyNode != null)
                 {
-                    refreshCellList = null;
-                    selectedProductId = 0;
-                    selectedColorId = 0;
-                    cellNb = _cellList.Count();
-                    if (_cellList != null)
+                    if (selectedProductId != 0)
                     {
-                        //contenaireNb = _contenaireList.Count(c => c.CellId!=null && c.CellStock?.WorkshopID == selectedWorkshopId);
-                        contenaireNb = _contenaireList.Count(c =>
-                                                c.CellID != null
-                                                && c.CellStock != null
-                                                && c.CellStock.RackCells != null
-                                                && c.CellStock.RackCells.Any(rc => rc.Rack.WorkshopID == selectedWorkshopId));
-                    }
-                }
-                else
-                {
-                    if (selectedColorId != 0)
-                    {
-                        refreshCellList = _cellList.Where(c => c.Containers.OrderBy(c=>c.Number).Any(c => c.ProdColorID == selectedColorId && c.ProductID == selectedProductId)).ToList();
-                        contenaireNb = refreshCellList.Sum(cell => cell.Containers.Where(c => c.ProdColorID == selectedColorId && c.ProductID == selectedProductId).Count());
-                    }
-                    else if (selectedProductId != 0)
-                    {
-                        refreshCellList = _cellList.Where(c => c.Containers.Any(c => c.ProductID == selectedProductId)).ToList();
-                        contenaireNb = refreshCellList.Sum(cell => cell.Containers.Where(c => c.ProductID == selectedProductId).Count());
-                    }
-                    else
-                    {
-                        foreach (var produit in _productService.GetAllPerProductFamily(selectedProductFamilyId))
+                        var productNode = familyNode.Products.FirstOrDefault(p => p.Product.Id == selectedProductId);
+                        if (productNode != null)
                         {
-                            if (refreshCellList == null)
+                            if (selectedColorId != 0)
                             {
-                                refreshCellList = _cellList.Where(c => c.Containers.Any(c => c.ProductID == produit.Id)).ToList();
-                                contenaireNb = refreshCellList.Sum(cell => cell.Containers.Where(c => c.ProductID == produit.Id).Count());
+                                var colorNode = productNode.Colors.FirstOrDefault(c => c.ProdColor.Id == selectedColorId);
+                                if (colorNode != null)
+                                {
+                                    contenaireNb = colorNode.TotalContainers;
+                                    productNb = colorNode.TotalQuantity;
+
+                                    refreshCellList = _cellList
+                                        .Where(cell => cell.Containers.Any(c =>
+                                            c.ProductID == selectedProductId &&
+                                            c.ProdColorID == selectedColorId))
+                                        .ToList();
+                                }
                             }
                             else
                             {
-                                refreshCellList = refreshCellList.Concat(_cellList.Where(c => c.Containers.Any(c => c.ProductID == produit.Id)).ToList()).ToList();
-                                contenaireNb += refreshCellList.Sum(cell => cell.Containers.Where(c => c.ProductID == produit.Id).Count());
-                            }        
+                                contenaireNb = productNode.TotalContainers;
+                                productNb = productNode.TotalQuantity;
+                                refreshCellList = _cellList
+                                    .Where(cell => cell.Containers.Any(c =>
+                                        c.ProductID == selectedProductId))
+                                    .ToList();
+                            }
                         }
                     }
-                    cellNb = refreshCellList.Count();
-                    
-                    if (SelectedProduct != null)
+                    else
                     {
-                        productNb = SelectedProduct.QuantityPerContainer * contenaireNb;
+                        contenaireNb = familyNode.TotalContainers;
+                        productNb = familyNode.TotalQuantity;
+
+                        var productIds = familyNode.Products.Select(p => p.Product.Id).ToHashSet();
+                        refreshCellList = _cellList
+                            .Where(cell => cell.Containers.Any(c =>
+                                productIds.Contains(c.ProductID ?? -1)))
+                            .ToList();
                     }
+
+                    cellNb = refreshCellList?.Count ?? 0;
                 }
             }
         }
+
 
 
     }
