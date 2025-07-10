@@ -19,6 +19,8 @@ namespace KANTAIM.DAL.Model
         [StringLength(50)]
         public string LoginADUser { get; set; }
 
+        public bool DarkMode { get; set; }
+
         public string? Comment { get; set; }
 
         [Column("FKTUserAccessLvlID")]

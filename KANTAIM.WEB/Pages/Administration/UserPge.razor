@@ -34,7 +34,11 @@
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
-
+            <PropertyColumn Property="x => x.DarkMode" Title="Dark Mode">
+                <EditTemplate>
+                    <MudCheckBox @bind-Checked=context.Item.DarkMode />
+                </EditTemplate>
+            </PropertyColumn>
             <PropertyColumn Property="x => x.Comment" Title="Commentaire" Required=false />
         </Columns>
         <PagerContent>

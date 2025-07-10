@@ -26,7 +26,7 @@
 <AuthorizeView>
     <PageTitle>KANTAIM.WEB</PageTitle>
 
-    <MudThemeProvider Theme="BicTheme" />
+    <MudThemeProvider Theme="BicTheme" @bind-IsDarkMode="@_isDarkMode" />
     <MudDialogProvider />
     <MudSnackbarProvider />
     @if (_userService.CurrentUserLvl > 0)
@@ -39,7 +39,11 @@
                     </MudPaper>*@
                 <MudImage Src="./css/LogoBic.png" Width="120" Style="margin-left:10px;cursor: pointer;" alt="Bouton" @onclick="NavigateToHome" />
 
-                <MudText Typo="Typo.h4" Class="ml-4 mr-12 pt-1 pb-2" Style="font-weight:bold" @onclick="@(()=>NavigateToImg(context.User.Identity?.Name.ToLower().ToString()))">KANTAIM</MudText>
+                @* <MudText Typo="Typo.h4" Class="ml-4 mr-12 pt-1 pb-2" Style="font-weight:bold" @onclick="@(()=>NavigateToImg(context.User.Identity?.Name.ToLower().ToString()))">KANTAIM</MudText> *@
+                <MudText Typo="Typo.h4" Class="ml-4 mr-4 ink-app-title"
+                         Style="@(_devModeService.DevMode ? "background-color:red;color:white;padding:4px;border-radius:4px;font-weight:bold;" : "font-weight:bold;")" @onclick="@(()=>NavigateToImg(context.User.Identity?.Name.ToLower().ToString()))">
+                    @(_devModeService.DevMode ? "KANTAIM DEV" : "KANTAIM")
+                </MudText>
                 @*Home*@
                 <MudButton Color="Color.Inherit" Link="/" StartIcon="@Icons.Material.Filled.Home" Class="appBarButton appBarLogo"
                          Style="--mud-typography-button-size:25px;--mud-typography-button-weight : bold;">Home</MudButton>
@@ -107,6 +111,7 @@
                 </MudMenu>
 
                 <MudSpacer/>
+                <MudToggleIconButton Icon="@Icons.Material.Filled.DarkMode" Color="@Color.Dark" ToggledIcon="@Icons.Material.Filled.LightMode" ToggledColor="@Color.Secondary" @bind-Toggled="@_isDarkMode" />
                 <div style=" margin-right:10px; font-size:15px">
                     <LoginDisplay />
                 </div>

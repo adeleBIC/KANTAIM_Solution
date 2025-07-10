@@ -16,15 +16,15 @@
                 <div style="flex:2; margin-right: 10px;">
                         <MudSelect T="int" @bind-Value="SelectedWorkshopId" Label="Atelier" Variant="MudBlazor.Variant.Outlined" Style="width: 200px;">
                             @foreach (var Workshop in _workshopList)
-                        {
+                            {
                                 <MudSelectItem T="int" Value="@(Workshop.Id)">@Workshop.Name</MudSelectItem>
-                        }
+                            }
                     </MudSelect>
                 </div>
             </div>
             </MudItem>
 
-             <MudItem xs="12" Style="display: flex; justify-content: center; align-items: center; background-color:linen">
+             <MudItem xs="12" Style="display: flex; justify-content: center; align-items: center; background-color:orange">
                 <div style="display: flex; gap: 20px;">
                     <MudText Typo="Typo.h6">Nombre de cellules: @cellNb</MudText>
                     <MudText Typo="Typo.h6">Quantité de conteneurs: @contenaireNb</MudText>
@@ -55,7 +55,7 @@
                             <MudSelect T="int" @bind-Value="SelectedColorId" Label="Couleur" Variant="MudBlazor.Variant.Outlined" Style="width: 300px;" Placeholder="Aucune">
                             @foreach (var color in colorList)
                             {
-                                    <MudSelectItem T="int" Value="@(color.Id)">@color.Name</MudSelectItem>
+                                <MudSelectItem T="int" Value="@(color.Id)">@color.Name</MudSelectItem>
                             }
                         </MudSelect>
                     </div>

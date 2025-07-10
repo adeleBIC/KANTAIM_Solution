@@ -19,12 +19,15 @@ using KANTAIM.DAL.Model;
 
 namespace KANTAIM.WEB.Shared
 {
-    public partial class MainLayout
+    public partial class MainLayout : IDisposable
     {
         [Inject] public UserService _userService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
         [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+        [Inject] public DevModeService _devModeService { get; set; }
         [Inject] ISnackbar _snackService { get; set; }
+
+        private bool _isDarkMode;
 
         //public int UserLvl { get; set; }
 
@@ -38,10 +41,17 @@ namespace KANTAIM.WEB.Shared
 
             User user = _userService.GetByName(userName);
             _userService.SetCurrentUserLvl(userName);
+            _isDarkMode = user?.DarkMode ?? false;
+            _devModeService.OnChange += StateHasChanged;
 
             //UserLvl = user?.UserAccessLvl.AccesLvL ?? 0;
 
             await InvokeAsync(StateHasChanged);
+        }
+
+        public void Dispose()
+        {
+            _devModeService.OnChange -= StateHasChanged;
         }
 
         private void NavigateToAuthorizedPage(string page, int lvl)
@@ -71,7 +81,15 @@ namespace KANTAIM.WEB.Shared
 
         MudTheme BicTheme = new MudTheme()
         {
-            Palette = new Palette()
+            PaletteDark = new PaletteDark()
+            {
+                AppbarBackground = "#b65b04",
+                AppbarText = "#000000",
+                Primary = "#f89332",
+                Secondary = "#fcfcfb",
+                Tertiary = "#b65b04",
+            },
+            Palette = new PaletteLight()
             {
                 AppbarBackground = "#f89332",
                 AppbarText = "#000000",

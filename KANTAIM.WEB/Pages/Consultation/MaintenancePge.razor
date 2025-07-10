@@ -36,52 +36,12 @@
 
 </style>
 
-@* <div>
-    <MudText Typo="Typo.h4" style="display: flex; padding: 0 15px;">Maintenance Page</MudText>
-    <div style="flex: 1; display: flex; justify-content: center;">
-        <MudButton Variant="MudBlazor.Variant.Outlined" OnClick="TogglePopover" Color="Color.Primary"
-                   style="width: 300px;" id="btnPopover">
-            List de Contenaires
-        </MudButton>
-    </div>
-</div>
-
-<MudPopover Open="@isPopoverOpen" OnClose="ClosePopover"
-            Anchor="#btnPopover"
-            AnchorOrigin="Origin.BottomCenter"
-            TransformOrigin="Origin.TopCenter">
-    <MudPaper Class="p-4"
-              Style="width: 300px; max-height: 800px; display: flex; flex-direction: column;
-                     background-color: white; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);">
-
-        <MudIconButton Icon="@Icons.Material.Filled.Close" Color="Color.Error" OnClick="TogglePopover"
-                       Style="position: absolute; top: 5px; right: 5px;" />
-
-        <MudList Dense Style="flex: 1; overflow-y: auto; max-height: 500px; margin-top: 10px">
-            @foreach (var contenaire in contenairesNames)
-            {
-                <MudListItem Style="@(selectedContenaire?.Number == contenaire.Number ? "border: 2px solid orange;" : "")"
-                             OnClick="() => SelectContenaire(contenaire)">
-                    Contenaire - @contenaire.Number
-                </MudListItem>
-            }
-        </MudList>
-
-        <MudButton Variant="MudBlazor.Variant.Filled" Color="Color.Warning"
-                   Style="margin-top: 10px; width: 100%;"
-                   OnClick="MiseEnMaintenance">
-            Mise en maintenance
-        </MudButton>
-    </MudPaper>
-</MudPopover>
- *@
-
 <div>
     <MudText Typo="Typo.h4" style="display: flex; padding: 0 15px;">Maintenance Page</MudText>
     <div style="flex: 1; display: flex; justify-content: center;">
-        <MudButton Variant="MudBlazor.Variant.Outlined" OnClick="TogglePopover" Color="Color.Primary"
+        <MudButton Variant="MudBlazor.Variant.Filled" OnClick="TogglePopover" Color="Color.Primary"
                    style="width: 300px;" id="btnPopover">
-            List de Contenaires
+            Liste de Contenaires
         </MudButton>
     </div>
 </div>

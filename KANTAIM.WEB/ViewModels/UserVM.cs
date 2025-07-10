@@ -20,6 +20,7 @@ namespace KANTAIM.WEB.ViewModels
 
             loginADUser = model.LoginADUser;
             userAccessLvlId = model.UserAccessLvlId;
+            darkMode = model.DarkMode;
             comment = model.Comment;
         }
 
@@ -37,6 +38,14 @@ namespace KANTAIM.WEB.ViewModels
         {
             get { return loginADUser; }
             set { loginADUser = value; IsEditing = true; }
+        }
+
+        [Label("Dark Mode")]
+        private bool darkMode;
+        public bool DarkMode
+        {
+            get { return darkMode; }
+            set { darkMode = value; IsEditing = true; }
         }
 
         [Label("Commentaire")]
@@ -70,6 +79,7 @@ namespace KANTAIM.WEB.ViewModels
             {
                 model.LoginADUser = loginADUser;
                 model.UserAccessLvlId = userAccessLvlId;
+                model.DarkMode = darkMode;
                 model.Comment = comment;
             }
 
