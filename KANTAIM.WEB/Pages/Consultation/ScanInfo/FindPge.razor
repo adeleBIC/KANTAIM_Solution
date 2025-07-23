@@ -8,23 +8,34 @@
 @using MudBlazor;
 @using System.ComponentModel.DataAnnotations;
 
-<MudPaper Height="830px" Style="overflow:hidden; position:relative;">
-    <MudDrawerContainer Class="mud-height-full">
+
+<!--
+    On utilise une structure flex en colonne :
+    - Partie haute : filtres + statistiques + cell grid (fixe)
+    - Partie basse : arbre produit (scrollable et remplit l'espace restant)
+-->
+
+<MudPaper Style="height:100%; display:flex; flex-direction:column; overflow:hidden;">
+
+    <!-- 🟢 Partie HAUTE : Filtres et informations générales -->
+    <div style="flex:0;">
         <MudGrid>
+            <!-- Filtres atelier -->
             <MudItem xs="12" Style="display: flex; justify-content: center; align-items: flex-start; margin-top: 20px;">
-            <div style="display: flex; justify-content: space-between;">
-                <div style="flex:2; margin-right: 10px;">
+                <div style="display: flex; justify-content: space-between;">
+                    <div style="flex:2; margin-right: 10px;">
                         <MudSelect T="int" @bind-Value="SelectedWorkshopId" Label="Atelier" Variant="MudBlazor.Variant.Outlined" Style="width: 200px;">
                             @foreach (var Workshop in _workshopList)
                             {
                                 <MudSelectItem T="int" Value="@(Workshop.Id)">@Workshop.Name</MudSelectItem>
                             }
-                    </MudSelect>
+                        </MudSelect>
+                    </div>
                 </div>
-            </div>
             </MudItem>
 
-             <MudItem xs="12" Style="display: flex; justify-content: center; align-items: center; background-color:orange">
+            <!-- Statistiques globales -->
+            <MudItem xs="12" Style="display: flex; justify-content: center; align-items: center; background-color:orange">
                 <div style="display: flex; gap: 20px;">
                     <MudText Typo="Typo.h6">Nombre de cellules: @cellNb</MudText>
                     <MudText Typo="Typo.h6">Quantité de conteneurs: @contenaireNb</MudText>
@@ -32,17 +43,18 @@
                 </div>
             </MudItem>
 
-            <MudItem xs="12" Style="display: flex; justify-content: center; align-items: flex-start; ">
+            <!-- Filtres produits -->
+            <MudItem xs="12" Style="display: flex; justify-content: center; align-items: flex-start;">
                 <div style="display: flex; justify-content: space-between;">
-                
                     <div style="flex:2; margin-right: 10px;">
-                        <MudSelect T="int" @bind-Value="SelectedProductFamilyId" Label="Famille de produits" Variant="MudBlazor.Variant.Outlined"  Style="width: 200px;">
+                        <MudSelect T="int" @bind-Value="SelectedProductFamilyId" Label="Famille de produits" Variant="MudBlazor.Variant.Outlined" Style="width: 200px;">
                             @foreach (var productfamily in productfamiliesList)
                             {
                                 <MudSelectItem T="int" Value="@(productfamily.Id)">@productfamily.Name</MudSelectItem>
                             }
                         </MudSelect>
                     </div>
+
                     <div style="flex: 1; margin-right: 10px;">
                         <MudSelect T="int" @bind-Value="SelectedProductId" Label="Produit" Variant="MudBlazor.Variant.Outlined" Style="width: 300px;" Placeholder="Aucune">
                             @foreach (var product in productList)
@@ -51,18 +63,18 @@
                             }
                         </MudSelect>
                     </div>
+
                     <div style="flex: 1; margin-right: 10px;">
-                            <MudSelect T="int" @bind-Value="SelectedColorId" Label="Couleur" Variant="MudBlazor.Variant.Outlined" Style="width: 300px;" Placeholder="Aucune">
+                        <MudSelect T="int" @bind-Value="SelectedColorId" Label="Couleur" Variant="MudBlazor.Variant.Outlined" Style="width: 300px;" Placeholder="Aucune">
                             @foreach (var color in colorList)
                             {
                                 <MudSelectItem T="int" Value="@(color.Id)">@color.Name</MudSelectItem>
                             }
                         </MudSelect>
                     </div>
-                   @*  <div style="display: flex; justify-content: center; margin-top: 10px;">
-                    <MudButton Variant="MudBlazor.Variant.Filled" Color="Color.Primary" OnClick="RefreshData">Afficher</MudButton>
-                </div> *@
                 </div>
+
+                <!-- Liste des statuts -->
                 <MudPaper>
                     <div style="overflow-x: auto; width: 100%; overflow-y: hidden">
                         <MudList Style="display: flex; flex-direction: row; gap: 10px;">
@@ -77,108 +89,105 @@
                     </div>
                 </MudPaper>
             </MudItem>
-
         </MudGrid>
-        <MudPaper Height="840px" Style="overflow:hidden; position:relative;  margin-top: 20px; margin-right: 10px; margin-left: 10px;">
-            <div style="overflow-x: auto; width: 100%;overflow-y: hidden">
-                <MudGrid>
-                    @foreach (var row in _cellList.Where(c => c.X < 900).GroupBy(c => -c.Y).OrderBy(g => g.Key))
-                    {
-                        <MudItem xs="12" Style="display: flex; justify-content: flex-start; align-items: center; min-width: max-content;">
-                            @foreach (var cell in row.OrderBy(c => c.X))
-                            {
-                                <MudCard Class="cell-card" Style="@GetCardStyle(cell.Status)"
-                                         @onclick="() => ShowCellDetails(cell)">
-                                    @if (refreshCellList== null || refreshCellList.Contains(cell)) {
-                                        <MudTooltip Text="@cell.Name">
-                                        <ChildContent>
-                                            <MudText>@cell.Name</MudText>
-                                        </ChildContent>
-                                        <TooltipContent>
-                                            <MudText >
-                                                    Nombre: @_contenaireList.Where(u => u.CellID == cell.Id).Count()
-                                            </MudText>
-                                                @if (cell != null && cell.Status != StatusCell.Empty)
-                                                {
-                                                    Container container = _contenaireService.GetByCellId(cell.Id).FirstOrDefault();
-                                                    <MudText>Produit: @container?.Product?.Name</MudText>
-                                                    <MudText>Couleur: @container?.ProdColor?.Name</MudText>
-                                                    <MudText>Date: @container?.LastEvent?.ToString("yyyy-MM-dd HH:mm:ss")</MudText>
 
-                                                }
-                                           @*  <MudText>Produit: @_logList.Where(u => u.CellID == cell.Id).OrderByDescending(u => u.EventTime).FirstOrDefault();</MudText> *@
-                                        </TooltipContent>
-                                    </MudTooltip>
-                                    }
-                                    
-                                </MudCard>
-                            }
-                        </MudItem>
-                    }
-                </MudGrid>
-            </div>
-            @if (_cellList.Any(c => c.X >= 900))
+        <!-- Séparateur entre la partie filtres et la partie cellule -->
+        <MudDivider />
+
+        <!-- 🟢 Grille des cellules (fixe aussi) -->
+        <MudGrid>
+            @foreach (var row in _cellList.Where(c => c.X < 900).GroupBy(c => -c.Y).OrderBy(g => g.Key))
             {
-                <MudDivider />
-
-                <MudPaper  Style="overflow-x: auto; white-space: nowrap; margin-top: 20px; padding: 10px;">
-                    <div style="display: flex; flex-wrap: nowrap; gap: 10px;">
-                        @foreach (var cell in _cellList.Where(c => c.X >= 900).OrderBy(c => c.X))
-                        {
-                            <MudCard Class="cell-card" Style="@GetCardStyle(cell.Status)" @onclick="() => ShowCellDetails(cell)">
+                <MudItem xs="12" Style="display: flex; justify-content: flex-start; align-items: center; min-width: max-content;">
+                    @foreach (var cell in row.OrderBy(c => c.X))
+                    {
+                        <MudCard Class="cell-card" Style="@GetCardStyle(cell.Status)" @onclick="() => ShowCellDetails(cell)">
+                            @if (refreshCellList == null || refreshCellList.Contains(cell))
+                            {
                                 <MudTooltip Text="@cell.Name">
                                     <ChildContent>
                                         <MudText>@cell.Name</MudText>
                                     </ChildContent>
                                     <TooltipContent>
-                                        <MudText >
-                                            Status: @cellStatus[cell.Status]
-                                        </MudText>
-                                        <MudText>Nombre: @_contenaireService.GetByCellId(cell.Id).Count()</MudText>
+                                        <MudText>Nombre: @_contenaireList.Where(u => u.CellID == cell.Id).Count()</MudText>
+                                        @if (cell != null && cell.Status != StatusCell.Empty)
+                                        {
+                                            Container container = _contenaireService.GetByCellId(cell.Id).FirstOrDefault();
+                                            <MudText>Produit: @container?.Product?.Name</MudText>
+                                            <MudText>Couleur: @container?.ProdColor?.Name</MudText>
+                                            <MudText>Date: @container?.LastEvent?.ToString("yyyy-MM-dd HH:mm:ss")</MudText>
+                                        }
                                     </TooltipContent>
                                 </MudTooltip>
-                            </MudCard>
-                        }
-                    </div>
-                </MudPaper>
-            }
-            <div style="max-height: 400px; overflow-y: auto; padding: 10px;">
-            <MudExpansionPanels>
-
-                @foreach (var family in productTree)
-                {
-                    <MudExpansionPanel Text="@GetFamilyHeader(family)">
-                        <MudExpansionPanels>
-
-                            @foreach (var product in family.Products)
-                            {
-                                <MudExpansionPanel Text="@GetProductHeader(product)">
-                                    <MudTable Items="product.Colors" Dense="true">
-                                        <HeaderContent>
-                                            <MudTh>Couleur</MudTh>
-                                            <MudTh>Conteneurs</MudTh>
-                                            <MudTh>Qté/Conteneur</MudTh>
-                                            <MudTh>Qté Totale</MudTh>
-                                        </HeaderContent>
-                                        <RowTemplate>
-                                            <MudTd>@context.ProdColor.Name</MudTd>
-                                            <MudTd>@context.TotalContainers</MudTd>
-                                            <MudTd>@context.QuantityPerContainer</MudTd>
-                                            <MudTd>@context.TotalQuantity</MudTd>
-                                        </RowTemplate>
-                                    </MudTable>
-                                </MudExpansionPanel>
                             }
+                        </MudCard>
+                    }
+                </MudItem>
+            }
+        </MudGrid>
 
-                        </MudExpansionPanels>
-                    </MudExpansionPanel>
-                }
+        @if (_cellList.Any(c => c.X >= 900))
+        {
+            <MudDivider />
+            <MudPaper Style="overflow-x: auto; white-space: nowrap; margin-top: 20px; padding: 10px;">
+                <div style="display: flex; flex-wrap: nowrap; gap: 10px;">
+                    @foreach (var cell in _cellList.Where(c => c.X >= 900).OrderBy(c => c.X))
+                    {
+                        <MudCard Class="cell-card" Style="@GetCardStyle(cell.Status)" @onclick="() => ShowCellDetails(cell)">
+                            <MudTooltip Text="@cell.Name">
+                                <ChildContent>
+                                    <MudText>@cell.Name</MudText>
+                                </ChildContent>
+                                <TooltipContent>
+                                    <MudText>Status: @cellStatus[cell.Status]</MudText>
+                                    <MudText>Nombre: @_contenaireService.GetByCellId(cell.Id).Count()</MudText>
+                                </TooltipContent>
+                            </MudTooltip>
+                        </MudCard>
+                    }
+                </div>
+            </MudPaper>
+        }
+    </div>
 
-            </MudExpansionPanels>
-            </div>
-        </MudPaper>
+    <!-- 🟢 Séparateur entre partie haute et arbre produit -->
+    <MudDivider />
 
-    </MudDrawerContainer>
+    <!-- 🟢 Partie BASSE : Arbre produit scrollable (occupe le reste de la page) -->
+    <!--
+        flex:1 => prend tout l'espace restant
+        min-height:0 => important pour que le scroll interne fonctionne
+        overflow-y:auto => permet le défilement uniquement pour cette zone
+    -->
+    <div style="flex:1; min-height:0; overflow-y:auto; padding:10px;">
+        <MudExpansionPanels MultiExpansion="true" Style="height:100%;">
+            @foreach (var family in productTree)
+            {
+                <MudExpansionPanel Text="@GetFamilyHeader(family)">
+                    <MudExpansionPanels MultiExpansion="true">
+                        @foreach (var product in family.Products)
+                        {
+                            <MudExpansionPanel Text="@GetProductHeader(product)">
+                                <MudTable Items="product.Colors" Dense="true">
+                                    <HeaderContent>
+                                        <MudTh>Couleur</MudTh>
+                                        <MudTh>Conteneurs</MudTh>
+                                        <MudTh>Qté/Conteneur</MudTh>
+                                        <MudTh>Qté Totale</MudTh>
+                                    </HeaderContent>
+                                    <RowTemplate>
+                                        <MudTd>@context.ProdColor.Name</MudTd>
+                                        <MudTd>@context.TotalContainers</MudTd>
+                                        <MudTd>@context.QuantityPerContainer</MudTd>
+                                        <MudTd>@context.TotalQuantity</MudTd>
+                                    </RowTemplate>
+                                </MudTable>
+                            </MudExpansionPanel>
+                        }
+                    </MudExpansionPanels>
+                </MudExpansionPanel>
+            }
+        </MudExpansionPanels>
+    </div>
+
 </MudPaper>
-
-
