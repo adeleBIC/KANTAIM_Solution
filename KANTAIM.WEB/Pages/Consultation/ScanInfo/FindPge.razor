@@ -9,15 +9,11 @@
 @using System.ComponentModel.DataAnnotations;
 
 
-<!--
-    On utilise une structure flex en colonne :
-    - Partie haute : filtres + statistiques + cell grid (fixe)
-    - Partie basse : arbre produit (scrollable et remplit l'espace restant)
--->
+
 
 <MudPaper Style="height:100%; display:flex; flex-direction:column; overflow:hidden;">
 
-    <!-- 🟢 Partie HAUTE : Filtres et informations générales -->
+    <!-- Filtres et informations générales -->
     <div style="flex:0;">
         <MudGrid>
             <!-- Filtres atelier -->
@@ -150,15 +146,9 @@
         }
     </div>
 
-    <!-- 🟢 Séparateur entre partie haute et arbre produit -->
     <MudDivider />
 
-    <!-- 🟢 Partie BASSE : Arbre produit scrollable (occupe le reste de la page) -->
-    <!--
-        flex:1 => prend tout l'espace restant
-        min-height:0 => important pour que le scroll interne fonctionne
-        overflow-y:auto => permet le défilement uniquement pour cette zone
-    -->
+
     <div style="flex:1; min-height:0; overflow-y:auto; padding:10px;">
         <MudExpansionPanels MultiExpansion="true" Style="height:100%;">
             @foreach (var family in productTree)
