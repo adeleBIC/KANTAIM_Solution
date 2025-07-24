@@ -50,7 +50,7 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
             public ProdColor ProdColor { get; set; }
             public int TotalContainers { get; set; }
             public int QuantityPerContainer { get; set; }
-            public int TotalQuantity => TotalContainers * QuantityPerContainer;
+            public int TotalQuantity { get; set; }
         }
 
         public class ProductNode
@@ -121,15 +121,48 @@ private void initialTable()
                         c.CellStock.RackCells.Any(rc => rc.Rack.WorkshopID == selectedWorkshopId))
                     .ToList();
 
-                var colorNode = new ProductColorNode
-                {
-                    ProdColor = prodColor,
-                    QuantityPerContainer = product.QuantityPerContainer,
-                    TotalContainers = colorContainers.Count
-                };
+                        double totalWeightedContainers = 0;
+                        int totalContainersCount = 0;
 
-                productNode.Colors.Add(colorNode);
-            }
+                        foreach (var container in colorContainers)
+                        {
+                            double weight = 0;
+
+                            switch (container.FillStatus)
+                            {
+                                case StatusContainer.Empty:
+                                    weight = 0;
+                                    break;
+                                case StatusContainer.HalfFull:
+                                    weight = 0.25;
+                                    break;
+                                case StatusContainer.Full:
+                                    weight = 1; 
+                                    break;
+                                case StatusContainer.Canceled:
+                                    weight = 0; 
+                                    break;
+                                default:
+                                    weight = 0; 
+                                    break;
+                            }
+
+                            totalWeightedContainers += weight;
+                            totalContainersCount++; 
+                        }
+
+                        var colorNode = new ProductColorNode
+                        {
+                            ProdColor = prodColor,
+                            QuantityPerContainer = product.QuantityPerContainer,
+                            TotalContainers = totalContainersCount,
+                        };
+
+                
+                        colorNode.TotalQuantity = (int)(totalWeightedContainers * product.QuantityPerContainer);
+
+                        productNode.Colors.Add(colorNode);
+                    }
 
             // Ajouter le produit s’il a au moins une couleur (avec ou sans conteneurs)
             if (productNode.Colors.Any())
