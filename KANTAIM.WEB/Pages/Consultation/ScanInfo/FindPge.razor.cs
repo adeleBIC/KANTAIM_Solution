@@ -319,12 +319,12 @@ private void initialTable()
 
         private string GetFamilyHeader(ProductFamilyNode family)
         {
-            return $"{family.ProductFamily.Name} (Conteneurs: {family.TotalContainers}, Quantité: {family.TotalQuantity})";
+            return $"{family.ProductFamily.Name} (Conteneurs: {family.TotalContainers.ToString("N0")}, Quantité: {family.TotalQuantity.ToString("N0")})";
         }
 
         private string GetProductHeader(ProductNode product)
         {
-            return $"{product.Product.Name} (Conteneurs: {product.TotalContainers}, Quantité: {product.TotalQuantity})";
+            return $"{product.Product.Name} (Conteneurs: {product.TotalContainers.ToString("N0")}, Quantité: {product.TotalQuantity.ToString("N0")})";
         }
 
         private int cellNb;

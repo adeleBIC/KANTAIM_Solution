@@ -33,9 +33,9 @@
             <!-- Statistiques globales -->
             <MudItem xs="12" Style="display: flex; justify-content: center; align-items: center; background-color:orange">
                 <div style="display: flex; gap: 20px;">
-                    <MudText Typo="Typo.h6">Nombre de cellules: @cellNb</MudText>
-                    <MudText Typo="Typo.h6">Quantité de conteneurs: @contenaireNb</MudText>
-                    <MudText Typo="Typo.h6">Quantité de produits: @productNb</MudText>
+                    <MudText Typo="Typo.h6">Nombre de cellules: @cellNb.ToString("N0")</MudText>
+                    <MudText Typo="Typo.h6">Quantité de conteneurs: @contenaireNb.ToString("N0")</MudText>
+                    <MudText Typo="Typo.h6">Quantité de produits: @productNb.ToString("N0")</MudText>
                 </div>
             </MudItem>
 
@@ -136,7 +136,7 @@
                                 </ChildContent>
                                 <TooltipContent>
                                     <MudText>Status: @cellStatus[cell.Status]</MudText>
-                                    <MudText>Nombre: @_contenaireService.GetByCellId(cell.Id).Count()</MudText>
+                                    <MudText>Nombre: @_contenaireService.GetByCellId(cell.Id).Count().ToString("N0")</MudText>
                                 </TooltipContent>
                             </MudTooltip>
                         </MudCard>
@@ -167,9 +167,9 @@
                                     </HeaderContent>
                                     <RowTemplate>
                                         <MudTd>@context.ProdColor.Name</MudTd>
-                                        <MudTd>@context.TotalContainers</MudTd>
-                                        <MudTd>@context.QuantityPerContainer</MudTd>
-                                        <MudTd>@context.TotalQuantity</MudTd>
+                                        <MudTd>@context.TotalContainers.ToString("N0")</MudTd>
+                                        <MudTd>@context.QuantityPerContainer.ToString("N0")</MudTd>
+                                        <MudTd>@context.TotalQuantity.ToString("N0")</MudTd>
                                     </RowTemplate>
                                 </MudTable>
                             </MudExpansionPanel>
