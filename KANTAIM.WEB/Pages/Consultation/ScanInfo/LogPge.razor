@@ -2,10 +2,18 @@
 @using KANTAIM.DAL.Model;
 @using KANTAIM.WEB.ViewModels;
 
-
-
 <style>
     .wide-column {
+        min-width: 180px;
+    }
+    .date-filter-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+    .date-picker {
         min-width: 180px;
     }
 </style>
@@ -14,20 +22,53 @@
     <MudText Typo="Typo.h4">Historique action Kanban</MudText>
 </div>
 
+<!-- Filtre par date -->
+<div class="date-filter-container">
+   @*  <MudText Typo="Typo.body1">Filtrer par date:</MudText> *@
+    <MudDatePicker @bind-Date="startDate" 
+                   Label="Date de début" 
+                   DateFormat="dd/MM/yyyy"
+                   Class="date-picker" />
+    <MudDatePicker @bind-Date="endDate" 
+                   Label="Date de fin" 
+                   DateFormat="dd/MM/yyyy"
+                   Class="date-picker" />
+    <MudButton Variant="MudBlazor.Variant.Filled" 
+               Color="Color.Primary" 
+               OnClick="ApplyDateFilter">
+        Appliquer
+    </MudButton>
+    <MudButton Variant="MudBlazor.Variant.Outlined" 
+               Color="Color.Primary" 
+               OnClick="ResetDateFilter">
+        30 derniers jours
+    </MudButton>
+    <MudButton Variant="MudBlazor.Variant.Text" 
+               Color="Color.Primary" 
+               OnClick="ClearDateFilter">
+        Afficher tout
+    </MudButton>
+</div>
+
+@if (isLoading)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-2" />
+}
 @if (Logs != null)
 {
-    /* ReadOnly=true si on voudrais log ne peux pas etre modifié */
     <MudDataGrid T="LogVM" RowClassFunc="RowClassFct" Items="@Logs" Dense=true Hover=true ReadOnly=true EditMode="MudBlazor.DataGridEditMode.Cell"
                  Virtualize="true" SelectOnRowClick=false MultiSelection=true SelectedItemsChanged="SelectionChanged" Bordered=true
                  Filterable="true" SortMode="SortMode.Multiple" Hideable="false" QuickFilter="@_quickFilter">
-        <ToolBarContent>
-@*             <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Save" OnClick="SaveAsync" Color="Color.Primary"></MudIconButton>
-            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Delete" OnClick="DeleteAsync" Color="Color.Error"></MudIconButton>
-            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Cancel" OnClick="CancelAsync" Color="Color.Primary"></MudIconButton> *@
+@*         <ToolBarContent>
             <MudSpacer />
-            <MudTextField @bind-Value="_searchString" Placeholder="Recherche Container" Adornment="Adornment.Start" Immediate="true"
-                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-        </ToolBarContent>
+            <MudTextField @bind-Value="_searchString" 
+                         Placeholder="Recherche Container" 
+                         Adornment="Adornment.Start" 
+                         Immediate="true"
+                         AdornmentIcon="@Icons.Material.Filled.Search" 
+                         IconSize="Size.Medium" 
+                         Class="mt-0" />
+        </ToolBarContent> *@
 
         <Columns>
             <SelectColumn ShowInFooter=false />
