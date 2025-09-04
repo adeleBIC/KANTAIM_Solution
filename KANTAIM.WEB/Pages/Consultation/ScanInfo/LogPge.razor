@@ -23,7 +23,8 @@
 </div>
 
 <!-- Filtre par date -->
-<div class="date-filter-container">
+<MudPaper Class="p-4 mb-4 d-flex flex-wrap align-items-center gap-4" Elevation="2" Rounded="true" Outlined="true">
+
    @*  <MudText Typo="Typo.body1">Filtrer par date:</MudText> *@
     <MudDatePicker @bind-Date="startDate" 
                    Label="Date de début" 
@@ -48,7 +49,7 @@
                OnClick="ClearDateFilter">
         Afficher tout
     </MudButton>
-</div>
+</MudPaper>
 
 @if (isLoading)
 {

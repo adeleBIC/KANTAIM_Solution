@@ -90,8 +90,9 @@
         <!-- Séparateur entre la partie filtres et la partie cellule -->
         <MudDivider />
 
-        <!-- 🟢 Grille des cellules (fixe aussi) -->
+        <!-- 🟢 Grille des cellules -->
         <MudGrid>
+            <MudPaper Style="overflow-x: auto; white-space: nowrap; padding: 10px;">
             @foreach (var row in _cellList.Where(c => c.X < 900).GroupBy(c => -c.Y).OrderBy(g => g.Key))
             {
                 <MudItem xs="12" Style="display: flex; justify-content: flex-start; align-items: center; min-width: max-content;">
@@ -120,6 +121,7 @@
                     }
                 </MudItem>
             }
+            </MudPaper>
         </MudGrid>
 
         @if (_cellList.Any(c => c.X >= 900))
