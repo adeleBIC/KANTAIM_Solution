@@ -167,9 +167,13 @@ namespace KANTAIM.APK.Components.Pages
             ContainerScanner.ContainerAction = _actionService.GetByStatus(4);// En vidange
             ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
             ContainerScanner.FillStatus = StatusContainer.Undefinded;
+            ContainerScanner.MachineID = MachineScanner.Id;
+
+            // Faire une IF pour la gestion des ContainerScanner.ContainerType.IsContainable = true
+            //Ces contenaires passe a totalement vide aprés l'injection
+
             ContainerScanner.CellID = null;
             ContainerScanner.ContainerID = null;
-            ContainerScanner.MachineID = MachineScanner.Id;
             ContainerScanner.LastEvent = u.EventTime;
             _contenaireService.UpSert(ContainerScanner);
 
