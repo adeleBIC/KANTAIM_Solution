@@ -260,6 +260,7 @@ namespace KANTAIM.WEB.ViewModels
 
             //if (string.IsNullOrWhiteSpace(QRCode)) list.Add(new ValIDationResult("Le QRCode est obligatoire", new string[] { "QRCode" }));
             if (Number == 0) list.Add(new ValidationResult("Number obligatoire", new string[] { "Number" }));
+            if (Id == ContainerID) list.Add(new ValidationResult("Le container de stockage ne peut être lui même", new string[] { "ContainerID" }));
             if (Containers.Any(c => c.Number == Number && c.Id != Id))
             {
                 list.Add(new ValidationResult("Le numéro de conteneur doit être unique.", new string[] { "Number" }));
