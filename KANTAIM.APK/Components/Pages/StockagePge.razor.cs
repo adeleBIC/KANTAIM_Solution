@@ -430,7 +430,7 @@ namespace KANTAIM.APK.Components.Pages
             ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
             ContainerScanner.BigContainer = PalletScanner;
             ContainerScanner.ContainerID = PalletScanner.Id;
-            ContainerScanner.FillStatus = Fillstatus;
+            //ContainerScanner.FillStatus = Fillstatus;
             ContainerScanner.Product = PalletScanner.Product;
             ContainerScanner.ProductID = PalletScanner.ProductID;
             ContainerScanner.ProdColor = PalletScanner.ProdColor;
@@ -635,7 +635,7 @@ namespace KANTAIM.APK.Components.Pages
                         item.CellID = CellScanner.Id;
                     }
                     
-                    item.FillStatus = Fillstatus; 
+                    //item.FillStatus = Fillstatus; 
                     if((ContainerScanner != null && ContainerScanner.InJail) || (PalletScanner != null && PalletScanner.InJail)) item.InJail = true;
                     if ((ContainerScanner != null && ContainerScanner.InMaintenance) || (PalletScanner != null && PalletScanner.InMaintenance)) item.InMaintenance = true;
                     _contenaireService.UpSert(item);
