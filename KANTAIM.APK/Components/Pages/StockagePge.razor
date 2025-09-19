@@ -123,6 +123,7 @@
         break;
     case 4 :
         {
+            
             @if (Id == 2)
             {
                 <div class="button-group">
@@ -169,6 +170,12 @@
                 }
             </div>
         }
+        @if (InjectForBac)
+        {
+            <div class="button-group">
+                <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="() => SortieBacDirect()">Sortie</MudButton>
+            </div>
+        }
         break;
     case 0 : 
         @if (ContainerScanner != null)
@@ -206,23 +213,35 @@
                     <h3 class="title">Scanner d'autres bacs s'il vous plait</h3>
                 </div>
             }
-            <div class="display-container">
-                <h3 class="title">Choisissez l'état de remplissage s'il vous plait</h3>
+
+            @if (ContainerScanner.ContainerType.IsContainable)
+            {
                 <div class="button-group">
-                    @if (Id == 1)
-                    {
-                        <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="()=>FillstatusSelected(1)">vide</MudButton>
-                    }
-                    <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="()=>FillstatusSelected(2)">Semi-Plein</MudButton>
-                    <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="()=>FillstatusSelected(3)">Plein</MudButton>
+                    <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="() => SortieBacDirect()">Sortie</MudButton>
                 </div>
-                
-            </div>
-            @if (ContainerScanner.FillStatus != StatusContainer.Empty) {
-                <div class="button-group">
-                    <MudButton Color="Color.Info" Variant="MudBlazor.Variant.Filled" Href="@($"/TransferPge/{ContainerScanner.Number}")" Match="NavLinkMatch.All">Transfer Contenaire</MudButton>
+
+            } else
+            {
+                <div class="display-container">
+                    <h3 class="title">Choisissez l'état de remplissage s'il vous plait</h3>
+                    <div class="button-group">
+                        @if (Id == 1)
+                        {
+                            <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="() => FillstatusSelected(1)">vide</MudButton>
+                        }
+                        <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="() => FillstatusSelected(2)">Semi-Plein</MudButton>
+                        <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="() => FillstatusSelected(3)">Plein</MudButton>
+                    </div>
+
                 </div>
+                @if (ContainerScanner.FillStatus != StatusContainer.Empty)
+                {
+                    <div class="button-group">
+                        <MudButton Color="Color.Info" Variant="MudBlazor.Variant.Filled" Href="@($"/TransferPge/{ContainerScanner.Number}")" Match="NavLinkMatch.All">Transfer Contenaire</MudButton>
+                    </div>
+                }
             }
+
 
         }
 

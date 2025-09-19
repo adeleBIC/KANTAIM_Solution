@@ -57,6 +57,7 @@ namespace KANTAIM.APK.Components.Pages
         public Boolean IsPallet { get; set; } = false;
         public Container? BacScanner { get; set; }
         public Boolean ScanPallet { get; set; } = false;
+        public Boolean InjectForBac { get; set; } = false;
         public string? TextValue { get; set; }
 
         private int state;
@@ -112,11 +113,18 @@ namespace KANTAIM.APK.Components.Pages
                 }
             }
         }
+
+        
         void ContainerManage(int containerNumber)
         {
             ContainerScanner = _contenaireService.GetContainerByNumber(containerNumber);
-            if (!ContainerScanner.ContainerType.IsContainable || ContainerScanner.FillStatus != 1)
+            if (!ContainerScanner.ContainerType.IsContainable || ContainerScanner.FillStatus != StatusContainer.Empty)
             {
+                if(ContainerScanner.ContainerType.IsContainable) // si il est bac sur pallete qui est aprés l'initialisation
+                {
+                    InjectForBac = true;
+                }
+
                 if (ContainerScanner.ContainerType.NbrMaxContainer > 0)
                 {
                     bacList = _contenaireService.GetAll()
@@ -134,6 +142,7 @@ namespace KANTAIM.APK.Components.Pages
                     Product = _productService.GetById((int)ContainerScanner.ProductID);
                     ColorOfProduct = _colorService.GetById(ContainerScanner.ProdColorID);
                 }
+
             }
             else
             {
@@ -495,6 +504,37 @@ namespace KANTAIM.APK.Components.Pages
             var options = new DialogOptions { CloseOnEscapeKey = true };
 
             await DialogService.ShowAsync<BacDialog>("Bacs associés à la palette", parameters, options);
+        }
+
+        void SortieBacDirect()
+        {
+            _shipment = true;
+            ContainerScanner.BigContainer = null;
+            ContainerScanner.ContainerID = null;
+            ContainerScanner.ContainerAction = _actionService.GetByStatus(OperationContainer.Shipment);
+            ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
+            Log u = new Log()
+            {
+                EventTime = DateTime.Now,
+                Operation = OperationContainer.Shipment,
+                Product = ContainerScanner.Product,
+                ProductID = ContainerScanner.ProductID,
+                Press = ContainerScanner.Press,
+                PressID = ContainerScanner.PressID,
+                Shape = ContainerScanner.Press?.Shape,
+                ShapeID = ContainerScanner.Press?.ShapeID,
+                Machine = ContainerScanner.Machine,
+                MachineID = ContainerScanner.MachineID,
+                Container = ContainerScanner,
+                ContainerID = ContainerScanner.Id,
+                ProdColor = ContainerScanner.ProdColor,
+                ProdColorID = ContainerScanner.ProdColorID,
+                FillStatus = ContainerScanner.FillStatus
+            };
+            _logService.UpSert(u);
+            _contenaireService.UpSert(ContainerScanner);
+            _snackService.Add("Bien sortie !", Severity.Success); 
+            NavigationManager.NavigateTo($"/");
         }
 
         void Exit(int action)

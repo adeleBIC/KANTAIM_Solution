@@ -164,10 +164,20 @@ namespace KANTAIM.APK.Components.Pages
             };
             _logService.UpSert(u);
 
-            ContainerScanner.ContainerAction = _actionService.GetByStatus(4);// En vidange
-            ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
-            ContainerScanner.FillStatus = StatusContainer.Undefinded;
-            ContainerScanner.MachineID = MachineScanner.Id;
+            if(ContainerScanner.ContainerType.IsContainable)
+            {
+                ContainerScanner.ContainerAction = _actionService.GetByStatus(OperationContainer.Undefinded);// Stocké Vide
+                ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
+                ContainerScanner.FillStatus = StatusContainer.Empty;
+                ContainerScanner.MachineID = MachineScanner.Id;
+            } else
+            {
+                ContainerScanner.ContainerAction = _actionService.GetByStatus(4);// En vidange
+                ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
+                ContainerScanner.FillStatus = StatusContainer.Undefinded;
+                ContainerScanner.MachineID = MachineScanner.Id;
+            }
+
 
             // Faire une IF pour la gestion des ContainerScanner.ContainerType.IsContainable = true
             //Ces contenaires passe a totalement vide aprés l'injection
