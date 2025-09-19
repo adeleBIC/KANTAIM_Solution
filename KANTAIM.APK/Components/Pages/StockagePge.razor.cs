@@ -118,13 +118,11 @@ namespace KANTAIM.APK.Components.Pages
         void ContainerManage(int containerNumber)
         {
             ContainerScanner = _contenaireService.GetContainerByNumber(containerNumber);
-            if (!ContainerScanner.ContainerType.IsContainable || ContainerScanner.FillStatus != StatusContainer.Empty)
+            if(ContainerScanner.ContainerType.IsContainable && ContainerScanner.FillStatus != StatusContainer.Empty)// si il est bac sur pallete qui est aprés l'initialisation
             {
-                if(ContainerScanner.ContainerType.IsContainable) // si il est bac sur pallete qui est aprés l'initialisation
-                {
-                    InjectForBac = true;
-                }
-
+                InjectForBac = true;
+            } else
+            {
                 if (ContainerScanner.ContainerType.NbrMaxContainer > 0)
                 {
                     bacList = _contenaireService.GetAll()
@@ -142,14 +140,9 @@ namespace KANTAIM.APK.Components.Pages
                     Product = _productService.GetById((int)ContainerScanner.ProductID);
                     ColorOfProduct = _colorService.GetById(ContainerScanner.ProdColorID);
                 }
+            }
+            
 
-            }
-            else
-            {
-                ContainerScanner = null;
-                _snackService.Add("Svp scannez une palette ou un contenaire !", Severity.Error);
-                NavigationManager.NavigateTo($"/");
-            }
         }
 
         void BacScan(string code)
