@@ -142,6 +142,19 @@ namespace KANTAIM.APK.Components.Pages
             }
         }
 
+        void VerifyEmptyPallet(Container PaletteScanner)
+        {
+            //PaletteScanner = _contenaireService.GetContainerByNumber(paletteNumber);
+            if (PaletteScanner!= null || _contenaireService.CountBac(PaletteScanner.Id) == 0) // s'il n'y a plus de bac sur la palette
+            {
+                PaletteScanner.ContainerAction = _actionService.GetByStatus(0);// Stocké Vide
+                PaletteScanner.ActionID = PaletteScanner.ContainerAction.Id;
+                PaletteScanner.FillStatus = StatusContainer.Empty;//Palette statut changé à vide
+                _contenaireService.UpSert(PaletteScanner);
+            }
+        }
+
+
         void Inject()
         {
             var cellstock = ContainerScanner.CellStock;
@@ -170,6 +183,7 @@ namespace KANTAIM.APK.Components.Pages
                 ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
                 ContainerScanner.FillStatus = StatusContainer.Empty;
                 ContainerScanner.MachineID = MachineScanner.Id;
+                VerifyEmptyPallet(ContainerScanner.BigContainer);
             } else
             {
                 ContainerScanner.ContainerAction = _actionService.GetByStatus(4);// En vidange
@@ -177,10 +191,6 @@ namespace KANTAIM.APK.Components.Pages
                 ContainerScanner.FillStatus = StatusContainer.Undefinded;
                 ContainerScanner.MachineID = MachineScanner.Id;
             }
-
-
-            // Faire une IF pour la gestion des ContainerScanner.ContainerType.IsContainable = true
-            //Ces contenaires passe a totalement vide aprés l'injection
 
             ContainerScanner.CellID = null;
             ContainerScanner.ContainerID = null;
