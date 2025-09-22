@@ -29,11 +29,14 @@ namespace KANTAIM.WEB.Pages.Administration
 
         public List<UserVM> Users { get; set; }
         private string _searchString;
+        private int _currentUserLvl;
+
 
         protected override async Task OnInitializedAsync()
         {
             //RefreshData();
             await Task.Run(RefreshData);
+            _currentUserLvl = _userService.CurrentUserLvl;
         }
 
         // quick filter - filter gobally across multiple columns with the same input
@@ -59,6 +62,18 @@ namespace KANTAIM.WEB.Pages.Administration
         {
             foreach (UserVM vm in Users.Where(vm => vm.IsEditing))
             {
+                if (vm.Id != 0 && vm.UserAccessLvlId > _currentUserLvl)
+                {
+                    _snackService.Add("Vous n'avez pas le droit de modifier cet utilisateur (niveau trop élevé).", Severity.Error);
+                    continue;
+                }
+
+                if (vm.UserAccessLvlId > _currentUserLvl)
+                {
+                    _snackService.Add("Vous ne pouvez pas attribuer un niveau supérieur au vôtre.", Severity.Error);
+                    continue;
+                }
+
                 ValidationContext validationContext = new ValidationContext(vm);
                 var validationResults = vm.Validate(validationContext).ToList();
 
@@ -67,8 +82,8 @@ namespace KANTAIM.WEB.Pages.Administration
                     User u = (User)vm;
                     _userService.UpSert(u);
                     vm.IsEditing = false;
-
                     _snackService.Add("Données sauvgardées !", Severity.Success);
+                    _currentUserLvl = _userService.CurrentUserLvl = vm.UserAccessLvlId;
                 }
                 else
                 {

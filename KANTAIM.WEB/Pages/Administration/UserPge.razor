@@ -26,12 +26,19 @@
 
             <PropertyColumn Property="x => x.UserAccessLvlId" Title="Niveau d'accès">
                 <EditTemplate>
-                    <MudSelect T=int @bind-Value=context.Item.UserAccessLvlId>
-                        @foreach (var f in context.Item.UserLvls)
-                        {
-                            <MudSelectItem T=int Value="@f.Id">@f.Name</MudSelectItem>
-                        }
-                    </MudSelect>
+                    @if (context.Item.UserAccessLvlId > _currentUserLvl)
+                    {
+                        <MudText>@context.Item.UserLvls.FirstOrDefault(l => l.Id == context.Item.UserAccessLvlId)?.Name</MudText>
+                    }
+                    else
+                    {
+                        <MudSelect T=int @bind-Value=context.Item.UserAccessLvlId>
+                            @foreach (var f in context.Item.UserLvls.Where(l => l.Id <= _currentUserLvl))
+                            {
+                                <MudSelectItem T=int Value="@f.Id">@f.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    }
                 </EditTemplate>
             </PropertyColumn>
             <PropertyColumn Property="x => x.DarkMode" Title="Dark Mode">
