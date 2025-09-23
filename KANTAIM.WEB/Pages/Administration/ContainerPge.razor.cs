@@ -1,4 +1,4 @@
-using global::System;
+ï»¿using global::System;
 using global::System.Collections.Generic;
 using global::System.Linq;
 using global::System.Threading.Tasks;
@@ -97,7 +97,7 @@ namespace KANTAIM.WEB.Pages.Administration
                         _contenaireService.UpSert(u);
                         vm.IsEditing = false;
 
-                        _snackService.Add("Données sauvgardées !", Severity.Success);
+                        _snackService.Add("DonnÃ©es sauvgardÃ©es !", Severity.Success);
                     }
                     catch (Exception ex)
                     {
@@ -136,7 +136,7 @@ namespace KANTAIM.WEB.Pages.Administration
 
                             _contenaireService.Delete(item.Id);
                             RefreshData();
-                            _snackService.Add("Données supprimées !", Severity.Success);
+                            _snackService.Add("DonnÃ©es supprimÃ©es !", Severity.Success);
                         }
                     }
                 });

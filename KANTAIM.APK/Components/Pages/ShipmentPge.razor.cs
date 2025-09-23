@@ -65,6 +65,10 @@ namespace KANTAIM.APK.Components.Pages
                 PaletteScanner.ActionID = PaletteScanner.ContainerAction.Id;
                 PaletteScanner.FillStatus = StatusContainer.Empty;//Palette statut changé à vide
                 _contenaireService.UpSert(PaletteScanner);
+            } else
+            {
+                PaletteScanner.FillStatus = StatusContainer.HalfFull;//Palette statut changé à semi-pleine
+                _contenaireService.UpSert(PaletteScanner);
             }
         }
 

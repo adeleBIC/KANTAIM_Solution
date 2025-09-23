@@ -145,7 +145,7 @@ namespace KANTAIM.APK.Components.Pages
         void VerifyEmptyPallet(Container PaletteScanner)
         {
             //PaletteScanner = _contenaireService.GetContainerByNumber(paletteNumber);
-            if (PaletteScanner!= null && _contenaireService.CountBac(PaletteScanner.Id) <= 1) // s'il n'y a plus de bac sur la palette
+            if (PaletteScanner != null && _contenaireService.CountBac(PaletteScanner.Id) <= 1) // s'il n'y a plus de bac sur la palette
             {
                 PaletteScanner.ContainerAction = _actionService.GetByStatus(0);// Stocké Vide
                 PaletteScanner.ActionID = PaletteScanner.ContainerAction.Id;
@@ -154,56 +154,63 @@ namespace KANTAIM.APK.Components.Pages
                 PaletteScanner.CellID = null;
                 _contenaireService.UpSert(PaletteScanner);
             }
-        }
-
-
-        void Inject()
-        {
-            var cellstock = ContainerScanner.CellStock;
-            Log u = new Log()
+            else if (PaletteScanner.FillStatus == StatusContainer.Full)
             {
-                EventTime = DateTime.Now,
-                Operation = OperationContainer.Inject, // Mise en machine
-                Product = ContainerScanner.Product,
-                ProductID = ContainerScanner.ProductID,
-                Press = ContainerScanner.Press,
-                PressID = ContainerScanner.PressID,
-                Shape = ContainerScanner.Press?.Shape,
-                ShapeID = ContainerScanner.Press?.ShapeID,
-                Container = ContainerScanner,
-                ContainerID = ContainerScanner.Id,
-                ProdColorID = ContainerScanner.ProdColorID,
-                FillStatus = ContainerScanner.FillStatus,
-                Machine = MachineScanner,
-                MachineID = MachineScanner.Id
-            };
-            _logService.UpSert(u);
-
-            if(ContainerScanner.ContainerType.IsContainable)
-            {
-                ContainerScanner.ContainerAction = _actionService.GetByStatus(OperationContainer.Undefinded);// Stocké Vide
-                ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
-                ContainerScanner.FillStatus = StatusContainer.Empty;
-                ContainerScanner.MachineID = MachineScanner.Id;
-                VerifyEmptyPallet(ContainerScanner.BigContainer);
-            } else
-            {
-                ContainerScanner.ContainerAction = _actionService.GetByStatus(4);// En vidange
-                ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
-                ContainerScanner.FillStatus = StatusContainer.Undefinded;
-                ContainerScanner.MachineID = MachineScanner.Id;
+                PaletteScanner.FillStatus = StatusContainer.HalfFull;//Palette statut changé à semi-pleine
+                _contenaireService.UpSert(PaletteScanner);
             }
-
-            ContainerScanner.CellID = null;
-            ContainerScanner.ContainerID = null;
-            ContainerScanner.LastEvent = u.EventTime;
-            _contenaireService.UpSert(ContainerScanner);
-
-            upDateCellState(cellstock);
-            inject = true;
-            NavigationManager.NavigateTo($"/");
-            _snackService.Add("Réussi !", Severity.Success);
         }
+
+
+            void Inject()
+            {
+                var cellstock = ContainerScanner.CellStock;
+                Log u = new Log()
+                {
+                    EventTime = DateTime.Now,
+                    Operation = OperationContainer.Inject, // Mise en machine
+                    Product = ContainerScanner.Product,
+                    ProductID = ContainerScanner.ProductID,
+                    Press = ContainerScanner.Press,
+                    PressID = ContainerScanner.PressID,
+                    Shape = ContainerScanner.Press?.Shape,
+                    ShapeID = ContainerScanner.Press?.ShapeID,
+                    Container = ContainerScanner,
+                    ContainerID = ContainerScanner.Id,
+                    ProdColorID = ContainerScanner.ProdColorID,
+                    FillStatus = ContainerScanner.FillStatus,
+                    Machine = MachineScanner,
+                    MachineID = MachineScanner.Id
+                };
+                _logService.UpSert(u);
+
+                if (ContainerScanner.ContainerType.IsContainable)
+                {
+                    ContainerScanner.ContainerAction = _actionService.GetByStatus(OperationContainer.Undefinded);// Stocké Vide
+                    ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
+                    ContainerScanner.FillStatus = StatusContainer.Empty;
+                    ContainerScanner.MachineID = MachineScanner.Id;
+                    VerifyEmptyPallet(ContainerScanner.BigContainer);
+                }
+                else
+                {
+                    ContainerScanner.ContainerAction = _actionService.GetByStatus(4);// En vidange
+                    ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
+                    ContainerScanner.FillStatus = StatusContainer.Undefinded;
+                    ContainerScanner.MachineID = MachineScanner.Id;
+                }
+
+                ContainerScanner.CellID = null;
+                ContainerScanner.ContainerID = null;
+                ContainerScanner.LastEvent = u.EventTime;
+                _contenaireService.UpSert(ContainerScanner);
+
+                upDateCellState(cellstock);
+                inject = true;
+                NavigationManager.NavigateTo($"/");
+                _snackService.Add("Réussi !", Severity.Success);
+            }
+        
 
         public override async void OnMessageReceived(InputMessage msg)
         {

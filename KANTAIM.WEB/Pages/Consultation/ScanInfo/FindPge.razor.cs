@@ -126,29 +126,36 @@ private void initialTable()
 
                         foreach (var container in colorContainers)
                         {
-                            double weight = 0;
-
-                            switch (container.FillStatus)
+                            if(container.ContainerType.NbrMaxContainer > 0)
                             {
-                                case StatusContainer.Empty:
-                                    weight = 0;
-                                    break;
-                                case StatusContainer.HalfFull:
-                                    weight = 0.25;
-                                    break;
-                                case StatusContainer.Full:
-                                    weight = 1; 
-                                    break;
-                                case StatusContainer.Canceled:
-                                    weight = 0; 
-                                    break;
-                                default:
-                                    weight = 0; 
-                                    break;
-                            }
+                                // Si c'est une palette, on compte pas
+                            } else
+                            {
+                                double weight = 0;
 
-                            totalWeightedContainers += weight;
-                            totalContainersCount++; 
+                                switch (container.FillStatus)
+                                {
+                                    case StatusContainer.Empty:
+                                        weight = 0;
+                                        break;
+                                    case StatusContainer.HalfFull:
+                                        weight = 0.25;
+                                        break;
+                                    case StatusContainer.Full:
+                                        weight = 1;
+                                        break;
+                                    case StatusContainer.Canceled:
+                                        weight = 0;
+                                        break;
+                                    default:
+                                        weight = 0;
+                                        break;
+                                }
+
+                                totalWeightedContainers += weight;
+                                totalContainersCount++;
+                            }
+                               
                         }
 
                         var colorNode = new ProductColorNode
