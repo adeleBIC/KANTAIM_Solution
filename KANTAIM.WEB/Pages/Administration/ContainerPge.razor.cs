@@ -30,54 +30,111 @@ namespace KANTAIM.WEB.Pages.Administration
         [Inject] IDialogService _dialogService { get; set; }
         [Inject] ISnackbar _snackService { get; set; }
 
-        public List<ContainerVM> Containers { get; set; }
-        public Dictionary<int,string> ContainerStatus {  get; set; }
+        public List<ContainerVM> Containers { get; set; } = new List<ContainerVM>();
+        public Dictionary<int, string> ContainerStatus { get; set; }
         public Dictionary<int, string> CellStatus { get; set; }
         private string _searchString;
+        private bool _isLoading = true;
 
-        
+        private int _currentPage = 0;
+        private int _pageSize = 50;
+        private int _totalItems = 0;
+
+        private List<Container> _allContainersForLookup;
+        private List<ContainerType> _containerTypes;
+        private List<Cell> _cells;
+        private List<ContainerAction> _actions;
+        private List<Product> _products;
+        private List<ProdColor> _colors;
+        private List<Press> _presses;
+        private List<Machine> _machines;
+
         protected override async Task OnInitializedAsync()
         {
+            _isLoading = true;
+            StateHasChanged();
+
             CellStatus = new StatusCell().Status;
             ContainerStatus = new StatusContainer().Status;
-            await Task.Run(RefreshData);
-        }
-        void RefreshData()
-        {
-            Containers = _contenaireService.GetAll(false).Select(u => new ContainerVM(u,
-                                                                    _contenaireService.GetAll(true),
-                                                                    _contenaireService.GetAllContainerType(),
-                                                                    _contenaireService.GetAllCell(),
-                                                                    _contenaireService.GetAllAction(),
-                                                                    _contenaireService.GetAllProd(),
-                                                                    _contenaireService.GetAllColor(),
-                                                                    _contenaireService.GetAllPress(),
-                                                                    _contenaireService.GetAllMachine())).ToList();
-            
+
+            await LoadLookupDataAsync();
+
+            await LoadPageDataAsync();
+
+            _isLoading = false;
+            StateHasChanged();
         }
 
-        // quick filter - filter gobally across multiple columns with the same input
-        private Func<ContainerVM, bool> _quickFilter => x =>
+        private async Task LoadLookupDataAsync()
         {
-            if (string.IsNullOrWhiteSpace(_searchString))
-                return true;
+            await Task.Run(() =>
+            {
+                _allContainersForLookup = _contenaireService.GetAll(false).ToList();
+                _containerTypes = _contenaireService.GetAllContainerType().ToList();
+                _cells = _contenaireService.GetAllCell().ToList();
+                _actions = _contenaireService.GetAllAction().ToList();
+                _products = _contenaireService.GetAllProd().ToList();
+                _colors = _contenaireService.GetAllColor().ToList();
+                _presses = _contenaireService.GetAllPress().ToList();
+                _machines = _contenaireService.GetAllMachine().ToList();
+            });
+        }
 
-            if (x.Number.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-                return true;
+        private async Task LoadPageDataAsync()
+        {
+            try
+            {
+                var (data, totalCount) = await _contenaireService.GetPagedContainersAsync(
+                    _currentPage,
+                    _pageSize,
+                    _searchString,
+                    false);
 
-            return false;
-        };
+                _totalItems = totalCount;
+
+                Containers = data.Select(u => new ContainerVM(u,
+                    _allContainersForLookup,
+                    _containerTypes,
+                    _cells,
+                    _actions,
+                    _products,
+                    _colors,
+                    _presses,
+                    _machines)).ToList();
+            }
+            catch (Exception ex)
+            {
+                _snackService.Add($"Erreur lors du chargement des données: {ex.Message}", Severity.Error);
+                Containers = new List<ContainerVM>();
+                _totalItems = 0;
+            }
+        }
+        private async Task OnSearchChanged(string searchTerm)
+        {
+            _searchString = searchTerm;
+            _currentPage = 0;
+            await LoadPageDataAsync();
+            StateHasChanged();
+        }
+
+        private async Task OnPageChanged(int page)
+        {
+            _currentPage = page;
+            await LoadPageDataAsync();
+            StateHasChanged();
+        }
 
         void AddAsync()
         {
-            ContainerVM item = new ContainerVM(_contenaireService.GetAll(false),
-                                                _contenaireService.GetAllContainerType(),
-                                                _contenaireService.GetAllCell(),
-                                                _contenaireService.GetAllAction(),
-                                                _contenaireService.GetAllProd(),
-                                                _contenaireService.GetAllColor(),
-                                                _contenaireService.GetAllPress(),
-                                                _contenaireService.GetAllMachine()) { IsEditing = true };
+            ContainerVM item = new ContainerVM(_allContainersForLookup,
+                                                _containerTypes,
+                                                _cells,
+                                                _actions,
+                                                _products,
+                                                _colors,
+                                                _presses,
+                                                _machines)
+            { IsEditing = true };
             Containers.Insert(0, item);
         }
 
@@ -101,11 +158,8 @@ namespace KANTAIM.WEB.Pages.Administration
                     }
                     catch (Exception ex)
                     {
-
-                        _snackService.Add($"{ex.Message}{ex.InnerException.Message}", Severity.Error);
+                        _snackService.Add($"{ex.Message}{ex.InnerException?.Message}", Severity.Error);
                     }
-
-                   
                 }
                 else
                 {
@@ -117,6 +171,8 @@ namespace KANTAIM.WEB.Pages.Administration
                     _snackService.Add(txt, Severity.Error);
                 }
             }
+
+            await LoadPageDataAsync();
             await InvokeAsync(StateHasChanged);
         }
 
@@ -126,27 +182,32 @@ namespace KANTAIM.WEB.Pages.Administration
 
             if (list.Count > 0)
             {
-                await _dialogService.Confirm($"Souhaitez-vous supprimer les {list.Count} lignes ?", () =>
+                await _dialogService.Confirm($"Souhaitez-vous supprimer les {list.Count} lignes ?", async () =>
                 {
-                    foreach (ContainerVM item in Containers.Where(vm => vm.IsChecked).ToList())
+                    foreach (ContainerVM item in list)
                     {
                         if (item.Id != 0)
                         {
-                            foreach (Log log in _logService.GetAllWithouInclude().Where(l => l.ContainerID == item.Id)) _logService.Delete(log.Id);
+                            await Task.Run(() =>
+                            {
+                                foreach (Log log in _logService.GetAllWithouInclude().Where(l => l.ContainerID == item.Id))
+                                    _logService.Delete(log.Id);
+                            });
 
                             _contenaireService.Delete(item.Id);
-                            RefreshData();
-                            _snackService.Add("Données supprimées !", Severity.Success);
                         }
                     }
+
+                    await LoadPageDataAsync();
+                    _snackService.Add("Données supprimées !", Severity.Success);
+                    StateHasChanged();
                 });
             }
-            await InvokeAsync(StateHasChanged);
         }
 
         async Task CancelAsync()
         {
-            RefreshData();
+            await LoadPageDataAsync();
             await InvokeAsync(StateHasChanged);
         }
 
@@ -155,11 +216,17 @@ namespace KANTAIM.WEB.Pages.Administration
             return unityVM.IsEditing ? "editing" : "";
         }
 
-        
         void SelectionChanged(HashSet<ContainerVM> changes)
         {
             foreach (var u in Containers)
                 u.IsChecked = changes.Contains(u);
         }
+
+        private async Task RefreshCurrentPageAsync()
+        {
+            await LoadPageDataAsync();
+            StateHasChanged();
+        }
+
     }
 }

@@ -2,23 +2,43 @@
 @using KANTAIM.DAL.Model;
 @using KANTAIM.WEB.ViewModels;
 
-<div class="pageTitle"
+<div class="pageTitle">
     <MudText Typo="Typo.h4">Contenaire</MudText>
 </div>
 
-@if (Containers != null)
+@if (_isLoading)
+{
+    <MudCard>
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px" />
+        <MudCardContent>
+            <MudSkeleton Width="30%" Height="42px;" />
+            <MudSkeleton Width="80%" />
+            <MudSkeleton Width="100%" />
+        </MudCardContent>
+        <MudCardActions>
+            <MudSkeleton Width="64px" Height="40px" Class="ml-2" />
+            <MudSkeleton Width="105px" Height="40px" Class="ml-3" />
+        </MudCardActions>
+        <MudProgressLinear Color="Color.Default" Indeterminate="true" Class="my-7" />
+    </MudCard>
+}
+else if (Containers != null)
 {
     <MudDataGrid T="ContainerVM" RowClassFunc="RowClassFct" Items="@Containers" Dense=true Hover=true ReadOnly=false EditMode="MudBlazor.DataGridEditMode.Cell"
-                 Virtualize="true" SelectOnRowClick=false MultiSelection=true SelectedItemsChanged="SelectionChanged" Bordered=true
-                 Filterable="true" SortMode="SortMode.Multiple" Hideable="false" QuickFilter="@_quickFilter">
+                 SelectOnRowClick=false MultiSelection=true SelectedItemsChanged="SelectionChanged" Bordered=true
+                 Filterable=false SortMode="SortMode.None" Hideable=false>
         <ToolBarContent>
             <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Add" OnClick="AddAsync" Color="Color.Primary"></MudIconButton>
             <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Save" OnClick="SaveAsync" Color="Color.Primary"></MudIconButton>
             <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Delete" OnClick="DeleteAsync" Color="Color.Error"></MudIconButton>
             <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Cancel" OnClick="CancelAsync" Color="Color.Primary"></MudIconButton>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Refresh" OnClick="RefreshCurrentPageAsync" Color="Color.Primary"></MudIconButton>
             <MudSpacer />
-            <MudTextField @bind-Value="_searchString" Placeholder="Recherche Container" Adornment="Adornment.Start" Immediate="true"
-                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            <MudTextField @bind-Value="_searchString" Placeholder="Recherche Container" Adornment="Adornment.Start" Immediate=false
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"
+                          OnKeyPress="@(async (e) => { if (e.Key == "Enter") await OnSearchChanged(_searchString); })"
+                          OnBlur="@(async () => await OnSearchChanged(_searchString))"></MudTextField>
+            <MudIconButton Icon="@Icons.Material.Filled.Search" OnClick="@(async () => await OnSearchChanged(_searchString))" />
         </ToolBarContent>
         <Columns>
             <SelectColumn ShowInFooter=false />
@@ -90,7 +110,7 @@
             <PropertyColumn Property="x => x.ColorName" Title="Couleur" Required=false>
                 <EditTemplate>
                     <MudSelect T=int? @bind-Value=context.Item.ColorID>
-                            <MudSelectItem T=int? Value="null">None</MudSelectItem>
+                        <MudSelectItem T=int? Value="null">None</MudSelectItem>
                         @foreach (var f in context.Item.Colors)
                         {
                             <MudSelectItem T=int? Value="@f.Id">@f.Name</MudSelectItem>
@@ -120,9 +140,8 @@
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
-           @*  <PropertyColumn Property="x => x.Status" Title="Status" /> *@
             <PropertyColumn Property="x => x.QRCode" Title="QRCode" Required=false />
-           
+
             <PropertyColumn Property="x => x.InJail" Title="Prison">
                 <EditTemplate>
                     <MudCheckBox @bind-Checked=context.Item.InJail />
@@ -141,23 +160,34 @@
             <PropertyColumn Property="x => x.Comment" Title="Commentaire" Required=false />
         </Columns>
         <PagerContent>
-            <MudDataGridPager T="ContainerVM" PageSizeOptions="@(new int[] {14, 30, 50,100})" />
+            <div class="d-flex align-items-center justify-content-between">
+                <MudText>Total: @_totalItems items</MudText>
+                <div class="d-flex align-items-center">
+                    <MudIconButton Icon="@Icons.Material.Filled.FirstPage"
+                                   Disabled="@(_currentPage == 0)"
+                                   OnClick="@(async () => await OnPageChanged(0))" />
+                    <MudIconButton Icon="@Icons.Material.Filled.ChevronLeft"
+                                   Disabled="@(_currentPage == 0)"
+                                   OnClick="@(async () => await OnPageChanged(_currentPage - 1))" />
+                    <MudText Class="mx-3">Page @(_currentPage + 1) of @(Math.Ceiling((double)_totalItems / _pageSize))</MudText>
+                    <MudIconButton Icon="@Icons.Material.Filled.ChevronRight"
+                                   Disabled="@((_currentPage + 1) * _pageSize >= _totalItems)"
+                                   OnClick="@(async () => await OnPageChanged(_currentPage + 1))" />
+                    <MudIconButton Icon="@Icons.Material.Filled.LastPage"
+                                   Disabled="@((_currentPage + 1) * _pageSize >= _totalItems)"
+                                   OnClick="@(async () => await OnPageChanged((int)Math.Ceiling((double)_totalItems / _pageSize) - 1))" />
+                    <MudSelect T=int Value="_pageSize" ValueChanged="@(async (int newSize) => { _pageSize = newSize; _currentPage = 0; await LoadPageDataAsync(); StateHasChanged(); })" Class="ml-3">
+                        <MudSelectItem Value="25">25</MudSelectItem>
+                        <MudSelectItem Value="50">50</MudSelectItem>
+                        <MudSelectItem Value="100">100</MudSelectItem>
+                        <MudSelectItem Value="200">200</MudSelectItem>
+                    </MudSelect>
+                </div>
+            </div>
         </PagerContent>
     </MudDataGrid>
 }
 else
 {
-    <MudCard>
-        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px" />
-        <MudCardContent>
-            <MudSkeleton Width="30%" Height="42px;" />
-            <MudSkeleton Width="80%" />
-            <MudSkeleton Width="100%" />
-        </MudCardContent>
-        <MudCardActions>
-            <MudSkeleton Width="64px" Height="40px" Class="ml-2" />
-            <MudSkeleton Width="105px" Height="40px" Class="ml-3" />
-        </MudCardActions>
-        <MudProgressLinear Color="Color.Default" Indeterminate="true" Class="my-7" />
-    </MudCard>
+    <MudAlert Severity="Severity.Info">Aucune donnée disponible</MudAlert>
 }
