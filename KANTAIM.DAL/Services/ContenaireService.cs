@@ -56,42 +56,7 @@ namespace KANTAIM.DAL.Services
             else return _repo.GetAll();
         }
 
-        // 新增: 分页获取数据的方法
-        public (IEnumerable<Container> Data, int TotalCount) GetPagedContainers(
-            int page,
-            int pageSize,
-            string searchTerm = null,
-            bool withInclude = false)
-        {
-            using DataKANTAIMContext ctx = new(_devModeService.DevMode);
-
-            var query = withInclude
-                ? ctx.Containers.Include(c => c.BigContainer)
-                                .Include(c => c.ContainerType)
-                                .Include(c => c.CellStock).ThenInclude(rc => rc.RackCells).ThenInclude(r => r.Rack)
-                                .Include(c => c.ContainerAction)
-                                .Include(c => c.Product)
-                                .Include(c => c.ProdColor)
-                                .Include(c => c.Press).ThenInclude(p => p.Shape)
-                                .Include(c => c.Machine)
-                : ctx.Containers.AsNoTracking(); // 使用 AsNoTracking 提高性能
-
-            // 应用搜索过滤
-            if (!string.IsNullOrWhiteSpace(searchTerm))
-            {
-                query = query.Where(c => c.Number.ToString().Contains(searchTerm));
-            }
-
-            int totalCount = query.Count();
-
-            var data = query.Skip(page * pageSize)
-                          .Take(pageSize)
-                          .ToList();
-
-            return (data, totalCount);
-        }
-
-        // 新增: 异步版本的分页方法
+      
         public async Task<(IEnumerable<Container> Data, int TotalCount)> GetPagedContainersAsync(
             int page,
             int pageSize,
@@ -109,11 +74,29 @@ namespace KANTAIM.DAL.Services
                                 .Include(c => c.ProdColor)
                                 .Include(c => c.Press).ThenInclude(p => p.Shape)
                                 .Include(c => c.Machine)
-                : ctx.Containers.AsNoTracking();
-
+                : ctx.Containers.Include(c => c.ContainerType)
+                                .Include(c => c.CellStock)
+                                .Include(c => c.ContainerAction)
+                                .Include(c => c.Product)
+                                .Include(c => c.ProdColor)
+                                .Include(c => c.Press)
+                                .Include(c => c.Machine)
+                                .AsNoTracking();
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
-                query = query.Where(c => c.Number.ToString().Contains(searchTerm));
+                var searchLower = searchTerm.ToLower();
+                query = query.Where(c =>
+                    c.Number.ToString().Contains(searchTerm) ||
+                    (c.ContainerType != null && c.ContainerType.Name.ToLower().Contains(searchLower)) ||
+                    (c.CellStock != null && c.CellStock.Name.ToLower().Contains(searchLower)) ||
+                    (c.ContainerAction != null && c.ContainerAction.Name.ToLower().Contains(searchLower)) ||
+                    (c.Product != null && c.Product.Name.ToLower().Contains(searchLower)) ||
+                    (c.ProdColor != null && c.ProdColor.Name.ToLower().Contains(searchLower)) ||
+                    (c.Press != null && c.Press.Number.ToString().Contains(searchTerm)) ||
+                    (c.Machine != null && c.Machine.Name.ToLower().Contains(searchLower)) ||
+                    (c.QRcode != null && c.QRcode.ToLower().Contains(searchLower)) ||
+                    (c.Comment != null && c.Comment.ToLower().Contains(searchLower))
+                );
             }
 
             int totalCount = await query.CountAsync();

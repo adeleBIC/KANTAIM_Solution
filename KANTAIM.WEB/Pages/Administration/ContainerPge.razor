@@ -2,6 +2,51 @@
 @using KANTAIM.DAL.Model;
 @using KANTAIM.WEB.ViewModels;
 
+<style>
+    /* 自定义列宽样式 */
+    .container-grid {
+        --mud-table-cell-padding: 8px;
+    }
+
+        .container-grid .mud-table-cell {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 120px;
+        }
+
+        .container-grid .wide-column {
+            min-width: 180px;
+        }
+
+        .container-grid .narrow-column {
+            min-width: 80px;
+            max-width: 100px;
+        }
+
+        .container-grid .medium-column {
+            min-width: 140px;
+            max-width: 160px;
+        }
+
+        .container-grid .qr-column {
+            min-width: 100px;
+            max-width: 120px;
+        }
+
+        .container-grid .comment-column {
+            min-width: 200px;
+        }
+
+        .container-grid .mud-select {
+            min-width: 100px;
+        }
+
+    .editing {
+        background-color: #f5f5f5 !important;
+    }
+</style>
+
 <div class="pageTitle">
     <MudText Typo="Typo.h4">Contenaire</MudText>
 </div>
@@ -24,28 +69,47 @@
 }
 else if (Containers != null)
 {
-    <MudDataGrid T="ContainerVM" RowClassFunc="RowClassFct" Items="@Containers" Dense=true Hover=true ReadOnly=false EditMode="MudBlazor.DataGridEditMode.Cell"
-                 SelectOnRowClick=false MultiSelection=true SelectedItemsChanged="SelectionChanged" Bordered=true
-                 Filterable=false SortMode="SortMode.None" Hideable=false>
+    <MudDataGrid T="ContainerVM"
+                 RowClassFunc="RowClassFct"
+                 Items="@Containers"
+                 Dense=true
+                 RowsPerPage="_pageSize"
+                 Hover=true
+                 ReadOnly=false
+                 EditMode="MudBlazor.DataGridEditMode.Cell"
+                 SelectOnRowClick=false
+                 MultiSelection=true
+                 SelectedItemsChanged="SelectionChanged"
+                 Bordered=true
+                 Filterable=false
+                 SortMode="SortMode.None"
+                 Hideable=false
+                 Class="container-grid">
         <ToolBarContent>
-            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Add" OnClick="AddAsync" Color="Color.Primary"></MudIconButton>
-            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Save" OnClick="SaveAsync" Color="Color.Primary"></MudIconButton>
-            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Delete" OnClick="DeleteAsync" Color="Color.Error"></MudIconButton>
-            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Cancel" OnClick="CancelAsync" Color="Color.Primary"></MudIconButton>
-            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Refresh" OnClick="RefreshCurrentPageAsync" Color="Color.Primary"></MudIconButton>
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Add" OnClick="AddAsync" Color="Color.Primary" />
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Save" OnClick="SaveAsync" Color="Color.Primary" />
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Delete" OnClick="DeleteAsync" Color="Color.Error" />
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Cancel" OnClick="CancelAsync" Color="Color.Primary" />
+            <MudIconButton Class="editButton" Variant="MudBlazor.Variant.Filled" Icon="@Icons.Material.Filled.Refresh" OnClick="RefreshCurrentPageAsync" Color="Color.Primary" />
             <MudSpacer />
-            <MudTextField @bind-Value="_searchString" Placeholder="Recherche Container" Adornment="Adornment.Start" Immediate=false
-                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"
+            <MudTextField @bind-Value="_searchString"
+                          Placeholder="Recherche (Numéro, Type, Cellule, Action, Produit, Couleur, Presse, Machine, QR, Commentaire)"
+                          Adornment="Adornment.Start"
+                          Immediate=false
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          IconSize="Size.Medium"
+                          Class="mt-0"
+                          Style="min-width: 400px;"
                           OnKeyPress="@(async (e) => { if (e.Key == "Enter") await OnSearchChanged(_searchString); })"
-                          OnBlur="@(async () => await OnSearchChanged(_searchString))"></MudTextField>
+                          OnBlur="@(async () => await OnSearchChanged(_searchString))" />
             <MudIconButton Icon="@Icons.Material.Filled.Search" OnClick="@(async () => await OnSearchChanged(_searchString))" />
         </ToolBarContent>
         <Columns>
             <SelectColumn ShowInFooter=false />
-            <PropertyColumn Property="x => x.Number" Title="Numéro" />
-            <PropertyColumn Property="x => x.FillStatus" Title="Remplissage">
+            <PropertyColumn Property="x => x.Number" Title="Numéro" Class="narrow-column" />
+            <PropertyColumn Property="x => x.FillStatus" Title="Remplissage" Class="medium-column">
                 <EditTemplate>
-                    <MudSelect T=int @bind-Value="context.Item.FillStatus">
+                    <MudSelect T=int @bind-Value="context.Item.FillStatus" Dense=true>
                         @foreach (var f in ContainerStatus)
                         {
                             <MudSelectItem Value="@f.Key">@f.Value</MudSelectItem>
@@ -53,9 +117,9 @@ else if (Containers != null)
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.ContainerTypeName" Title="Type">
+            <PropertyColumn Property="x => x.ContainerTypeName" Title="Type" Class="medium-column">
                 <EditTemplate>
-                    <MudSelect T=int? @bind-Value="context.Item.ContainerTypeID">
+                    <MudSelect T=int? @bind-Value="context.Item.ContainerTypeID" Dense=true>
                         @foreach (var f in context.Item.ContainerTypes)
                         {
                             <MudSelectItem T=int? Value="@f.Id">@f.Name</MudSelectItem>
@@ -63,9 +127,9 @@ else if (Containers != null)
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.ContainerName" Title="Stocké dans">
+            <PropertyColumn Property="x => x.ContainerName" Title="Stocké dans" Class="medium-column">
                 <EditTemplate>
-                    <MudSelect T=int? @bind-Value=context.Item.ContainerID>
+                    <MudSelect T=int? @bind-Value=context.Item.ContainerID Dense=true>
                         <MudSelectItem T=int? Value="null">None</MudSelectItem>
                         @foreach (var f in context.Item.Containers.OrderBy(s => s.Number))
                         {
@@ -74,10 +138,9 @@ else if (Containers != null)
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
-
-            <PropertyColumn Property="x => x.CellName" Title="Cellule">
+            <PropertyColumn Property="x => x.CellName" Title="Cellule" Class="medium-column">
                 <EditTemplate>
-                    <MudSelect T=int? @bind-Value=context.Item.CellID>
+                    <MudSelect T=int? @bind-Value=context.Item.CellID Dense=true>
                         <MudSelectItem T=int? Value="null">None</MudSelectItem>
                         @foreach (var f in context.Item.Cells)
                         {
@@ -86,9 +149,9 @@ else if (Containers != null)
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.ActionName" Title="Dernière action" Required=false>
+            <PropertyColumn Property="x => x.ActionName" Title="Dernière action" Required=false Class="medium-column">
                 <EditTemplate>
-                    <MudSelect T=int @bind-Value=context.Item.ActionID>
+                    <MudSelect T=int @bind-Value=context.Item.ActionID Dense=true>
                         @foreach (var f in context.Item.Actions)
                         {
                             <MudSelectItem T=int Value="@f.Id">@f.Name</MudSelectItem>
@@ -96,9 +159,9 @@ else if (Containers != null)
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.ProductName" Title="Produit" Required=false>
+            <PropertyColumn Property="x => x.ProductName" Title="Produit" Required=false Class="medium-column">
                 <EditTemplate>
-                    <MudSelect T=int? @bind-Value=context.Item.ProductID>
+                    <MudSelect T=int? @bind-Value=context.Item.ProductID Dense=true>
                         <MudSelectItem T=int? Value="null">None</MudSelectItem>
                         @foreach (var f in context.Item.Products)
                         {
@@ -107,9 +170,9 @@ else if (Containers != null)
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.ColorName" Title="Couleur" Required=false>
+            <PropertyColumn Property="x => x.ColorName" Title="Couleur" Required=false Class="medium-column">
                 <EditTemplate>
-                    <MudSelect T=int? @bind-Value=context.Item.ColorID>
+                    <MudSelect T=int? @bind-Value=context.Item.ColorID Dense=true>
                         <MudSelectItem T=int? Value="null">None</MudSelectItem>
                         @foreach (var f in context.Item.Colors)
                         {
@@ -118,9 +181,9 @@ else if (Containers != null)
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.PressName" Title="Presse" Required=false>
+            <PropertyColumn Property="x => x.PressName" Title="Presse" Required=false Class="narrow-column">
                 <EditTemplate>
-                    <MudSelect T=int? @bind-Value=context.Item.PressID>
+                    <MudSelect T=int? @bind-Value=context.Item.PressID Dense=true>
                         <MudSelectItem T=int? Value="null">None</MudSelectItem>
                         @foreach (var f in context.Item.Presses)
                         {
@@ -129,9 +192,9 @@ else if (Containers != null)
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.MachineName" Title="Machine" Required=false>
+            <PropertyColumn Property="x => x.MachineName" Title="Machine" Required=false Class="medium-column">
                 <EditTemplate>
-                    <MudSelect T=int? @bind-Value=context.Item.MachineID>
+                    <MudSelect T=int? @bind-Value=context.Item.MachineID Dense=true>
                         <MudSelectItem T=int? Value="null">None</MudSelectItem>
                         @foreach (var f in context.Item.Machines)
                         {
@@ -140,51 +203,68 @@ else if (Containers != null)
                     </MudSelect>
                 </EditTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.QRCode" Title="QRCode" Required=false />
-
-            <PropertyColumn Property="x => x.InJail" Title="Prison">
+            <PropertyColumn Property="x => x.QRCode" Title="QRCode" Required=false Class="qr-column" />
+            <PropertyColumn Property="x => x.InJail" Title="Prison" Class="narrow-column">
                 <EditTemplate>
                     <MudCheckBox @bind-Checked=context.Item.InJail />
                 </EditTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.InMaintenance" Title="Maintenance">
+            <PropertyColumn Property="x => x.InMaintenance" Title="Maintenance" Class="narrow-column">
                 <EditTemplate>
                     <MudCheckBox @bind-Checked=context.Item.InMaintenance />
                 </EditTemplate>
             </PropertyColumn>
             <PropertyColumn Property="x => x.Lastevent" Title="Date" Class="wide-column">
                 <CellTemplate>
-                    <MudTextField @bind-Value="context.Item.Lastevent" Format="dd/MM/yyyy HH:mm:ss" />
+                    <MudTextField @bind-Value="context.Item.Lastevent" Format="dd/MM/yyyy HH:mm:ss" Dense=true />
                 </CellTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.Comment" Title="Commentaire" Required=false />
+            <PropertyColumn Property="x => x.Comment" Title="Commentaire" Required=false Class="comment-column" />
         </Columns>
+        <NoRecordsContent>
+            <MudText>Aucun résultat trouvé</MudText>
+        </NoRecordsContent>
         <PagerContent>
-            <div class="d-flex align-items-center justify-content-between">
-                <MudText>Total: @_totalItems items</MudText>
-                <div class="d-flex align-items-center">
-                    <MudIconButton Icon="@Icons.Material.Filled.FirstPage"
-                                   Disabled="@(_currentPage == 0)"
-                                   OnClick="@(async () => await OnPageChanged(0))" />
-                    <MudIconButton Icon="@Icons.Material.Filled.ChevronLeft"
-                                   Disabled="@(_currentPage == 0)"
-                                   OnClick="@(async () => await OnPageChanged(_currentPage - 1))" />
-                    <MudText Class="mx-3">Page @(_currentPage + 1) of @(Math.Ceiling((double)_totalItems / _pageSize))</MudText>
-                    <MudIconButton Icon="@Icons.Material.Filled.ChevronRight"
-                                   Disabled="@((_currentPage + 1) * _pageSize >= _totalItems)"
-                                   OnClick="@(async () => await OnPageChanged(_currentPage + 1))" />
-                    <MudIconButton Icon="@Icons.Material.Filled.LastPage"
-                                   Disabled="@((_currentPage + 1) * _pageSize >= _totalItems)"
-                                   OnClick="@(async () => await OnPageChanged((int)Math.Ceiling((double)_totalItems / _pageSize) - 1))" />
-                    <MudSelect T=int Value="_pageSize" ValueChanged="@(async (int newSize) => { _pageSize = newSize; _currentPage = 0; await LoadPageDataAsync(); StateHasChanged(); })" Class="ml-3">
-                        <MudSelectItem Value="25">25</MudSelectItem>
+            <div class="d-flex align-items-center justify-content-between px-4 py-2">
+                <MudText Typo="Typo.body2" Class="me-3">
+                    Total: @_totalItems items (Page @(_currentPage + 1) sur @(Math.Max(1, (int)Math.Ceiling((double)_totalItems / _pageSize))))
+                </MudText>
+
+                <div class="d-flex align-items-center gap-3">
+                    <MudText Typo="Typo.body2">Éléments par page:</MudText>
+
+                    <MudSelect T=int Value="_pageSize"
+                               ValueChanged="@(async (int newSize) => await ChangePageSize(newSize))"
+                               Dense="true"
+                               Class="me-3"
+                               Style="min-width: 80px;">
+                        <MudSelectItem Value="14">14</MudSelectItem>
+                        <MudSelectItem Value="20">20</MudSelectItem>
+                        <MudSelectItem Value="30">30</MudSelectItem>
                         <MudSelectItem Value="50">50</MudSelectItem>
-                        <MudSelectItem Value="100">100</MudSelectItem>
-                        <MudSelectItem Value="200">200</MudSelectItem>
                     </MudSelect>
+
+                    <div class="d-flex align-items-center gap-1">
+                        <MudIconButton Icon="@Icons.Material.Filled.FirstPage"
+                                       Disabled="@(_currentPage == 0)"
+                                       OnClick="@(async () => await OnPageChanged(0))" />
+                        <MudIconButton Icon="@Icons.Material.Filled.ChevronLeft"
+                                       Disabled="@(_currentPage == 0)"
+                                       OnClick="@(async () => await OnPageChanged(_currentPage - 1))" />
+
+                        <MudText Typo="Typo.body2" Class="px-2">@(_currentPage + 1)</MudText>
+
+                        <MudIconButton Icon="@Icons.Material.Filled.ChevronRight"
+                                       Disabled="@((_currentPage + 1) * _pageSize >= _totalItems)"
+                                       OnClick="@(async () => await OnPageChanged(_currentPage + 1))" />
+                        <MudIconButton Icon="@Icons.Material.Filled.LastPage"
+                                       Disabled="@((_currentPage + 1) * _pageSize >= _totalItems)"
+                                       OnClick="@(async () => await OnPageChanged((int)Math.Ceiling((double)_totalItems / _pageSize) - 1))" />
+                    </div>
                 </div>
             </div>
         </PagerContent>
+
     </MudDataGrid>
 }
 else

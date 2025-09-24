@@ -97,85 +97,90 @@ private void initialTable()
 
         foreach (var product in productsInFamily)
         {
-            var productNode = new ProductNode
+            if(product.Active)
             {
-                Product = product
-            };
+                var productNode = new ProductNode
+                {
+                    Product = product
+                };
 
-            var colorLinks = allColorProducts
-                .Where(cp => cp.ProductID == product.Id)
-                .ToList();
-
-            foreach (var colorLink in colorLinks)
-            {
-                var prodColor = allColors.FirstOrDefault(c => c.Id == colorLink.ColorID);
-                if (prodColor == null) continue;
-
-                // Conteneurs pour ce produit + couleur + atelier sélectionné
-                var colorContainers = containers
-                    .Where(c =>
-                        c.ProductID == product.Id &&
-                        c.ProdColorID == prodColor.Id &&
-                        c.CellStock != null &&
-                        c.CellStock.RackCells != null &&
-                        c.CellStock.RackCells.Any(rc => rc.Rack.WorkshopID == selectedWorkshopId))
+                var colorLinks = allColorProducts
+                    .Where(cp => cp.ProductID == product.Id)
                     .ToList();
 
-                        double totalWeightedContainers = 0;
-                        int totalContainersCount = 0;
+                foreach (var colorLink in colorLinks)
+                {
+                    var prodColor = allColors.FirstOrDefault(c => c.Id == colorLink.ColorID);
+                    if (prodColor == null) continue;
 
-                        foreach (var container in colorContainers)
+                    // Conteneurs pour ce produit + couleur + atelier sélectionné
+                    var colorContainers = containers
+                        .Where(c =>
+                            c.ProductID == product.Id &&
+                            c.ProdColorID == prodColor.Id &&
+                            c.CellStock != null &&
+                            c.CellStock.RackCells != null &&
+                            c.CellStock.RackCells.Any(rc => rc.Rack.WorkshopID == selectedWorkshopId))
+                        .ToList();
+
+                    double totalWeightedContainers = 0;
+                    int totalContainersCount = 0;
+
+                    foreach (var container in colorContainers)
+                    {
+                        if (container.ContainerType.NbrMaxContainer > 0)
                         {
-                            if(container.ContainerType.NbrMaxContainer > 0)
-                            {
-                                // Si c'est une palette, on compte pas
-                            } else
-                            {
-                                double weight = 0;
+                            // Si c'est une palette, on compte pas
+                        }
+                        else
+                        {
+                            double weight = 0;
 
-                                switch (container.FillStatus)
-                                {
-                                    case StatusContainer.Empty:
-                                        weight = 0;
-                                        break;
-                                    case StatusContainer.HalfFull:
-                                        weight = 0.25;
-                                        break;
-                                    case StatusContainer.Full:
-                                        weight = 1;
-                                        break;
-                                    case StatusContainer.Canceled:
-                                        weight = 0;
-                                        break;
-                                    default:
-                                        weight = 0;
-                                        break;
-                                }
-
-                                totalWeightedContainers += weight;
-                                totalContainersCount++;
+                            switch (container.FillStatus)
+                            {
+                                case StatusContainer.Empty:
+                                    weight = 0;
+                                    break;
+                                case StatusContainer.HalfFull:
+                                    weight = 0.25;
+                                    break;
+                                case StatusContainer.Full:
+                                    weight = 1;
+                                    break;
+                                case StatusContainer.Canceled:
+                                    weight = 0;
+                                    break;
+                                default:
+                                    weight = 0;
+                                    break;
                             }
-                               
+
+                            totalWeightedContainers += weight;
+                            totalContainersCount++;
                         }
 
-                        var colorNode = new ProductColorNode
-                        {
-                            ProdColor = prodColor,
-                            QuantityPerContainer = product.QuantityPerContainer,
-                            TotalContainers = totalContainersCount,
-                        };
-
-                
-                        colorNode.TotalQuantity = (int)(totalWeightedContainers * product.QuantityPerContainer);
-
-                        productNode.Colors.Add(colorNode);
                     }
 
-            // Ajouter le produit s’il a au moins une couleur (avec ou sans conteneurs)
-            if (productNode.Colors.Any())
-            {
-                familyNode.Products.Add(productNode);
+                    var colorNode = new ProductColorNode
+                    {
+                        ProdColor = prodColor,
+                        QuantityPerContainer = product.QuantityPerContainer,
+                        TotalContainers = totalContainersCount,
+                    };
+
+
+                    colorNode.TotalQuantity = (int)(totalWeightedContainers * product.QuantityPerContainer);
+
+                    productNode.Colors.Add(colorNode);
+                }
+
+                // Ajouter le produit s’il a au moins une couleur (avec ou sans conteneurs)
+                if (productNode.Colors.Any())
+                {
+                    familyNode.Products.Add(productNode);
+                }
             }
+            
         }
 
         if (familyNode.Products.Any())

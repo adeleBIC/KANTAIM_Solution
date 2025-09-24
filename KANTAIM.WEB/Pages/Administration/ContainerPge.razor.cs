@@ -33,11 +33,11 @@ namespace KANTAIM.WEB.Pages.Administration
         public List<ContainerVM> Containers { get; set; } = new List<ContainerVM>();
         public Dictionary<int, string> ContainerStatus { get; set; }
         public Dictionary<int, string> CellStatus { get; set; }
-        private string _searchString;
+        private string _searchString = "";
         private bool _isLoading = true;
 
         private int _currentPage = 0;
-        private int _pageSize = 50;
+        private int _pageSize = 14;
         private int _totalItems = 0;
 
         private List<Container> _allContainersForLookup;
@@ -58,7 +58,6 @@ namespace KANTAIM.WEB.Pages.Administration
             ContainerStatus = new StatusContainer().Status;
 
             await LoadLookupDataAsync();
-
             await LoadPageDataAsync();
 
             _isLoading = false;
@@ -109,9 +108,10 @@ namespace KANTAIM.WEB.Pages.Administration
                 _totalItems = 0;
             }
         }
+
         private async Task OnSearchChanged(string searchTerm)
         {
-            _searchString = searchTerm;
+            _searchString = searchTerm?.Trim() ?? "";
             _currentPage = 0;
             await LoadPageDataAsync();
             StateHasChanged();
@@ -119,7 +119,17 @@ namespace KANTAIM.WEB.Pages.Administration
 
         private async Task OnPageChanged(int page)
         {
+            if (page < 0 || (page * _pageSize) >= _totalItems && _totalItems > 0) return;
+
             _currentPage = page;
+            await LoadPageDataAsync();
+            StateHasChanged();
+        }
+
+        private async Task ChangePageSize(int newSize)
+        {
+            _pageSize = newSize;
+            _currentPage = 0;
             await LoadPageDataAsync();
             StateHasChanged();
         }
@@ -136,11 +146,19 @@ namespace KANTAIM.WEB.Pages.Administration
                                                 _machines)
             { IsEditing = true };
             Containers.Insert(0, item);
+            StateHasChanged();
         }
 
         async Task SaveAsync()
         {
-            foreach (ContainerVM vm in Containers.Where(vm => vm.IsEditing))
+            var editingItems = Containers.Where(vm => vm.IsEditing).ToList();
+            if (!editingItems.Any())
+            {
+                _snackService.Add("Aucune modification à sauvegarder", Severity.Info);
+                return;
+            }
+
+            foreach (ContainerVM vm in editingItems)
             {
                 vm.QRCode = "1#" + vm.Number + "#" + vm.ContainerTypeID + "$";
                 ValidationContext validationContext = new ValidationContext(vm);
@@ -153,12 +171,11 @@ namespace KANTAIM.WEB.Pages.Administration
                         Container u = (Container)vm;
                         _contenaireService.UpSert(u);
                         vm.IsEditing = false;
-
-                        _snackService.Add("Données sauvgardées !", Severity.Success);
                     }
                     catch (Exception ex)
                     {
-                        _snackService.Add($"{ex.Message}{ex.InnerException?.Message}", Severity.Error);
+                        _snackService.Add($"Erreur sauvegarde: {ex.Message}{ex.InnerException?.Message}", Severity.Error);
+                        return; // Arrêter le processus en cas d'erreur
                     }
                 }
                 else
@@ -166,54 +183,85 @@ namespace KANTAIM.WEB.Pages.Administration
                     string txt = "<ul>";
                     foreach (ValidationResult item in validationResults)
                         txt += $"<li>{item.ErrorMessage}</li>";
-
                     txt += "</ul>";
                     _snackService.Add(txt, Severity.Error);
+                    return; // Arrêter le processus en cas d'erreur de validation
                 }
             }
 
+            _snackService.Add($"{editingItems.Count} élément(s) sauvegardé(s) avec succès!", Severity.Success);
             await LoadPageDataAsync();
-            await InvokeAsync(StateHasChanged);
+            StateHasChanged();
         }
 
         async Task DeleteAsync()
         {
             var list = Containers.Where(vm => vm.IsChecked).ToList();
 
-            if (list.Count > 0)
+            if (list.Count == 0)
             {
-                await _dialogService.Confirm($"Souhaitez-vous supprimer les {list.Count} lignes ?", async () =>
+                _snackService.Add("Aucun élément sélectionné", Severity.Warning);
+                return;
+            }
+
+            bool? result = await _dialogService.ShowMessageBox(
+                "Confirmation de suppression",
+                $"Souhaitez-vous vraiment supprimer les {list.Count} élément(s) sélectionné(s) ?",
+                yesText: "Oui", cancelText: "Annuler");
+
+            if (result == true)
+            {
+                try
                 {
                     foreach (ContainerVM item in list)
                     {
                         if (item.Id != 0)
                         {
+                            // Supprimer les logs associés
                             await Task.Run(() =>
                             {
-                                foreach (Log log in _logService.GetAllWithouInclude().Where(l => l.ContainerID == item.Id))
+                                var logs = _logService.GetAllWithouInclude().Where(l => l.ContainerID == item.Id).ToList();
+                                foreach (Log log in logs)
                                     _logService.Delete(log.Id);
                             });
 
                             _contenaireService.Delete(item.Id);
                         }
+                        else
+                        {
+                            // Supprimer les nouveaux éléments non sauvegardés de la liste
+                            Containers.Remove(item);
+                        }
                     }
 
+                    _snackService.Add($"{list.Count} élément(s) supprimé(s) avec succès!", Severity.Success);
                     await LoadPageDataAsync();
-                    _snackService.Add("Données supprimées !", Severity.Success);
                     StateHasChanged();
-                });
+                }
+                catch (Exception ex)
+                {
+                    _snackService.Add($"Erreur lors de la suppression: {ex.Message}", Severity.Error);
+                }
             }
         }
 
         async Task CancelAsync()
         {
+            // Supprimer les nouveaux éléments non sauvegardés
+            var newItems = Containers.Where(c => c.Id == 0 && c.IsEditing).ToList();
+            foreach (var item in newItems)
+            {
+                Containers.Remove(item);
+            }
+
+            // Recharger les données pour annuler les modifications
             await LoadPageDataAsync();
-            await InvokeAsync(StateHasChanged);
+            StateHasChanged();
         }
 
-        public string RowClassFct(ContainerVM unityVM, int row)
+        public string RowClassFct(ContainerVM containerVM, int row)
         {
-            return unityVM.IsEditing ? "editing" : "";
+            return containerVM.IsEditing ? "editing" : "";
         }
 
         void SelectionChanged(HashSet<ContainerVM> changes)
@@ -227,6 +275,5 @@ namespace KANTAIM.WEB.Pages.Administration
             await LoadPageDataAsync();
             StateHasChanged();
         }
-
     }
 }
