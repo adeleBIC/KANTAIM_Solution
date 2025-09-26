@@ -271,7 +271,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                 bac.CellID = palette.CellID;
                 bac.ActionID = palette.ActionID;
                 bac.FillStatus = palette.FillStatus;
-                bac.Status = palette.Status;
+                bac.Status = StatusContainer.Full;
                 bac.InJail = palette.InJail;
                 bac.InMaintenance = palette.InMaintenance;
                 bac.Comment = palette.Comment;

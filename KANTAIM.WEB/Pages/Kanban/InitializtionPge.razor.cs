@@ -180,7 +180,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                 logRescent = _logService.GetByContenaireId(palette.Id);
                 bac.CellID = palette.CellID;
                 bac.ActionID = palette.ActionID;
-                bac.FillStatus = palette.FillStatus;
+                bac.FillStatus = StatusContainer.Full;
                 bac.Status = palette.Status;
                 bac.InJail = palette.InJail;
                 bac.InMaintenance = palette.InMaintenance;

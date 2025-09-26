@@ -181,7 +181,7 @@ namespace KANTAIM.APK.Components.Pages
             {
                 bac.CellID = palette.CellID;
                 bac.ActionID = palette.ActionID;
-                bac.FillStatus = palette.FillStatus;
+                bac.FillStatus = StatusContainer.Full;
                 bac.Status = palette.Status;
                 bac.InJail = palette.InJail;
                 bac.InMaintenance = palette.InMaintenance;

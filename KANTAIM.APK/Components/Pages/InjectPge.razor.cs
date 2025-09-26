@@ -189,6 +189,12 @@ namespace KANTAIM.APK.Components.Pages
                     ContainerScanner.ContainerAction = _actionService.GetByStatus(OperationContainer.Undefinded);// Stocké Vide
                     ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
                     ContainerScanner.FillStatus = StatusContainer.Empty;
+                    ContainerScanner.Product = null;
+                    ContainerScanner.ProductID = null;
+                    ContainerScanner.ProdColor = null;
+                    ContainerScanner.ProdColorID = null;
+                    ContainerScanner.Press = null;
+                    ContainerScanner.PressID = null;
                     ContainerScanner.MachineID = MachineScanner.Id;
                     VerifyEmptyPallet(ContainerScanner.BigContainer);
                 }
