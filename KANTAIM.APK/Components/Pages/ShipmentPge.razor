@@ -88,7 +88,10 @@
             <MudButton Class="bouton"  Color="Color.Secondary" Variant="MudBlazor.Variant.Filled" Href="@($"/StockagePge/1/{ContainerScanner.Number}")" Match="NavLinkMatch.All">Déplacement Contenaire</MudButton>
             @if (!IsPalette)
             {
-                <MudButton Class="bouton" Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="Shipment">Sortie</MudButton>
+                @if (!ContainerScanner.ContainerType.IsContainable)
+                {
+                    <MudButton Class="bouton" Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="Shipment">Sortie</MudButton>
+                }
                 <MudButton Class="bouton" Color="Color.Info" Variant="MudBlazor.Variant.Filled" Href="@($"/InjectPge/1/{ContainerScanner.Number}")" Match="NavLinkMatch.All">Mise en Machine</MudButton>
             }
             </div>

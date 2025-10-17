@@ -38,9 +38,11 @@ namespace KANTAIM.APK.Components.Pages
         public List<ProdColor> Colors { get; set; }
 
         public List<Container> ContainerFindList { get; set; }
+        public List<Container> ContainerPhantomFindList { get; set; }
         public Container? ContainerScanner { get; set; }
         public DAL.Model.Cell? CellPropose { get; set; }
         public bool ShowAllCells { get; set; }
+        public bool ShowAllCellsPhantom { get; set; }
         private bool contFind;
 
         public bool ContFind
@@ -54,6 +56,11 @@ namespace KANTAIM.APK.Components.Pages
         void ToggleCellList()
         {
             ShowAllCells = !ShowAllCells;
+        }
+
+        void ToggleCellListPhantom()
+        {
+            ShowAllCellsPhantom = !ShowAllCellsPhantom;
         }
 
         public class CellLog
@@ -82,6 +89,7 @@ namespace KANTAIM.APK.Components.Pages
 
         void findCells()
         {
+
             ContainerFindList = new List<Container>(_contenaireService.GetAllByOperationStatus(ActionStatus.Store)
                                                                     .Where(c => c.CellStock != null &&
                                                                     c.ProductID == ProductScanner.Id &&
@@ -94,6 +102,17 @@ namespace KANTAIM.APK.Components.Pages
                                                                     c.CellStock.RackCells.Any(rc => profilSelected.RackProfils.Any(rp => rp.RackId == rc.RackId)))
                                                                     .OrderBy(c => c.LastEvent));
 
+            ContainerPhantomFindList = new List<Container>(_contenaireService.GetAllByOperationStatus(ActionStatus.Store)
+                                                                    .Where(c => c.CellStock != null &&
+                                                                    c.ProductID == ProductScanner.Id &&
+                                                                    (ColorChoose == null || c.ProdColorID == ColorChoose.Id) &&
+                                                                    c.CellID != ContainerScanner?.CellID &&
+                                                                    !c.CellStock.IsJail &&
+                                                                    !c.CellStock.IsMaintenance &&
+                                                                    c.CellStock.IsPhantom &&
+                                                                    c.CellStock.RackCells != null &&
+                                                                    c.CellStock.RackCells.Any(rc => profilSelected.RackProfils.Any(rp => rp.RackId == rc.RackId)))
+                                                                    .OrderBy(c => c.LastEvent));
             if (ContainerFindList != null && ContainerFindList.Count > 0) {CellPropose = ContainerFindList.FirstOrDefault()?.CellStock ?? null; }
 
         }
