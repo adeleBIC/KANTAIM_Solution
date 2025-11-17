@@ -1,0 +1,122 @@
+﻿
+.table-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow-y: auto;
+    height: auto;
+}
+
+.table-scroll-container {
+    flex: 1; /* occupe tout l’espace restant */
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin-top: 10px;
+    max-height: calc(100vh - 200px); /* adapte selon la hauteur du menu */
+}
+
+/* Ajustement responsive */
+@media (max-height: 800px) {
+    .table-scroll-container {
+        max-height: calc(100vh - 160px);
+    }
+}
+
+/* Bordures du tableau */
+table {
+    width: 99%;
+    border-collapse: collapse; /* évite les doubles lignes */
+    margin-top: 10px;
+}
+
+table, th, td {
+    border: 1px solid black; /* ajoute les bordures */
+}
+
+th, td {
+    text-align: center;
+    padding: 4px;
+}
+
+/* En-têtes colorés */
+.grey-th {
+    background-color: lightgrey;
+    font-size: 20px;
+    font-family: Calibri;
+}
+
+.orange-th {
+    background-color: darkorange;
+    font-size: 20px;
+    font-family: Calibri;
+}
+
+.sizeTd {
+    height: 35px;
+    font-size: 18px;
+}
+
+
+/* Style for correct data */
+.correct {
+    background-color: #4CAF50; /* Green */
+    color: white;
+}
+
+/* Style for fault data */
+.fault {
+    background-color: #f44336; /* Red */
+    color: white;
+}
+
+.sizeCommentTdColor {
+    height: 30px;
+    width: 30px;
+    font-size: 20px;
+    background-color: darkorange;
+}
+
+.sizeCommentTd {
+    height: 30px;
+    width: 30px;
+    font-size: 20px;
+}
+
+.tooltip1 {
+    position: relative;
+    display: inline-block;
+    font-size: 20px;
+}
+
+    .tooltip1 .tooltiptext1 {
+        visibility: hidden;
+        width: 300px;
+        background-color: #555;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px 0;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -60px;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+        .tooltip1 .tooltiptext1::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 20%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #555 transparent transparent transparent;
+        }
+
+    .tooltip1:hover .tooltiptext1 {
+        visibility: visible;
+        opacity: 1;
+    }
