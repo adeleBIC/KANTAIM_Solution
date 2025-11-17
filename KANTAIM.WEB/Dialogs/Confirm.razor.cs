@@ -16,7 +16,7 @@ using KANTAIM.WEB.Shared;
 using MudBlazor;
 using System.Globalization;
 
-namespace KANTAIM.WEB.Dialogs.Dialog
+namespace KANTAIM.WEB.Dialogs
 {
     public partial class Confirm
     {
