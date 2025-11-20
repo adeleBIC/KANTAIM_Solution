@@ -18,6 +18,8 @@ namespace KANTAIM.WEB.ViewModels
         {
             this.model = model;
             name = model.Name;
+            iPAdressConsign = model.IPAdressConsign;
+            generation = model.Generation;
             comment = model.Comment;
         }
 
@@ -35,6 +37,24 @@ namespace KANTAIM.WEB.ViewModels
             set { name = value; IsEditing = true; }
         }
 
+        private string iPAdressConsign;
+        [Required]
+        [Label("Adresse IP Consignateur")]
+        public string IPAdressConsign
+        {
+            get { return iPAdressConsign; }
+            set { iPAdressConsign = value; IsEditing = true; }
+        }
+
+        private int? generation;
+        [Required]
+        [Label("Génération concentrateur")]
+        public int? Generation
+        {
+            get { return generation; }
+            set { generation = value; IsEditing = true; }
+        }
+
         private string? comment;
         [Label("Commentaire")]
         public string? Comment
@@ -49,6 +69,8 @@ namespace KANTAIM.WEB.ViewModels
             else
             {
                 model.Name = name;
+                model.IPAdressConsign = iPAdressConsign;
+                model.Generation = generation; 
                 model.Comment = comment;
             }
         }

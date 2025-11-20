@@ -37,6 +37,11 @@ namespace Kantaim.OPC.Services
 
         public async Task<bool> ConnectAsync(string endpointUrl)
         {
+            if (string.IsNullOrEmpty(endpointUrl))
+            {
+                throw new InvalidOperationException("L'URL de l'endpoint OPC n'est pas configurée.");
+            }
+
             try
             {
                 var config = new ApplicationConfiguration

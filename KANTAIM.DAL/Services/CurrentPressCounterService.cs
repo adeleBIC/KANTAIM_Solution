@@ -36,10 +36,22 @@ namespace KANTAIM.DAL.Services
             return ctx.Press.Include(c => c.Shape).ThenInclude(C=>C.Product).ToList();
         }
 
+        public IEnumerable<Press> GetAllPressPerWorkshopInclude(int wsId)
+        {
+            using DataKANTAIMContext ctx = new(_devModeService.DevMode);
+            return ctx.Press.Where(w=>w.WorkshopID == wsId).Include(c => c.Shape).ThenInclude(C => C.Product).ToList();
+        }
+
         public Press GetPressByIdInclude(int id)
         {
             using DataKANTAIMContext ctx = new(_devModeService.DevMode);
             return ctx.Press.Include(c => c.Shape).ThenInclude(C => C.Product).SingleOrDefault(p => p.Id == id);
+        }
+
+        public IEnumerable<Workshop> GetAllWorkshop()
+        {
+            using DataKANTAIMContext ctx = new(_devModeService.DevMode);
+            return ctx.Workshops.ToList();
         }
     }
 }

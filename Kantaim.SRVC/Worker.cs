@@ -3,6 +3,7 @@ using KANTAIM.DAL.Model;
 using KANTAIM.DAL.Services;
 using Opc.Ua;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime;
 
 namespace Kantaim.SRVC
 {
@@ -34,13 +35,12 @@ namespace Kantaim.SRVC
                     _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
                 }
 
-
                 try
                 {
                     _devModeService.DevMode = false;
                     //Assignation des fins de shifts
                     DateTime now = DateTime.Now;
-                    //now = new DateTime(2025, 03, 25, 14, 30, 30);
+                    //now = new DateTime(2025, 11, 20, 14, 30, 30);
 
                     _shiftService.ResetCache();
 
@@ -76,25 +76,51 @@ namespace Kantaim.SRVC
 
         private async Task UpdatePressCounter(DateTime dateprod)
         {
+            //IConfigurationRoot config = new ConfigurationBuilder()
+            //.AddJsonFile("appsettings.json")
+            //.Build();
+
+            //var opcSettings = config.GetSection("OpcSettingsWorkShop").GetChildren();
+            //string[] endpointUrls = opcSettings.Select(x => x.Value).ToArray();
+
+
             List<PressCounter> listCounter = new List<PressCounter>();
             try
             {
-                if (await _opcUaService.ConnectAsync())
+                foreach (Workshop ws in _currentPressCounterService.GetAllWorkshop())
                 {
-                    List<Press> presses = _currentPressCounterService.GetAllPressInclude().Where(p => p.Active).ToList();
-
-                    foreach (Press p in presses)
+                    string endPointUrl = $"opc.tcp://{ws.IPAdressConsign}:51210";
+                    if (await _opcUaService.ConnectAsync(endPointUrl))
                     {
-                        listCounter.Add( new PressCounter
+                        List<Press> presses = _currentPressCounterService.GetAllPressPerWorkshopInclude(ws.Id).Where(p => p.Active).ToList();
+
+                        foreach (Press p in presses)
                         {
-                            PressId = p.Id,
-                            Press = p,
-                            ConsignNumber = p.ConsignNumber,
-                            Value = int.TryParse(await _opcUaService.ReadNodeValueAsync($"ns=2;s=Presse_{p.ConsignNumber}:Cycle_Count_Good"), out int counterValue) ? counterValue : 0
-                        });
+                            int value = 0;
+                            switch (ws.Generation)
+                            {
+                                case 1:
+                                    value = int.TryParse(await _opcUaService.ReadNodeValueAsync($"ns=2;s=Presse_{p.ConsignNumber}:Cycle_Count_Good"), out value) ? value : 0;
+                                    break;
+                                case 2:
+                                    value = int.TryParse(await _opcUaService.ReadNodeValueAsync($"ns=2;s=TCP.Presse_{p.ConsignNumber}.Presse_{p.ConsignNumber}:Cycle_Count_Good"), out value) ? value : 0;
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            listCounter.Add(new PressCounter
+                            {
+                                PressId = p.Id,
+                                Press = p,
+                                ConsignNumber = p.ConsignNumber,
+                                Value = value
+                            });
+                        }
                     }
+                    _opcUaService.Disconnect();
+                    
                 }
-                _opcUaService.Disconnect();
             }
             catch (Exception ex)
             {

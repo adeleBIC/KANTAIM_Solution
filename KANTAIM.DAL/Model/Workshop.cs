@@ -19,6 +19,11 @@ namespace KANTAIM.DAL.Model
         [StringLength(50)]
         public string Name { get; set; }
 
+        [StringLength(15)]
+        public string? IPAdressConsign { get; set; }
+
+        public int? Generation { get; set; }
+
         public string? Comment { get; set; }
     }
 }

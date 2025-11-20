@@ -20,10 +20,16 @@
         <DataAnnotationsValidator />
         <ValidationSummary />
         <MudGrid>
-            <MudItem xs="3">
+            <MudItem xs="2">
                 <MudTextField Disabled=@(!Workshop.IsEditing) @bind-Value=@Workshop.Name For="@(()=>Workshop.Name)" Margin="Margin.Dense" Variant="MudBlazor.Variant.Outlined" />
             </MudItem>
-            <MudItem xs="7">
+            <MudItem xs="2">
+                <MudTextField Disabled=@(!Workshop.IsEditing) @bind-Value=@Workshop.IPAdressConsign For="@(() => Workshop.IPAdressConsign)" Margin="Margin.Dense" Variant="MudBlazor.Variant.Outlined" />
+            </MudItem>
+            <MudItem xs="1">
+                <MudNumericField Disabled=@(!Workshop.IsEditing) @bind-Value=@Workshop.Generation For="@(() => Workshop.Generation)" Margin="Margin.Dense" Variant="MudBlazor.Variant.Outlined" />
+            </MudItem>
+            <MudItem xs="5">
                 <MudTextField Disabled=@(!Workshop.IsEditing) @bind-Value=@Workshop.Comment For="@(()=>Workshop.Comment)" Margin="Margin.Dense" Variant="MudBlazor.Variant.Outlined" />
             </MudItem>
             <MudItem xs="1">
