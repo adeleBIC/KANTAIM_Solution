@@ -17,12 +17,12 @@
         <MudGrid>
             <MudItem xs="12" Style="display: flex; justify-content: center; align-items: flex-start; margin-top: 20px;">
                 <div style="display: flex; flex-direction: row; align-items: center;">
-                   
+
                     <MudDatePicker @ref="_picker" Label="Date" @bind-Date="date" Variant="MudBlazor.Variant.Outlined" Style="margin-right: 10px;" Picker="DatePickerType.Week">
                         <PickerActions>
                             <MudButton Class="mr-auto align-self-start" OnClick="@(() => _picker.Clear())">Clear</MudButton>
                             <MudButton OnClick="@(() => _picker.Close(false))">Cancel</MudButton>
-                            <MudButton Color="Color.Primary" OnClick="@(() => {_picker.Close(); RefreshData();})">Ok</MudButton>
+                            <MudButton Color="Color.Primary" OnClick="@(() => { _picker.Close(); RefreshData(); })">Ok</MudButton>
                         </PickerActions>
                     </MudDatePicker>
 
@@ -45,18 +45,18 @@
                             <th colspan="3" class="grey-th">Total</th>
                         </tr>
                     </thead>
-                    @if (pressNumber.Count-1 > 0)
+                    @if (pressNumber.Count - 1 > 0)
                     {
                         int i;
                         <tbody>
-                            @for (i = 0; i < Length+1; i++)
+                            @for (i = 0; i < Length + 1; i++)
                             {
                                 int j;
                                 <tr>
                                     <th class="orange-th">@pressNumber[i]</th>
-                                    @for(j = 0; j < 8; j++)
+                                    @for (j = 0; j < 8; j++)
                                     {
-                                        @if(Data[i][j] != null)
+                                        @if (Data[i][j] != null)
                                         {
                                             <td colspan="1" class="sizeTd">
                                                 @Data[i][j].Counter.ToString("# ### ### ##0")
@@ -92,12 +92,12 @@
                             }
                         </tbody>
                     }
-                   
+
                 </table>
 
             </div>
         }
-        
+
 
 
     </MudDrawerContainer>

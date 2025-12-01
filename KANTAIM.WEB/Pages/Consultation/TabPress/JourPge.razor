@@ -30,28 +30,31 @@
             </MudItem>
         </MudGrid>
         <div class="table-scroll-container">
-        <table>
-            <thead>
-                <tr>
+            <table>
+                <thead>
+                    <tr>
                         <th class="grey-th">Presses / Equipe</th>
                         @foreach (string shift in Shifts)
                         {
                             <th colspan="3" class="grey-th">@shift</th>
                         }
-                </tr>
-            </thead>
-                
-            <tbody>
+                    </tr>
+                </thead>
+
+                <tbody>
 
 
-                @if(pressNumber.Count > 1){
-                    int i = 0;
-                    foreach (string number in pressNumber)
+                    @if (pressNumber.Count > 1)
                     {
+                        int i = 0;
+                        foreach (string number in pressNumber)
+                        {
                             <tr>
-                            <th class="orange-th">@number</th>
-                            @for(int j = 0; j < 4; j++){
-                                    if (Data[i] != null){
+                                <th class="orange-th">@number</th>
+                                @for (int j = 0; j < 4; j++)
+                                {
+                                    if (Data[i] != null)
+                                    {
 
                                         if (Data[i][j] != null)
                                         {
@@ -82,24 +85,24 @@
                                             <td class="sizeCommentTd"> </td>
                                         }
                                     }
-                                    }
-                 
-                        </tr>
+                                }
 
-                        i++;
+                            </tr>
+
+                            i++;
+                        }
                     }
-                }
-                    
- 
-            </tbody>
-        </table>
+
+
+                </tbody>
+            </table>
 
         </div>
 
 
-        </MudDrawerContainer>
+    </MudDrawerContainer>
 
-    </MudPaper>
+</MudPaper>
 
 
 

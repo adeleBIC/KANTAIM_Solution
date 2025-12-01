@@ -47,11 +47,10 @@ namespace KANTAIM.APK.Components.Pages
         protected override async Task OnInitializedAsync()
         {
             DevMode = false;
-#if DEBUG
+#if DEBUG            
             PwdOK = true;
-            DevMode = true;  
+            DevMode = true; 
 #endif
-
             var context = new DataKANTAIMContext();
             bool isConnected = await context.TestConnectionAsync();
             if (isConnected)

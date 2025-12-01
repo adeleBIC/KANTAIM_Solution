@@ -108,8 +108,7 @@ namespace KANTAIM.APK.Components.Pages
                         _snackService.Add("Le contenaire est en maintenance!", Severity.Error);
                         return;
                     }
-
-                    if (PaletteScanner.ContainerAction.Status == 0) // On ne peux pas mettre un bac vide dans une palette, on ne peux pas mettre un bac dans une palette qu'il n'as pas été initialisé.
+                    if (PaletteScanner.ContainerAction.Status == 0) // On ne peux pas mettre une bac vide dans une palette, on ne peux pas mettre un bac dans une palette qu'il n'as pas été initialisé.
                     {
                         _snackService.Add("Svp initialisez palette d'abord!", Severity.Error);
                         PaletteScanner = null;
@@ -118,17 +117,16 @@ namespace KANTAIM.APK.Components.Pages
                     {
                         TransferBacToPalette(ContainerScanner, PaletteScanner);
                     }
+
                 }
             }
         }
-
         void TransferBacToPalette(Container bac, Container palette)
         {
             if (bac.ContainerID == palette.Id || bac.FillStatus > StatusContainer.Empty)
             {
                 _snackService.Add("Bac déjà présent dans une palette ou non vide !", Severity.Error);
-            }
-            else
+            } else
             {
                 bac.CellID = palette.CellID;
                 bac.ActionID = palette.ActionID;
