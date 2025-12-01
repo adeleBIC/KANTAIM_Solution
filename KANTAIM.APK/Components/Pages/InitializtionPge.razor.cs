@@ -123,9 +123,9 @@ namespace KANTAIM.APK.Components.Pages
         }
         void TransferBacToPalette(Container bac, Container palette)
         {
-            if(bac.ContainerID == palette.Id)
+            if (bac.ContainerID == palette.Id || bac.FillStatus > StatusContainer.Empty)
             {
-                _snackService.Add("Déjà ajouté !", Severity.Error);
+                _snackService.Add("Bac déjà présent dans une palette ou non vide !", Severity.Error);
             } else
             {
                 bac.CellID = palette.CellID;
