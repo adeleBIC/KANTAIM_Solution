@@ -6,12 +6,24 @@ using MudBlazor;
 namespace KANTAIM.APK.Components.Layout
 {
     public partial class MainLayout
+        
     {
+        [Inject] public IJSRuntime JS { get; set; }
+
         private bool drawerOpen = false;
 
         void ToggleDrawer()
         {
             drawerOpen = !drawerOpen;
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                // appelle la fonction d'initialisation robuste
+                await JS.InvokeVoidAsync("initNoFocus");
+            }
         }
 
         protected override async Task OnInitializedAsync()

@@ -1,6 +1,7 @@
 ﻿@inherits LayoutComponentBase
 
 @* <script src="js/managKeyboard.js"></script> *@
+<script src="js/noFocus.js"></script>
 
 <PageTitle>KANTAIM.APK</PageTitle>
 <style>
@@ -34,7 +35,14 @@
     <MudLayout>
         <MudAppBar Bottom="true" Fixed="true" Elevation="0" DisableGutters="true">
             <div class="bottom-tabs">
-                <MudButton Color="Color.Inherit" Style="--mud-typography-button-size:25px;--mud-typography-button-weight : bold;" Href="/" Match="NavLinkMatch.Prefix">Page principale</MudButton>
+                <MudButton Color="Color.Inherit"
+                           TabIndex="-1"
+                           Class="nofocus"
+                           Style="--mud-typography-button-size:25px;--mud-typography-button-weight : bold;"
+                           Href="/"
+                           Match="NavLinkMatch.Prefix">
+                    Page principale
+                </MudButton>
                 @*  <MudButton Color="Color.Inherit" Style="--mud-typography-button-size:25px;--mud-typography-button-weight : bold;" Href="/MenuPge" Match="NavLinkMatch.All">Menu</MudButton> *@
             </div>
 
