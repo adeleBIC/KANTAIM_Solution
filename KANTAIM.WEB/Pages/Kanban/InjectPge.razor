@@ -1,10 +1,10 @@
 ﻿@page "/InjectPge/{id:int}/{number:int}"
-@layout PhoneLayout
 @using KANTAIM.DAL.Model;
-@using KANTAIM.WEB.ViewModels;
+@using KANTAIM.WEB.Components.Pages
 @using MudBlazor
 @using static MudBlazor.Icons
 @using Microsoft.AspNetCore.Components.Routing
+@inherits BasePage
 
 <h3>Mise en Machine</h3>
 
@@ -48,6 +48,7 @@
     .button-group {
         display: flex;
         justify-content: space-evenly;
+        gap: 10px;
     }
 
     .fillstatus-container {
@@ -57,6 +58,7 @@
 
     .bouton {
         margin: 5px;
+        padding: 10px;
     }
 
 </style>
@@ -64,35 +66,21 @@
 
 @switch (State)
 {
-@*     case 1 :
-        <div class="display-container">
-            <h3 class="title">Produit bien mis en machine</h3>
-        </div>
-        break; *@
-
     case 2 : 
-@*         @if (ContainerScanner.ContainerType.IsContainable == true) // if we scan a bac.
-        {
-            <div class="button-group">
-                <MudButton Color="Color.Secondary" Variant="MudBlazor.Variant.Filled" Href="@($"/StockagePge/1/{ContainerScanner.Number}")" Match="NavLinkMatch.All">Déplacement contenaire</MudButton>
-            </div>
-        } *@
+
 
         <div class="display-container">
             <h3 class="title">Scannez la machine svp</h3>
             <MudText> @TextValue</MudText>
-            @* <div>
-                <MudTextField @bind-Value="MachineValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true" ></MudTextField>
-            </div> *@
         
         <div class="status-display">
-            <div class="status-item">Produit: @product.Name</div>
-            @if (prodColor != null)
+            <div class="status-item">Produit: @Product.Name</div>
+                @if (ProdColor != null)
             {
 
                 <div class="status-item">
-                    Couleur: @prodColor.Name
-                    <MudIcon Icon="@Icons.Material.Filled.Circle" Style="@($"color:{prodColor.ColorNumber};")" />
+                        Couleur: @ProdColor.Name
+                        <MudIcon Icon="@Icons.Material.Filled.Circle" Style="@($"color:{ProdColor.ColorNumber};")" />
                 </div>
                 
             }
@@ -102,18 +90,16 @@
         </div>
         <div class="button-group">
         <MudButton Color="Color.Secondary" Variant="MudBlazor.Variant.Filled" Href="@($"/StockagePge/1/{ContainerScanner.Number}")" Match="NavLinkMatch.All">Déplacement Contenaire</MudButton>
+            
         </div>
         break;
     case 3 :
         <div class="display-container">
             <div class="status-display">
-            <h3 class="title">Scannez la contenaire svp</h3>
+            <h3 class="title">Scannez le contenaire svp</h3>
                 <div class="status-item">Machine: @MachineScanner.Name</div>
             </div>
             <MudText> @TextValue</MudText>
-            @* <div>
-                <MudTextField @bind-Value="ContainerValue" AutoFocus="true" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true"></MudTextField>
-            </div> *@
         </div>
         break;
 
@@ -122,12 +108,12 @@
             <h3 class="title">Vérifier informations</h3>
 
             <div class="status-display">
-                <div class="status-item">Produit: @product.Name</div>
-                @if (prodColor != null)
+                <div class="status-item">Produit: @Product.Name</div>
+                @if (ProdColor != null)
                 {
                     <div class="status-item">
-                        Couleur: @prodColor.Name
-                        <MudIcon Icon="@Icons.Material.Filled.Circle" Style="@($"color:{prodColor.ColorNumber};")" />
+                        Couleur: @ProdColor.Name
+                        <MudIcon Icon="@Icons.Material.Filled.Circle" Style="@($"color:{ProdColor.ColorNumber};")" />
                     </div>
                 }
 
@@ -136,7 +122,6 @@
             </div>
         </div>
             <div class="button-group">
-                <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="returnAction">Retour</MudButton>
                 <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="Inject">Valider</MudButton>
             </div>
       

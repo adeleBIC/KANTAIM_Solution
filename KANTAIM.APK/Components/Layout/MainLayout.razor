@@ -43,26 +43,10 @@
                            Match="NavLinkMatch.Prefix">
                     Page principale
                 </MudButton>
-                @*  <MudButton Color="Color.Inherit" Style="--mud-typography-button-size:25px;--mud-typography-button-weight : bold;" Href="/MenuPge" Match="NavLinkMatch.All">Menu</MudButton> *@
             </div>
 
         </MudAppBar>
 
-       @*  <MudAppBar Color="Color.Primary" Fixed="false" Dense="true">
-            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" @onclick="ToggleDrawer" />
-            <MudSpacer />
-        </MudAppBar> *@
-
-       @*  <MudDrawer @bind-Open="@drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="1">
-            <MudNavMenu> *@
-                @* <MudNavLink Href="/">Initialisation Machine</MudNavLink> *@
-                @* <MudNavLink Href="/">Mise en Rack</MudNavLink> *@
-                @* <MudNavLink Href="/">Sortie de Rack</MudNavLink> *@
-                @* <MudNavLink Href="/">Mise en Machine</MudNavLink> *@
-                @* <MudNavLink Href="/">Déplacement Contenaire</MudNavLink> *@
-               @*  <MudNavLink Href="/TransferPge">Transferer Contenaire</MudNavLink>
-            </MudNavMenu>
-        </MudDrawer> *@
         <MudMainContent style="margin-top: -20px;">
             @Body
         </MudMainContent>

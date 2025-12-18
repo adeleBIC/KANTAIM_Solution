@@ -93,10 +93,7 @@
                     @ContainerStatus[context.Item.FillStatus]
                 </CellTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.Container.Number" Title="Conditioné dans">
-                <CellTemplate>
-                    @context.Item.Container.Number
-                </CellTemplate>
+            <PropertyColumn Property="x => x.BigContainer" Title="Conditioné dans">
             </PropertyColumn>
             <PropertyColumn Property="x => x.Cell.Name" Title="Cellule">
                 <CellTemplate>

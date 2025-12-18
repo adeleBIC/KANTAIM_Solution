@@ -7,8 +7,6 @@ using KANTAIM.WEB.Services;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
-
-
 namespace KANTAIM.WEB.Pages.Kanban
 {
     public partial class FindProductPge : BasePage
@@ -31,9 +29,11 @@ namespace KANTAIM.WEB.Pages.Kanban
         public List<ProdColor> Colors { get; set; }
 
         public List<Container> ContainerFindList { get; set; }
+        public List<Container> ContainerPhantomFindList { get; set; }
         public Container? ContainerScanner { get; set; }
         public DAL.Model.Cell? CellPropose { get; set; }
         public bool ShowAllCells { get; set; }
+        public bool ShowAllCellsPhantom { get; set; }
         private bool contFind;
 
         public bool ContFind
@@ -47,6 +47,11 @@ namespace KANTAIM.WEB.Pages.Kanban
         void ToggleCellList()
         {
             ShowAllCells = !ShowAllCells;
+        }
+
+        void ToggleCellListPhantom()
+        {
+            ShowAllCellsPhantom = !ShowAllCellsPhantom;
         }
 
         public class CellLog
@@ -75,15 +80,30 @@ namespace KANTAIM.WEB.Pages.Kanban
 
         void findCells()
         {
+
             ContainerFindList = new List<Container>(_contenaireService.GetAllByOperationStatus(ActionStatus.Store)
                                                                     .Where(c => c.CellStock != null &&
                                                                     c.ProductID == ProductScanner.Id &&
                                                                     (ColorChoose == null || c.ProdColorID == ColorChoose.Id) &&
                                                                     c.CellID != ContainerScanner?.CellID &&
+                                                                    !c.CellStock.IsJail &&
+                                                                    !c.CellStock.IsMaintenance &&
+                                                                    !c.CellStock.IsPhantom &&
                                                                     c.CellStock.RackCells != null &&
                                                                     c.CellStock.RackCells.Any(rc => profilSelected.RackProfils.Any(rp => rp.RackId == rc.RackId)))
                                                                     .OrderBy(c => c.LastEvent));
 
+            ContainerPhantomFindList = new List<Container>(_contenaireService.GetAllByOperationStatus(ActionStatus.Store)
+                                                                    .Where(c => c.CellStock != null &&
+                                                                    c.ProductID == ProductScanner.Id &&
+                                                                    (ColorChoose == null || c.ProdColorID == ColorChoose.Id) &&
+                                                                    c.CellID != ContainerScanner?.CellID &&
+                                                                    !c.CellStock.IsJail &&
+                                                                    !c.CellStock.IsMaintenance &&
+                                                                    c.CellStock.IsPhantom &&
+                                                                    c.CellStock.RackCells != null &&
+                                                                    c.CellStock.RackCells.Any(rc => profilSelected.RackProfils.Any(rp => rp.RackId == rc.RackId)))
+                                                                    .OrderBy(c => c.LastEvent));
             if (ContainerFindList != null && ContainerFindList.Count > 0) { CellPropose = ContainerFindList.FirstOrDefault()?.CellStock ?? null; }
 
         }
@@ -160,6 +180,19 @@ namespace KANTAIM.WEB.Pages.Kanban
             ContainerScan(msg.Code);
 
             await InvokeAsync(StateHasChanged);
+        }
+
+        private string GetContrastingTextColor(string hexColor)
+        {
+            if (string.IsNullOrEmpty(hexColor) || !hexColor.StartsWith("#") || (hexColor.Length != 7 && hexColor.Length != 9)) return "#000000"; // fallback 
+
+            // Extraire les composantes R, G, B
+            var r = Convert.ToInt32(hexColor.Substring(1, 2), 16);
+            var g = Convert.ToInt32(hexColor.Substring(3, 2), 16);
+            var b = Convert.ToInt32(hexColor.Substring(5, 2), 16);
+            var luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+            return luminance > 0.5 ? "#000000" : "#FFFFFF";
         }
     }
 }

@@ -44,6 +44,7 @@ namespace KANTAIM.WEB.ViewModels
             machineID = model.MachineID;
             comment = model.Comment;
             container = model.Container;
+            bigContainer = model.BigContainer;
             product = model.Product ?? new Product();
             press = model.Press ?? new Press();
             shape = model.Shape ?? new Shape();
@@ -206,6 +207,14 @@ namespace KANTAIM.WEB.ViewModels
             set { comment = value; IsEditing = true; }
         }
 
+        private int? bigContainer;
+        [Label("Contenant")]
+        public int? BigContainer
+        {
+            get { return bigContainer; }
+            set { bigContainer = value; IsEditing = true; }
+        }
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             List<ValidationResult> list = new List<ValidationResult>();
@@ -226,6 +235,7 @@ namespace KANTAIM.WEB.ViewModels
                 model.CellID = cellID;
                 model.ProdColorID = colorID;
                 model.MachineID = machineID;
+                model.BigContainer = bigContainer;
                 model.Comment = comment;
             }
 

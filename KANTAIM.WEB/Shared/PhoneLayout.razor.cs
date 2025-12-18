@@ -23,6 +23,7 @@ namespace KANTAIM.WEB.Shared
     {
         [Inject] public UserService _userService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
+        [Inject] public IJSRuntime JS { get; set; }
 
         public List<string> Users { get; set; }
 
@@ -32,6 +33,15 @@ namespace KANTAIM.WEB.Shared
             Users = _userService.GetAll().Where(u => u.UserAccessLvlId > 0).Select(n => n.LoginADUser.ToLower()).ToList();
 
             await InvokeAsync(StateHasChanged);
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                // appelle la fonction d'initialisation robuste
+                await JS.InvokeVoidAsync("initNoFocus");
+            }
         }
 
         private void NavigateToHome()

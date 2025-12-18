@@ -1,5 +1,7 @@
 using KANTAIM.DAL.Model;
 using KANTAIM.DAL.Services;
+using KANTAIM.WEB.Components.Pages;
+using KANTAIM.WEB.MessageBus.Messages;
 using KANTAIM.WEB.Ressources;
 using KANTAIM.WEB.Services;
 using Microsoft.AspNetCore.Components;
@@ -7,7 +9,7 @@ using MudBlazor;
 
 namespace KANTAIM.WEB.Pages.Kanban
 {
-    public partial class ShipmentPge
+    public partial class ShipmentPge : BasePage
     {
         [Inject] public NavigationManager NavigationManager { get; set; }
         [Inject] public ContenaireService _contenaireService { get; set; }
@@ -18,68 +20,65 @@ namespace KANTAIM.WEB.Pages.Kanban
         [Inject] public ActionService _actionService { get; set; }
         [Parameter] public int Id { get; set; }
         [Parameter] public int Number { get; set; }
+        public Boolean IsPalette { get; set; } = false;
 
 
-        public Product? product { get; set; }
-        public Cell? cellStock { get; set; }
-        //public Product? productModified { get; set; }
-        public ProdColor? colorOfProduct { get; set; }
-        public bool shipment { get; set; } = false;
+        public Product? Product { get; set; }
+        public DAL.Model.Cell? CellStock { get; set; }
+        public ProdColor? ColorOfProduct { get; set; }
         public Container? ContainerScanner { get; set; }
         public Container? PaletteScanner { get; set; }
-        public Log? logRescent { get; set; }
         [Inject] ISnackbar _snackService { get; set; }
         public bool correct { get; set; } = true;
 
         protected override void OnInitialized()
         {
             ContainerScanner = _contenaireService.GetContainerByNumber(Number);
-            //if(ContainerScanner.ContainerType.Name == "Palette" && _contenaireService.CountBac(ContainerScanner.Id) != 0)// S'il est palette et n'est pas vide, on interdit cette opération
-            //{
-            //    correct = false;
-            //    NavigationManager.NavigateTo($"/ScannerPge");
-            //    _snackService.Add("Scannez les bacs à la place de la palette", Severity.Error);
-                
-            //}
-            if (ContainerScanner.ContainerTypeID == 2) //s'il est un bac 
+            if (ContainerScanner.InMaintenance)
             {
-                logRescent = _logService.GetByContenaireId(ContainerScanner.ContainerID.Value);
+                correct = false;
+                NavigationManager.NavigateTo($"/");
+                _snackService.Add("Le contenaire est en maintenance!", Severity.Error);
+                return;
             }
-            else
+            if (ContainerScanner.InJail)
             {
-                logRescent = _logService.GetByContenaireId(ContainerScanner.Id);
+                correct = false;
+                NavigationManager.NavigateTo($"/");
+                _snackService.Add("Le contenaire est en prison!", Severity.Error);
+                return;
             }
-            if (logRescent != null)
+            if (!ContainerScanner.ContainerType.IsContainable && ContainerScanner.ContainerType.NbrMaxContainer > 0 && _contenaireService.CountBac(ContainerScanner.Id) != 0)// S'il est palette et n'est pas vide, on interdit cette opération
             {
-                product = _productService.GetById((int)logRescent.ProductID);
-                colorOfProduct = _colorService.GetById(logRescent.ProdColorID);
-                cellStock = _cellService.GetById(logRescent.CellID);
+                IsPalette = true;
             }
+
+            Product = ContainerScanner.Product;
+            ColorOfProduct = ContainerScanner.ProdColor;
+            CellStock = ContainerScanner.CellStock;
         }
 
-        void VerifyPaletteEmpty(int paletteNumber)
+        void VerifyEmptyPallet(int paletteNumber)
         {
             PaletteScanner = _contenaireService.GetContainerByNumber(paletteNumber);
-            if(_contenaireService.CountBac(PaletteScanner.Id) == 0) // s'il n'y a plus de bac sur la palette
+            if (_contenaireService.CountBac(PaletteScanner.Id) == 0) // s'il n'y a plus de bac sur la palette
             {
                 PaletteScanner.ContainerAction = _actionService.GetByStatus(0);// Stocké Vide
                 PaletteScanner.ActionID = PaletteScanner.ContainerAction.Id;
                 PaletteScanner.FillStatus = StatusContainer.Empty;//Palette statut changé à vide
                 _contenaireService.UpSert(PaletteScanner);
             }
-        }
-
-
-        void upDateCellState(Cell cell)
-        {
-            if (_contenaireService.CountCells(cell.Id) == 0)
-            {
-                cell.Status = StatusCell.Empty;
-            }
             else
             {
-                cell.Status = StatusCell.InFill;
+                PaletteScanner.FillStatus = StatusContainer.HalfFull;//Palette statut changé à semi-pleine
+                _contenaireService.UpSert(PaletteScanner);
             }
+        }
+
+        void UpDateCellState(DAL.Model.Cell cell)
+        {
+            if (_contenaireService.CountCells(cell.Id) == 0) cell.Status = StatusCell.Empty;
+            else cell.Status = StatusCell.InFill;
 
             _cellService.Upsert(cell);
 
@@ -87,54 +86,60 @@ namespace KANTAIM.WEB.Pages.Kanban
 
         void Shipment()
         {
-            
             Log u = new Log()
             {
                 EventTime = DateTime.Now,
                 Operation = OperationContainer.Shipment, // shipment
-                Product = logRescent.Product,
-                ProductID = logRescent.ProductID,
-                Press = logRescent.Press,
-                PressID = logRescent.PressID,
-                Shape = logRescent.Shape,
-                ShapeID = logRescent.ShapeID,
+                Product = ContainerScanner.Product,
+                ProductID = ContainerScanner.ProductID,
+                Press = ContainerScanner.Press,
+                PressID = ContainerScanner.PressID,
+                Shape = ContainerScanner.Press?.Shape,
+                ShapeID = ContainerScanner.Press?.ShapeID,
                 Container = ContainerScanner,
                 ContainerID = ContainerScanner.Id,
-                
-                FillStatus = logRescent.FillStatus,
-                Machine = logRescent.Machine,
-                MachineID = logRescent.MachineID,
-                Cell = logRescent.Cell,
-                CellID = logRescent.CellID
+
+                FillStatus = ContainerScanner.FillStatus,
+                Machine = ContainerScanner.Machine,
+                MachineID = ContainerScanner.MachineID,
+                Cell = ContainerScanner.CellStock,
+                CellID = ContainerScanner.CellID
             };
-            if(colorOfProduct != null )
+            if (ColorOfProduct != null)
             {
-                u.ProdColor = colorOfProduct;
-                u.ProdColorID = colorOfProduct.Id;
+                u.ProdColor = ColorOfProduct;
+                u.ProdColorID = ColorOfProduct.Id;
             }
             _logService.UpSert(u);
 
+            ContainerScanner.LastEvent = u.EventTime;
             ContainerScanner.ContainerAction = _actionService.GetByStatus(3);// Sortie stock
             ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
             ContainerScanner.CellID = null;
+
             if (ContainerScanner.ContainerType.IsContainable == true) //s'il est un bac 
             {
                 int paletteNumber = ContainerScanner.BigContainer.Number;
                 ContainerScanner.BigContainer = null;
                 ContainerScanner.ContainerID = null;
                 _contenaireService.UpSert(ContainerScanner);
-                VerifyPaletteEmpty(paletteNumber);
-            } else
+                VerifyEmptyPallet(paletteNumber);
+            }
+            else
             {
                 _contenaireService.UpSert(ContainerScanner);
             }
 
-            upDateCellState(ContainerScanner.CellStock);
+            UpDateCellState(CellStock);
 
             //shipment = true;
-            NavigationManager.NavigateTo($"/ScannerPge");
+            NavigationManager.NavigateTo($"/");
             _snackService.Add("Bien sortie !", Severity.Success);
         }
 
+        public override void OnMessageReceived(InputMessage msg)
+        {
+            
+        }
     }
 }

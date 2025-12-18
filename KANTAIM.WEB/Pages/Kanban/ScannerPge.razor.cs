@@ -38,6 +38,7 @@ namespace KANTAIM.WEB.Pages.Kanban
         }
 
 
+
         public List<Profil> Profils { get; set; }
         private Profil profilSelected;
 
@@ -50,6 +51,10 @@ namespace KANTAIM.WEB.Pages.Kanban
         protected override async Task OnInitializedAsync()
         {
             DevMode = false;
+#if DEBUG            
+            PwdOK = true;
+            DevMode = true;
+#endif
             var context = new DataKANTAIMContext();
             bool isConnected = await context.TestConnectionAsync();
             if (isConnected)
@@ -204,6 +209,5 @@ namespace KANTAIM.WEB.Pages.Kanban
                 PwdOK = true;
             }
         }
-
     }
 }

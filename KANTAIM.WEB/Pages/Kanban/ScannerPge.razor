@@ -50,7 +50,7 @@
             }
 
             <MudSelect T="Profil" @bind-Value="ProfilSelected" Label="Profil" Variant="MudBlazor.Variant.Outlined">
-                @foreach (var p in Profils)
+                @foreach (var p in Profils) 
                 {
                     <MudSelectItem T="Profil" Value="@(p)">@p.Name</MudSelectItem>
                 }

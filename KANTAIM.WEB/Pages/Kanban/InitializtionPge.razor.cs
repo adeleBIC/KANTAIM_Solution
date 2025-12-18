@@ -1,7 +1,5 @@
 using KANTAIM.DAL.Model;
 using KANTAIM.DAL.Services;
-using KANTAIM.WEB.Services;
-using KANTAIM.WEB.ViewModels;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using MudBlazor.Charts;
@@ -9,11 +7,14 @@ using MudBlazor;
 using MudBlazor.Services;
 using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components.Routing;
+using KANTAIM.WEB.Services;
+using KANTAIM.WEB.MessageBus.Messages;
+using KANTAIM.WEB.Components.Pages;
 using KANTAIM.WEB.Ressources;
 
 namespace KANTAIM.WEB.Pages.Kanban
 {
-    public partial class InitializtionPge
+    public partial class InitializtionPge : BasePage
     {
         [Inject] public NavigationManager NavigationManager { get; set; }
         [Inject] public ContenaireService _contenaireService { get; set; }
@@ -26,38 +27,22 @@ namespace KANTAIM.WEB.Pages.Kanban
         [Inject] public ColorProductService _colorProductServiceService { get; set; }
         [Inject] public CellService _cellService { get; set; }
         [Inject] ISnackbar _snackService { get; set; }
-        [Inject] IJSRuntime JS { get; set; }
         [Parameter] public int Id { get; set; }
         [Parameter] public int Number { get; set; }
 
-        public string? ContainerValue { get; set; }
-        public string? PressValue { get; set; }
-        public string? ColorValue { get; set; }
-        public string ContainerFeedback { get; set; } = string.Empty;
-        public string? PaletteValue { get; set; }
         public Boolean BacInitialisation { get; set; } = false;
-        private int state;
+        public Boolean Maintenance { get; set; } = false;
+        
         public Container? ContainerScanner { get; set; }
         public Press? PressScanner { get; set; }
         public ProdColor? ColorChoose { get; set; }
         public List<ProdColor> Colors { get; set; }
         public Container? PaletteScanner { get; set; }
         public Machine? MachineScanner { get; set; }
-        public Log logRescent { get; set; }
+        //public Log logRescent { get; set; }
         public string? TextValue { get; set; }
 
-        public Product? product { get; set; }
-
-        private static InitializtionPge _instance;
-        private string currentUrl;
-        private string pageUrl;
-
-        [JSInvokable]
-        public static void CaptureInputInit(string input)
-        {
-            _instance?.HandleInput(input);
-        }
-
+        private int state;
         public int State
         {
             get
@@ -79,14 +64,18 @@ namespace KANTAIM.WEB.Pages.Kanban
 
         protected override async Task OnInitializedAsync()
         {
-            //RefreshData();
-            currentUrl = NavigationManager.Uri;
-            pageUrl = NavigationManager.Uri;
-            _instance = this;
             switch (Id)
             {
                 case 0:
                     ContainerScanner = _contenaireService.GetContainerByNumber(Number);
+                    if (ContainerScanner.InMaintenance)
+                    {
+                        Maintenance = true;
+                        ContainerScanner = null;
+                        NavigationManager.NavigateTo($"/");
+                        _snackService.Add("Le contenaire est en maintenance!", Severity.Error);
+                        return;
+                    }
                     if (ContainerScanner.ContainerType.IsContainable) // Quand on scan le bac
                     {
                         BacInitialisation = true;
@@ -97,51 +86,6 @@ namespace KANTAIM.WEB.Pages.Kanban
                     break;
                 default:
                     break;
-            }
-            NavigationManager.LocationChanged += OnLocationChanged;
-        }
-
-        private void OnLocationChanged(object sender, LocationChangedEventArgs e)
-        {
-            // Mettre à jour l'URL actuelle lorsque l'URL change
-            currentUrl = e.Location;
-            // Vous pouvez ajouter ici toute logique que vous souhaitez exécuter lorsque l'URL change
-        }
-
-        public void Dispose()
-        {
-            // Se désabonner de l'événement pour éviter les fuites de mémoire
-            NavigationManager.LocationChanged -= OnLocationChanged;
-        }
-
-
-        private void HandleInput(string input)
-        {
-
-            if (input == "Enter" && currentUrl == pageUrl)
-            {
-                switch (state)
-                {
-                    case 0:
-                        ContainerScan(TextValue);
-                        break;
-                    case 1:
-                        PaletteScan(TextValue);
-                        break;
-                    case 2:
-                        PressScan(TextValue);
-                        break;
-                }
-
-                StateHasChanged();
-                TextValue = null;
-
-            }
-            else
-            {
-                TextValue += input;
-                StateHasChanged();
-
             }
         }
 
@@ -156,10 +100,17 @@ namespace KANTAIM.WEB.Pages.Kanban
                 if (type == 1)
                 {
                     PaletteScanner = _contenaireService.GetContainerByNumber(PaletteNumber);
+                    if (PaletteScanner.InMaintenance)
+                    {
+                        Maintenance = true;
+                        PaletteScanner = null;
+                        NavigationManager.NavigateTo($"/");
+                        _snackService.Add("Le contenaire est en maintenance!", Severity.Error);
+                        return;
+                    }
                     if (PaletteScanner.ContainerAction.Status == 0) // On ne peux pas mettre une bac vide dans une palette, on ne peux pas mettre un bac dans une palette qu'il n'as pas été initialisé.
                     {
                         _snackService.Add("Svp initialisez palette d'abord!", Severity.Error);
-                        PaletteValue = null;
                         PaletteScanner = null;
                     }
                     else
@@ -172,12 +123,11 @@ namespace KANTAIM.WEB.Pages.Kanban
         }
         void TransferBacToPalette(Container bac, Container palette)
         {
-            if(bac.ContainerID == palette.Id)
+            if (bac.ContainerID == palette.Id || bac.FillStatus > StatusContainer.Empty)
             {
-                _snackService.Add("Déjà ajouté !", Severity.Error);
+                _snackService.Add("Bac déjà présent dans une palette ou non vide !", Severity.Error);
             } else
             {
-                logRescent = _logService.GetByContenaireId(palette.Id);
                 bac.CellID = palette.CellID;
                 bac.ActionID = palette.ActionID;
                 bac.FillStatus = StatusContainer.Full;
@@ -186,27 +136,34 @@ namespace KANTAIM.WEB.Pages.Kanban
                 bac.InMaintenance = palette.InMaintenance;
                 bac.Comment = palette.Comment;
                 bac.ContainerID = palette.Id;
+                bac.PressID = palette.PressID;
+                bac.LastEvent = DateTime.Now;
+                bac.Product = palette.Product;
+                bac.ProductID = palette.ProductID;
+                bac.ProdColor = palette.ProdColor;
+                bac.ProdColorID = palette.ProdColorID;
                 _contenaireService.UpSert(bac);
 
 
                 Log bacLog = new Log()
                 {
-                    EventTime = DateTime.Now,
+                    EventTime = bac.LastEvent.Value,
                     Operation = OperationContainer.Initisalisation, // Initialisation pour le bac
-                    ProductID = logRescent.ProductID,
-                    Press = logRescent.Press,
-                    PressID = logRescent.PressID,
-                    Shape = logRescent.Shape,
-                    ShapeID = logRescent.ShapeID,
+                    ProductID = palette.ProductID,
+                    Press = palette.Press,
+                    PressID = palette.PressID,
+                    Shape = palette.Press?.Shape,
+                    ShapeID = palette.Press?.ShapeID,
                     Container = bac,
                     ContainerID = bac.Id,
-                    ProdColor = logRescent.ProdColor,
-                    ProdColorID = logRescent.ProdColorID,
-                    CellID = logRescent.CellID,
-                    FillStatus = logRescent.FillStatus
+                    BigContainer = palette.Number,
+                    ProdColor = palette.ProdColor,
+                    ProdColorID = palette.ProdColorID,
+                    //CellID = logRescent.CellID,
+                    FillStatus = StatusContainer.Full
                 };
                 _logService.UpSert(bacLog);
-                NavigationManager.NavigateTo($"/ScannerPge");
+                NavigationManager.NavigateTo($"/");
                 _snackService.Add("Réussi !", Severity.Success);
             }
             
@@ -226,7 +183,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                 }
                 else if (type == 2 && Number > 0) // scanner un machine inject pour initialiser
                 {
-                    MachineScanner = _machineService.GetById(Number);
+                    MachineScanner = _machineService.GetByNumber(Number);
                     if(MachineScanner.IsInkjet == false)
                     {
                         _snackService.Add("Ce n'est pas une machine INK JET !", Severity.Error);
@@ -272,6 +229,7 @@ namespace KANTAIM.WEB.Pages.Kanban
                 ContainerScanner = _contenaireService.GetContainerByNumber(ContainerNumber);
                 if (ContainerScanner.InMaintenance)
                 {
+                    Maintenance = true;
                     ContainerScanner = null;
                     NavigationManager.NavigateTo($"/");
                     _snackService.Add("Le contenaire est en maintenance!", Severity.Error);
@@ -303,13 +261,13 @@ namespace KANTAIM.WEB.Pages.Kanban
                 case 1:
                     if (Id == 0)
                     {
-                        PressValue = null;
+                        //PressValue = null;
                         PressScanner = null;
                         MachineScanner = null;
                     }  
                     else if (Id == 3)
                     {
-                        ContainerValue = null;
+                        //ContainerValue = null;
                         ContainerScanner = null;
                     }
                     break;
@@ -323,20 +281,29 @@ namespace KANTAIM.WEB.Pages.Kanban
             StateHasChanged();
         }
 
-        void upDateCellState(Cell cell)
+        void upDateCellState(DAL.Model.Cell cell)
         {
-            if (_contenaireService.CountCells(cell.Id) == 0)
+            if(cell != null)
             {
-                cell.Status = StatusCell.Empty;
-            }
-            else
-            {
-                cell.Status = StatusCell.InFill;
-            }
+                if (_contenaireService.CountCells(cell.Id) == 0)
+                {
+                    cell.Status = StatusCell.Empty;
+                }
+                else
+                {
+                    cell.Status = StatusCell.InFill;
+                }
 
-            _cellService.Upsert(cell);
-
+                _cellService.Upsert(cell);
+            }
         }
+
+        private void ClearTextField()
+        {
+            TextValue = string.Empty;
+            //scanFieldCont.FocusAsync();
+        }
+
 
         void SaveLog()
         {
@@ -356,6 +323,11 @@ namespace KANTAIM.WEB.Pages.Kanban
                 u.PressID = PressScanner.Id;
                 u.Shape = PressScanner.Shape;
                 u.ShapeID = PressScanner.Shape.Id;
+
+                ContainerScanner.Product = PressScanner.Shape.Product;
+                ContainerScanner.ProductID = PressScanner.Shape.Product.Id;
+                ContainerScanner.Press = PressScanner;
+                ContainerScanner.PressID = PressScanner.Id;
             }
             if(MachineScanner != null)
             {
@@ -363,11 +335,18 @@ namespace KANTAIM.WEB.Pages.Kanban
                 u.ProductID = MachineScanner.ProductID;
                 u.Machine = MachineScanner;
                 u.MachineID = MachineScanner.Id;
+
+                ContainerScanner.Product = MachineScanner.Product;
+                ContainerScanner.ProductID = MachineScanner.ProductID;
+                ContainerScanner.Machine = MachineScanner;
+                ContainerScanner.MachineID = MachineScanner.Id;
             }
             if (ColorChoose != null)
             {
                 u.ProdColor = ColorChoose;
                 u.ProdColorID = ColorChoose.Id;
+                ContainerScanner.ProdColor = ColorChoose;
+                ContainerScanner.ProdColorID = ColorChoose.Id;
             }
             _logService.UpSert(u);
 
@@ -375,14 +354,47 @@ namespace KANTAIM.WEB.Pages.Kanban
             ContainerScanner.ActionID = ContainerScanner.ContainerAction.Id;
             //ContainerScanner.CellStock = null;
             ContainerScanner.CellID = null;
-            if(ContainerScanner.ContainerTypeID == 2) // S'il est un bac, on initialise son fillstatue en plein directement
-                ContainerScanner.Status = 3;
+            if(ContainerScanner.ContainerTypeID == 2) ContainerScanner.Status = 3;// S'il est un bac, on initialise son fillstatue en plein directement
+            ContainerScanner.FillStatus = StatusContainer.Undefinded;
+            ContainerScanner.LastEvent = u.EventTime;
+
             _contenaireService.UpSert(ContainerScanner);
 
             upDateCellState(ContainerScanner.CellStock);
             
-            NavigationManager.NavigateTo("/ScannerPge");
+            NavigationManager.NavigateTo("/");
             _snackService.Add("Bien initialisé !", Severity.Success);
+        }
+
+        public override async void OnMessageReceived(InputMessage msg)
+        {
+            TextValue = msg.Code;
+            switch (state)
+            {
+                case 0:
+                    ContainerScan(msg.Code);
+                    break;
+                case 1:
+                    PaletteScan(msg.Code);
+                    break;
+                case 2:
+                    PressScan(msg.Code);
+                    break;
+            }
+
+            await InvokeAsync(StateHasChanged);
+        }
+        private string GetContrastingTextColor(string hexColor)
+        {
+            if (string.IsNullOrEmpty(hexColor) || !hexColor.StartsWith("#") || (hexColor.Length != 7 && hexColor.Length != 9)) return "#000000"; // fallback 
+
+            // Extraire les composantes R, G, B
+            var r = Convert.ToInt32(hexColor.Substring(1, 2), 16);
+            var g = Convert.ToInt32(hexColor.Substring(3, 2), 16);
+            var b = Convert.ToInt32(hexColor.Substring(5, 2), 16);
+            var luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+            return luminance > 0.5 ? "#000000" : "#FFFFFF";
         }
     }
 }

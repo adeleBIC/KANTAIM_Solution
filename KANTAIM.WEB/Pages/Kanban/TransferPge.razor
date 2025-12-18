@@ -1,10 +1,12 @@
 ﻿@page "/TransferPge"
 @layout PhoneLayout
 @using KANTAIM.DAL.Model;
+@using KANTAIM.WEB.Components.Pages
 @using KANTAIM.WEB.ViewModels;
 @using MudBlazor
 @using static MudBlazor.Icons
 @using Microsoft.AspNetCore.Components.Routing
+@inherits BasePage
 
 
 <style>
@@ -60,7 +62,7 @@
 
 <h3>Page de transfert</h3>
 
-@switch(state)
+@switch (state)
 {
     case 3:
         <div class="display-container">
@@ -70,7 +72,7 @@
             </h3>
         </div>
         break;
-    
+
     case 2:
         <div class="display-container">
             <h3 class="title">Svp Scannez un autre contenaire dans le quel vous voulez transférer</h3>
@@ -80,19 +82,19 @@
             </div> *@
         </div>
         <div class="button-group">
-            <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>ContainerScanner=null">Retour</MudButton>
+            <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" Href="@($"/StockagePge/1/{ContainerScanner.Number}")" Match="NavLinkMatch.All">Retour</MudButton>
         </div>
         break;
-    case 1 :
+    case 1:
         <div class="display-container">
-            <h3 class="title">Transfert du @ContainerScanner.Number vers @AutreScanner.Number</h3>
+            <h3 class="title">Transfert du @ContainerScanner.Number vers @OtherScanner.Number</h3>
         </div>
         <div class="button-group">
-            <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="()=>AutreScanner=null">Retour</MudButton>
-            <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="()=>transferInformation()">Valider</MudButton>
+            <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="() => { OtherScanner = null; state = 2; }">Retour</MudButton>
+            <MudButton Color="Color.Success" Variant="MudBlazor.Variant.Filled" OnClick="() => TransferInformation()">Valider</MudButton>
         </div>
         break;
-    case 0 :
+    case 0:
         <div class="display-container">
             <h3 class="title">Svp Scannez le contenaire que vous voulez transférer</h3>
             <MudText> @TextValue</MudText>
@@ -103,7 +105,3 @@
         break;
 
 }
-
-
-
-

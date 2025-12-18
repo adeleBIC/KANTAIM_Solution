@@ -28,12 +28,33 @@
     else if (ContainerFindList != null && ContainerFindList.Count == 0)
     {
         <div class="content">
-            Il n'y a pas <b>@ProductScanner.Name</b> en
-            @if (ColorChoose != null)
+            <p>
+                Il n'y a pas <b>@ProductScanner.Name</b> en
+                @if (ColorChoose != null)
+                {
+                    <b style="@($"color:{ColorChoose.Name};")">@ColorChoose.Name</b>
+                }
+                stocké dans les cellules
+            </p>
+
+
+            @if (ContainerPhantomFindList != null && ContainerPhantomFindList.Count > 0)
             {
-                <b style="@($"color:{ColorChoose.Name};")">@ColorChoose.Name</b>
+                <MudButton Class="bouton-large" OnClick="ToggleCellListPhantom" Variant="MudBlazor.Variant.Filled" Style="margin-top: 20px;">
+                    @(ShowAllCellsPhantom ? "Masquer" : "Afficher contenaires en zone fantôme")
+                </MudButton>
+
+                @if (ShowAllCellsPhantom)
+                {
+                    <div class="content cell-log-container">
+                        @foreach (var cellLog in ContainerPhantomFindList.OrderBy(u => u.LastEvent))
+                        {
+                            <h3 class="title">Cellule: @cellLog.Number (Stockée le: @cellLog.LastEvent)</h3>
+                        }
+                    </div>
+                }
             }
-            stocké dans la cellule
+
         </div>
     }
 
@@ -59,9 +80,12 @@
         @if (Colors != null)
         {
             <div class="colors-container">
-                @foreach (var color in Colors)
+                @foreach (var color in Colors.OrderBy(u => u.Priority ?? int.MaxValue))
                 {
-                    <MudButton Class="bouton" Style="@($"background: {color.ColorNumber};")" OnClick="() => ColorSelected(color.Id)" Variant="MudBlazor.Variant.Filled">
+                    var textColor = GetContrastingTextColor(color.ColorNumber);
+                    <MudButton Class="bouton"
+                               Style="@($"background:{color.ColorNumber}; color:{textColor};")"
+                               OnClick="() => ColorSelected(color.Id)" Variant="MudBlazor.Variant.Filled">
                         @color.Name
                     </MudButton>
                 }

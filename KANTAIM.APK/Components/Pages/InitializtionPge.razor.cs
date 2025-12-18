@@ -156,6 +156,7 @@ namespace KANTAIM.APK.Components.Pages
                     ShapeID = palette.Press?.ShapeID,
                     Container = bac,
                     ContainerID = bac.Id,
+                    BigContainer = palette.Number,
                     ProdColor = palette.ProdColor,
                     ProdColorID = palette.ProdColorID,
                     //CellID = logRescent.CellID,

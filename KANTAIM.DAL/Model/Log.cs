@@ -28,6 +28,7 @@ namespace KANTAIM.DAL.Model
         [ForeignKey(nameof(ContainerID))]
         public virtual Container Container { get; set; }
 
+        public int? BigContainer { get; set; }
         //[Column("FKTActionID")]
         //public int ContainerActionID { get; set; }
         //[ForeignKey(nameof(ContainerActionID))]

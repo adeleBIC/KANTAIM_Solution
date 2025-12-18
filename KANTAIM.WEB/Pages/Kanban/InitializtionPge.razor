@@ -1,10 +1,10 @@
 ﻿@page "/InitialisationPge/{id:int}/{number:int}"
-@layout PhoneLayout
 @using KANTAIM.DAL.Model;
-@using KANTAIM.WEB.ViewModels;
+@using KANTAIM.WEB.Components.Pages
 @using MudBlazor
 @using static MudBlazor.Icons
 @using Microsoft.AspNetCore.Components.Routing
+@inherits BasePage
 
 <h1 >Initialisation de contenaire</h1>
 
@@ -25,7 +25,7 @@
     .title {
         color: #333333;
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
     }
 
     .status-display, .status-item {
@@ -71,7 +71,7 @@
 </style>
 
 
-
+@if (Maintenance == false) {
     @switch (State)
     {
         case 0: //Scan du contenaire
@@ -80,9 +80,12 @@
                     <div class="status-item">Press: @PressScanner.Number</div>
                     <div class="status-item">Moule : @PressScanner.Shape.Name</div>
                     <div class="status-item">Produit : @PressScanner.Shape.Product.Name</div>
-                    <MudText> @TextValue</MudText>
+                    @* <MudText> @TextValue</MudText> *@
                 </div>
                 <h3 class="title">Scanner le contenaire s'il vous plait</h3>
+
+                @* <MudTextField Disabled=true id="myInput" @bind-Value="TextValue" Label="Standard" Variant="MudBlazor.Variant.Text" Immediate="true"></MudTextField> *@
+                <MudText> @TextValue</MudText>
             </div>
        
             break;
@@ -103,7 +106,7 @@
                 <div class="status-item">@ContainerScanner.ContainerType.Name scanné: @ContainerScanner.Number</div>
                     <MudText> @TextValue</MudText>
                 </div>
-                <h3 class="title">Scanner la presse s'il vous plait</h3>
+                <h3 class="title">Scanner la presse ou la machine INKJET s'il vous plait</h3>
             </div>
             break;
 
@@ -127,19 +130,20 @@
                             Contenaire: @ContainerScanner?.Number
                         </div>
                     }
-                    <h3 class="title">Choisissez la couleur s'il vous plait</h3>
+                   
                 </div>
             </div>
-
+            <h3 class="title">Choisissez la couleur svp</h3>
             @if (Colors != null && Colors.Count() != 0)
             {
                 @*                     <div class="text-container">
                             <br> Choisissez la couleur s'il vous plait
                         </div> *@
                     <div class="colors-container">
-                        @foreach (var c in Colors)
+                    @foreach (var c in Colors.OrderBy(u => u.Priority ?? int.MaxValue))
                         {
-                            <MudButton Class="bouton" Style="@($"background:{c.ColorNumber};")" OnClick="()=>ColorSelected(c.Id)" Variant="MudBlazor.Variant.Filled">
+                            var textColor = GetContrastingTextColor(c.ColorNumber);
+                            <MudButton Class="bouton" Style="@($"background:{c.ColorNumber}; color:{textColor};")" OnClick="()=>ColorSelected(c.Id)" Variant="MudBlazor.Variant.Filled">
                                 @c.Name
                             </MudButton>
                         }
@@ -180,7 +184,7 @@
                     }
                 </div>
             </div>
-        <div class="button-group">
+            <div class="button-group">
                 <MudButton Class="bouton" OnClick="() => GoBack(2)" Color="Color.Error" Variant="MudBlazor.Variant.Filled">Retour</MudButton>
                 <MudButton Class="bouton" OnClick="() => SaveLog()" Color="Color.Success" Variant="MudBlazor.Variant.Filled">Valider</MudButton>
             </div>
@@ -192,4 +196,5 @@
     <div class="button-group">
         <MudButton Color="Color.Secondary" Variant="MudBlazor.Variant.Filled" Href="@($"/StockagePge/1/{ContainerScanner.Number}")" Match="NavLinkMatch.All">Déplacement Contenaire</MudButton>
     </div>
+}
 }

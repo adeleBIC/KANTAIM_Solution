@@ -1,18 +1,4 @@
-﻿//window.preventKeyboardOnTouch = function (elementId) {
-//    var element = document.getElementById(elementId);
-//    if (element) {
-//        // Remove existing event listener if it exists to avoid multiple listeners
-//        element.removeEventListener('focus', preventFocus);
-//        element.addEventListener('focus', preventFocus);
-//    }
-//};
-
-//function preventFocus(event) {
-//    event.preventDefault();
-//    event.target.blur();
-//}
-
-function focusElementById(elementId) {
+﻿function focusElementById(elementId) {
     const element = document.getElementById(elementId);
     if (element) {
         element.focus();
