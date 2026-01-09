@@ -88,6 +88,7 @@ namespace KANTAIM.DAL.Services
                 query = query.Where(c =>
                     c.Number.ToString().Contains(searchTerm) ||
                     (c.ContainerType != null && c.ContainerType.Name.ToLower().Contains(searchLower)) ||
+                    (c.BigContainer != null && c.BigContainer.Number.ToString().Contains(searchLower)) ||
                     (c.CellStock != null && c.CellStock.Name.ToLower().Contains(searchLower)) ||
                     (c.ContainerAction != null && c.ContainerAction.Name.ToLower().Contains(searchLower)) ||
                     (c.Product != null && c.Product.Name.ToLower().Contains(searchLower)) ||
