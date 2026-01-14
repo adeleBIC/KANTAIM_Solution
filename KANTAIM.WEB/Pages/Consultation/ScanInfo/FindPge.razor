@@ -132,15 +132,33 @@
                     @foreach (var cell in _cellList.Where(c => c.X >= 900).OrderBy(c => c.X))
                     {
                         <MudCard Class="cell-card" Style="@GetCardStyle(cell.Status)" @onclick="() => ShowCellDetails(cell)">
-                            <MudTooltip Text="@cell.Name">
-                                <ChildContent>
-                                    <MudText>@cell.Name</MudText>
-                                </ChildContent>
-                                <TooltipContent>
-                                    <MudText>Status: @cellStatus[cell.Status]</MudText>
-                                    <MudText>Nombre: @_contenaireService.GetByCellId(cell.Id).Count().ToString("N0")</MudText>
-                                </TooltipContent>
-                            </MudTooltip>
+                            @if (refreshCellList == null || refreshCellList.Contains(cell))
+                            {
+                                <MudTooltip Text="@cell.Name">
+                                    <ChildContent>
+                                        <MudText>@cell.Name</MudText>
+                                    </ChildContent>
+                                    <TooltipContent>
+                                        <MudText>Status: @cellStatus[cell.Status]</MudText>
+                                        @* <MudText>Nombre: @_contenaireService.GetByCellId(cell.Id).Where(c => c.ProductID == SelectedProductId && c.ProdColorID == SelectedColorId).Count().ToString("N0")</MudText> *@
+
+                                        <MudText>
+                                            Nombre: @{
+                                                var containers = _contenaireService.GetByCellId(cell.Id);
+
+                                                if (SelectedProductId != null && SelectedProductId != 0)
+                                                    containers = containers.Where(c => c.ProductID == SelectedProductId);
+
+                                                if (SelectedColorId != null && SelectedColorId != 0)
+                                                    containers = containers.Where(c => c.ProdColorID == SelectedColorId);
+
+                                                @containers.Count().ToString("N0");
+                                            }
+                                        </MudText>
+
+                                    </TooltipContent>
+                                </MudTooltip>
+                            }
                         </MudCard>
                     }
                 </div>
