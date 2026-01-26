@@ -10,7 +10,7 @@
                 {
                     <li style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; margin-bottom: 0.5rem; background: #f9f9f9; border-radius: 6px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
                         <span style="font-size: 1rem; font-weight: 500;">Bac @bac.Number  </span>
-                        <div style="font-size: 0.9rem; color: #555;">@_logService.GetByContenaireId(bac.Id).EventTime.ToString("dd-MM-yyyy HH:mm:ss")</div>
+                        <div style="font-size: 0.9rem; color: #555;"> @bac.LastEvent.Value.ToString("dd-MM-yyyy HH:mm:ss")</div>
                         <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" @onclick="() => RemoveBac(bac)" />
                     </li>
                 }

@@ -145,6 +145,7 @@ namespace KANTAIM.APK.Components.Pages
         void VerifyEmptyPallet(Container PaletteScanner)
         {
             //PaletteScanner = _contenaireService.GetContainerByNumber(paletteNumber);
+            if (PaletteScanner == null) return;
             if (PaletteScanner != null && _contenaireService.CountBac(PaletteScanner.Id) <= 1) // s'il n'y a plus de bac sur la palette
             {
                 PaletteScanner.ContainerAction = _actionService.GetByStatus(0);// Stocké Vide

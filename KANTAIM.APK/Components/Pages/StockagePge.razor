@@ -34,8 +34,8 @@
 
     .status-display, .status-item {
     color: #555555;
-    margin: 10px 0;
-    padding: 10px;
+    margin: 6px 0;
+    padding: 6px;
     background-color: #f2f2f2;
     border-radius: 10px;
     }
@@ -203,6 +203,13 @@
                     @if (Id != 4)
                     {
                         <div class="status-display">
+                            @if (Product != null)
+                            {
+                                if (ContainerScanner.Press != null)
+                                {
+                                    <div class="status-item">Presse: @ContainerScanner.Press.Number - Moule: @ContainerScanner.Press.Shape.Name</div>
+                                }
+                            }
                             @if(Product != null)
                             {
                                <div class="status-item">Produit: @Product.Name</div> 
