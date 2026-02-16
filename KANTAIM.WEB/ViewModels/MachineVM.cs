@@ -1,4 +1,5 @@
 ﻿using KANTAIM.DAL.Model;
+using Microsoft.IdentityModel.Tokens;
 using MudBlazor;
 using System.ComponentModel.DataAnnotations;
 
@@ -117,7 +118,8 @@ namespace KANTAIM.WEB.ViewModels
             {
                 list.Add(new ValidationResult("Le numéro de machine doit être unique.", new string[] { "Number" }));
             }
-            if (Name == null) list.Add(new ValidationResult("Name obligatoire", new string[] { "Name" }));
+            if (Name.IsNullOrEmpty()) list.Add(new ValidationResult("Nom obligatoire", new string[] { "Name" }));
+            if (IPAdress.IsNullOrEmpty()) list.Add(new ValidationResult("Adresse IP obligatoire", new string[] { "Name" }));
 
             if (list.Count <= 0)
             {
