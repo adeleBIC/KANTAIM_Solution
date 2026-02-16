@@ -85,7 +85,10 @@
                 </div>
 
                 <div class="button-group">
-            <MudButton Class="bouton"  Color="Color.Secondary" Variant="MudBlazor.Variant.Filled" Href="@($"/StockagePge/1/{ContainerScanner.Number}")" Match="NavLinkMatch.All">Déplacement Contenaire</MudButton>
+            @if (!ContainerScanner.ContainerType.IsContainable)
+            {
+                <MudButton Class="bouton"  Color="Color.Secondary" Variant="MudBlazor.Variant.Filled" Href="@($"/StockagePge/1/{ContainerScanner.Number}")" Match="NavLinkMatch.All">Déplacement Contenaire</MudButton>
+            }
             @if (!IsPalette)
             {
                 @if (!ContainerScanner.ContainerType.IsContainable)

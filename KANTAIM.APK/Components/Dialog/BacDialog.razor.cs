@@ -1,3 +1,4 @@
+using KANTAIM.APK.Resources;
 using KANTAIM.DAL.Model;
 using KANTAIM.DAL.Services;
 using Microsoft.AspNetCore.Components;
@@ -23,6 +24,7 @@ namespace KANTAIM.APK.Components.Dialog
         void RemoveBac(Container bac)
         {
             bac.ContainerAction = _actionService.GetByStatus(0);/*0: Stocké vide*/
+            bac.FillStatus = StatusContainer.Empty;
             bac.ActionID = bac.ContainerAction.Id;
             bac.BigContainer = null;
             bac.ContainerID = null;
