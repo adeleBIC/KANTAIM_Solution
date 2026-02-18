@@ -100,24 +100,30 @@ namespace KANTAIM.APK.Components.Pages
                 if (type == 1)
                 {
                     PaletteScanner = _contenaireService.GetContainerByNumber(PaletteNumber);
-                    if (PaletteScanner.InMaintenance)
+                    if (PaletteScanner != null && PaletteScanner.ContainerType.NbrMaxContainer > 0)
                     {
-                        Maintenance = true;
-                        PaletteScanner = null;
-                        NavigationManager.NavigateTo($"/");
-                        _snackService.Add("Le contenaire est en maintenance!", Severity.Error);
-                        return;
-                    }
-                    if (PaletteScanner.ContainerAction.Status == 0) // On ne peux pas mettre une bac vide dans une palette, on ne peux pas mettre un bac dans une palette qu'il n'as pas été initialisé.
-                    {
-                        _snackService.Add("Svp initialisez palette d'abord!", Severity.Error);
-                        PaletteScanner = null;
+                        if (PaletteScanner.InMaintenance)
+                        {
+                            Maintenance = true;
+                            PaletteScanner = null;
+                            NavigationManager.NavigateTo($"/");
+                            _snackService.Add("Le contenaire est en maintenance!", Severity.Error);
+                            return;
+                        }
+                        if (PaletteScanner.ContainerAction.Status == 0) // On ne peux pas mettre une bac vide dans une palette, on ne peux pas mettre un bac dans une palette qu'il n'as pas été initialisé.
+                        {
+                            _snackService.Add("Svp initialisez palette d'abord!", Severity.Error);
+                            PaletteScanner = null;
+                        }
+                        else
+                        {
+                            TransferBacToPalette(ContainerScanner, PaletteScanner);
+                        }
                     }
                     else
                     {
-                        TransferBacToPalette(ContainerScanner, PaletteScanner);
+                        _snackService.Add("Mauvais scan, ce n'est pas une palette", Severity.Error);
                     }
-
                 }
             }
         }
