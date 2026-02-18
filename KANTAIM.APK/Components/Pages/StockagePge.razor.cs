@@ -107,7 +107,7 @@ namespace KANTAIM.APK.Components.Pages
                 {
                     ContainerManage(containerNumber);
                 }
-                else
+                else 
                 {
                     _snackService.Add("Svp scannez un bac !", Severity.Error);
                 }

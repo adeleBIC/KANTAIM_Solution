@@ -52,8 +52,8 @@ namespace KANTAIM.DAL.Services
 
         public IEnumerable<Container> GetAll(bool withInclude)
         {
-            if (withInclude) return GetAll();
-            else return _repo.GetAll();
+            if (withInclude) return GetAll().OrderBy(l=>l.Number);
+            else return _repo.GetAll().OrderBy(l => l.Number);
         }
 
       

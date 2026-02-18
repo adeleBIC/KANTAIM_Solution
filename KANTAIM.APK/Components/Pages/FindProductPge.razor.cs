@@ -89,34 +89,62 @@ namespace KANTAIM.APK.Components.Pages
 
         void findCells()
         {
+            var rackIds = profilSelected.RackProfils.Select(rp => rp.RackId).ToList();
 
-            ContainerFindList = new List<Container>(_contenaireService.GetAllByOperationStatus(ActionStatus.Store)
-                                                                    .Where(c => c.CellStock != null &&
-                                                                    c.ProductID == ProductScanner.Id &&
-                                                                    (ColorChoose == null || c.ProdColorID == ColorChoose.Id) &&
-                                                                    c.CellID != ContainerScanner?.CellID &&
-                                                                    !c.CellStock.IsJail &&
-                                                                    !c.CellStock.IsMaintenance &&
-                                                                    !c.CellStock.IsPhantom &&
-                                                                    c.CellStock.RackCells != null &&
-                                                                    c.CellStock.RackCells.Any(rc => profilSelected.RackProfils.Any(rp => rp.RackId == rc.RackId)))
-                                                                    .OrderBy(c => c.LastEvent));
+            var orderedList = _contenaireService.GetAllByOperationStatus(ActionStatus.Store)
+                                                .Where(c => c.CellStock != null &&
+                                                            c.ProductID == ProductScanner.Id &&
+                                                            (ColorChoose == null || c.ProdColorID == ColorChoose.Id) &&
+                                                            c.CellID != ContainerScanner?.CellID &&
+                                                            !c.CellStock.IsJail &&
+                                                            !c.CellStock.IsMaintenance)
+                                                .OrderBy(c => c.LastEvent)
+                                                .ToList();
 
-            ContainerPhantomFindList = new List<Container>(_contenaireService.GetAllByOperationStatus(ActionStatus.Store)
-                                                                    .Where(c => c.CellStock != null &&
-                                                                    c.ProductID == ProductScanner.Id &&
-                                                                    (ColorChoose == null || c.ProdColorID == ColorChoose.Id) &&
-                                                                    c.CellID != ContainerScanner?.CellID &&
-                                                                    !c.CellStock.IsJail &&
-                                                                    !c.CellStock.IsMaintenance &&
-                                                                    c.CellStock.IsPhantom &&
-                                                                    c.CellStock.RackCells != null &&
-                                                                    c.CellStock.RackCells.Any(rc => profilSelected.RackProfils.Any(rp => rp.RackId == rc.RackId)))
-                                                                    .OrderBy(c => c.LastEvent));
-            if (ContainerFindList != null && ContainerFindList.Count > 0) {CellPropose = ContainerFindList.FirstOrDefault()?.CellStock ?? null; }
+            var noPhantom = orderedList.Where(c => !c.CellStock.IsPhantom).ToList();
+
+            ContainerFindList = noPhantom.Where(c => c.CellStock.RackCells != null &&
+                                                        c.CellStock.RackCells.Any(rc => rackIds.Contains(rc.RackId)))
+                                            .ToList();
+
+            if (!ContainerFindList.Any()) ContainerFindList = noPhantom;
+
+            var phantom = orderedList.Where(c => c.CellStock.IsPhantom).ToList();
+
+            ContainerPhantomFindList = phantom.Where(c => c.CellStock.RackCells != null &&
+                                                        c.CellStock.RackCells.Any(rc => rackIds.Contains(rc.RackId)))
+                                                 .ToList();
+
+            if (!ContainerPhantomFindList.Any()) ContainerPhantomFindList = phantom;
+
+            CellPropose = ContainerFindList.FirstOrDefault()?.CellStock;
+
+            //ContainerFindList = new List<Container>(_contenaireService.GetAllByOperationStatus(ActionStatus.Store)
+            //                                                        .Where(c => c.CellStock != null &&
+            //                                                                    c.ProductID == ProductScanner.Id &&
+            //                                                                    (ColorChoose == null || c.ProdColorID == ColorChoose.Id) &&
+            //                                                                    c.CellID != ContainerScanner?.CellID &&
+            //                                                                    !c.CellStock.IsJail &&
+            //                                                                    !c.CellStock.IsMaintenance &&
+            //                                                                    !c.CellStock.IsPhantom &&
+            //                                                                    c.CellStock.RackCells != null &&
+            //                                                                    c.CellStock.RackCells.Any(rc => profilSelected.RackProfils.Any(rp => rp.RackId == rc.RackId)))
+            //                                                        .OrderBy(c => c.LastEvent));
+
+            //ContainerPhantomFindList = new List<Container>(_contenaireService.GetAllByOperationStatus(ActionStatus.Store)
+            //                                                        .Where(c => c.CellStock != null &&
+            //                                                                    c.ProductID == ProductScanner.Id &&
+            //                                                                    (ColorChoose == null || c.ProdColorID == ColorChoose.Id) &&
+            //                                                                    c.CellID != ContainerScanner?.CellID &&
+            //                                                                    !c.CellStock.IsJail &&
+            //                                                                    !c.CellStock.IsMaintenance &&
+            //                                                                    c.CellStock.IsPhantom &&
+            //                                                                    c.CellStock.RackCells != null &&
+            //                                                                    c.CellStock.RackCells.Any(rc => profilSelected.RackProfils.Any(rp => rp.RackId == rc.RackId)))
+            //                                                        .OrderBy(c => c.LastEvent));
+            //if (ContainerFindList != null && ContainerFindList.Count > 0) {CellPropose = ContainerFindList.FirstOrDefault()?.CellStock ?? null; }
 
         }
-
 
         async void ColorSelected(int colorid)
         {

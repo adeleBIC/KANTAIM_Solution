@@ -116,7 +116,7 @@ namespace KANTAIM.WEB.ViewModels
             if (Number == 0) list.Add(new ValidationResult("Niveau obligatoire", new string[] { "Number" }));
             if (machines.Any(c => c.Number == Number && c.Id != Id)) list.Add(new ValidationResult("Le numéro de machine doit être unique.", new string[] { "Number" }));
             if (Name.IsNullOrEmpty()) list.Add(new ValidationResult("Nom obligatoire", new string[] { "Name" }));
-            if (IPAdress.IsNullOrEmpty()) list.Add(new ValidationResult("Adresse IP obligatoire", new string[] { "Name" }));
+            if (IPAdress.IsNullOrEmpty()) list.Add(new ValidationResult("Adresse IP obligatoire", new string[] { "IPAdress" }));
 
             if (list.Count <= 0)
             {
