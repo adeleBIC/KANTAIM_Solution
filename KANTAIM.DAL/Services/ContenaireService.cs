@@ -102,7 +102,7 @@ namespace KANTAIM.DAL.Services
 
             int totalCount = await query.CountAsync();
 
-            var data = await query.Skip(page * pageSize)
+            var data = await query.OrderBy(c=>c.Number).Skip(page * pageSize)
                                  .Take(pageSize)
                                  .ToListAsync();
 
