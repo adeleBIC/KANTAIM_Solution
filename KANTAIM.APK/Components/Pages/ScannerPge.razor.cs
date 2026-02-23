@@ -117,6 +117,11 @@ namespace KANTAIM.APK.Components.Pages
                                                 switch (containerScanner.ContainerAction.Status)
                                                 {
                                                     case 0:
+                                                        if (containerScanner.ContainerType.IsContainable)
+                                                        {
+                                                            _snackService.Add("Ce contenaire est un bac, impossible de le scanner en premier !", MudBlazor.Severity.Error);
+                                                            break;
+                                                        }
                                                         /*Quand on scan un contenaire vide, on l'initialise sur press.*/
                                                         NavigationManager.NavigateTo($"/InitialisationPge/0/{containerNumber}");
                                                         break;

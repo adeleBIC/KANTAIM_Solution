@@ -148,7 +148,11 @@
                         </h3>
                         <MudText> @TextValue</MudText>
                         <div class="button-group">
-                            <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="() => { Stock = false; ScanPallet = false; Fillstatus = 0; }">Retour</MudButton>
+                            <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="() => Return()">Retour</MudButton>
+                            @if (ContainerScanner.ContainerType.NbrMaxContainer > 0 && Fillstatus != StatusContainer.Empty)
+                            {
+                                <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="() => FillstatusSelected(1)">Vidange Palette</MudButton>
+                            }
                         </div>
                     }
                     else
@@ -175,13 +179,16 @@
                         {
                             <div class="button-group">
 
-                                <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="() => { Stock = false; ScanPallet = false; Fillstatus = 0; }">Retour</MudButton>
+                                <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="() => Return()">Retour</MudButton>
+                                @if (ContainerScanner.ContainerType.NbrMaxContainer > 0 && Fillstatus != StatusContainer.Empty)
+                                {
+                                    <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Filled" OnClick="() => FillstatusSelected(1)">Vidange Palette</MudButton>
+                                }
                             </div>
                         }
                     }
                 </div>
-            }
-           
+            }         
         }
        
         break;

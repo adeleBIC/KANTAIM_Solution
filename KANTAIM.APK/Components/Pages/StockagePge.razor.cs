@@ -107,21 +107,22 @@ namespace KANTAIM.APK.Components.Pages
                 {
                     ContainerManage(containerNumber);
                 }
-                else 
+                else
                 {
                     _snackService.Add("Svp scannez un bac !", Severity.Error);
                 }
             }
         }
 
-        
+
         void ContainerManage(int containerNumber)
         {
             ContainerScanner = _contenaireService.GetContainerByNumber(containerNumber);
-            if(ContainerScanner.ContainerType.IsContainable && ContainerScanner.FillStatus != StatusContainer.Empty)// si il est bac sur pallete qui est aprés l'initialisation
+            if (ContainerScanner.ContainerType.IsContainable && ContainerScanner.FillStatus != StatusContainer.Empty)// si il est bac sur pallete qui est aprés l'initialisation
             {
                 InjectForBac = true;
-            } else
+            }
+            else
             {
                 if (ContainerScanner.ContainerType.NbrMaxContainer > 0)
                 {
@@ -141,7 +142,7 @@ namespace KANTAIM.APK.Components.Pages
                     ColorOfProduct = _colorService.GetById(ContainerScanner.ProdColorID);
                 }
             }
-            
+
 
         }
 
@@ -177,7 +178,8 @@ namespace KANTAIM.APK.Components.Pages
             if (bac.ContainerID == palette.Id || bac.FillStatus > StatusContainer.Empty)
             {
                 _snackService.Add("Bac déjà présent dans une palette ou non vide !", Severity.Error);
-            } else
+            }
+            else
             {
                 bac.CellID = palette.CellID;
                 bac.ActionID = palette.ActionID;
@@ -231,13 +233,14 @@ namespace KANTAIM.APK.Components.Pages
             Fillstatus = fillstatus;
             List<DAL.Model.Cell> cells = new List<DAL.Model.Cell>();
             Stock = true;
-            if(Fillstatus == StatusContainer.Empty) // vide
+            if (Fillstatus == StatusContainer.Empty) // vide
             {
                 cells = _cellService.GetAll().Where(u => u.ForEmpty == true).ToList();
-                if(ContainerScanner.ContainerType.IsContainable == true)
+                if (ContainerScanner.ContainerType.IsContainable == true)
                 {
                     cells = cells.FindAll(u => u.IsPhantom == true); // if it is a bac empty, we stock it in the cell phantom and empty
-                } else
+                }
+                else
                 {
                     cells = cells.FindAll(u => u.IsPhantom != true);// if it isn't a bac empty, we stock it in the cell empty
                 }
@@ -246,9 +249,10 @@ namespace KANTAIM.APK.Components.Pages
                     if (cell.Status != StatusCell.Full && cell.Id != ContainerScanner.CellID)
                     {
                         CellPropose = cell;
-                    }       
+                    }
                 }
-            } else // plein ou semi-plein
+            }
+            else // plein ou semi-plein
             {
                 Product = ContainerScanner.Product;
                 ColorOfProduct = ContainerScanner.ProdColor;
@@ -258,14 +262,14 @@ namespace KANTAIM.APK.Components.Pages
                     ScanPallet = true;
                 }
 
-                if(IsPallet && _contenaireService.CountBac(ContainerScanner.Id) < 24 )
+                if (IsPallet && _contenaireService.CountBac(ContainerScanner.Id) < 24)
                 {
                     _snackService.Add("Le nombre de bac est inférieur que 24 !", Severity.Error);
                 }
                 findCells();
-                
+
             }
-           
+
         }
 
         void findCells()
@@ -283,7 +287,7 @@ namespace KANTAIM.APK.Components.Pages
                                                                                 c.CellID != ContainerScanner?.CellID &&
                                                                                 c.CellStock.RackCells != null &&
                                                                                 c.CellStock.RackCells.Any(rc => profilSelected.RackProfils.Any(rp => rp.RackId == rc.RackId)))
-                                                                                .OrderBy(c=>c.LastEvent));
+                                                                                .OrderBy(c => c.LastEvent));
 
 
             if (list != null && list.Count > 0) CellPropose = list.FirstOrDefault()?.CellStock ?? null;
@@ -326,7 +330,6 @@ namespace KANTAIM.APK.Components.Pages
                         }
                         else _snackService.Add("Svp scannez le QR code de la maintenance.", Severity.Error);
                     }
-
 
                     if (CellPropose != null && CellScanner.Id == CellPropose.Id) Exit(2);
                     else
@@ -375,7 +378,7 @@ namespace KANTAIM.APK.Components.Pages
 
         void upDateCellState()
         {
-            if(CellScanner == null) CellScanner = CellPropose;
+            if (CellScanner == null) CellScanner = CellPropose;
             if (_contenaireService.CountCells(CellScanner.Id) == 0) CellScanner.Status = StatusCell.Empty;
             else if (_contenaireService.CountCells(CellScanner.Id) < CellScanner.NbMax) CellScanner.Status = StatusCell.InFill;
             else CellScanner.Status = StatusCell.Full;
@@ -527,7 +530,7 @@ namespace KANTAIM.APK.Components.Pages
             };
             _logService.UpSert(u);
             _contenaireService.UpSert(ContainerScanner);
-            _snackService.Add("Bien sortie !", Severity.Success); 
+            _snackService.Add("Bien sortie !", Severity.Success);
             NavigationManager.NavigateTo($"/");
         }
 
@@ -536,13 +539,13 @@ namespace KANTAIM.APK.Components.Pages
             var oldCellule = ContainerScanner?.CellStock;
             if (action == 3)
                 _shipment = true;
-            if(ContainerScanner != null && CellScanner != null)
+            if (ContainerScanner != null && CellScanner != null)
             {
                 ContainerScanner.InMaintenance = CellScanner.IsMaintenance;
                 ContainerScanner.InJail = CellScanner.IsJail;
             }
             Log u;
-            if (Fillstatus != 1)
+            if (Fillstatus != StatusContainer.Empty)
             {//if container is not empty
                 if (ContainerScanner != null && ContainerScanner.ContainerType.IsContainable) // if it isn't an empty bac, we can replace this bac to correspond pallete 
                 {
@@ -567,12 +570,13 @@ namespace KANTAIM.APK.Components.Pages
                     ProdColorID = ContainerScanner.ProdColorID,
                     FillStatus = Fillstatus
                 };
-                if(CellScanner != null)
+                if (CellScanner != null)
                 {
                     u.Cell = CellScanner;
                     u.CellID = CellScanner.Id;
                 }
-            } else
+            }
+            else
             {
                 action = 0;/*0: Stocké vide, store without product*/
                 ContainerScanner.Press = null;
@@ -616,29 +620,42 @@ namespace KANTAIM.APK.Components.Pages
             ContainerScanner.CellID = CellScanner.Id;
             if (CellScanner.IsJail) ContainerScanner.InJail = true;
             _contenaireService.UpSert(ContainerScanner);
-            
+
             if (IsPallet)
             {
                 foreach (var item in _contenaireService.GetAllBacs(ContainerScanner.Id))
                 {
-                    item.ContainerAction = _actionService.GetByStatus(action);/*0: Stocké vide, store without product 2 : store with product 3 : Shipment*/
-                    item.ActionID = item.ContainerAction.Id;
-                    if (CellScanner != null)
+                    if (Fillstatus == StatusContainer.Empty)
                     {
-                        item.CellStock = CellScanner;
-                        item.CellID = CellScanner.Id;
+                        item.LastEvent = u.EventTime;
+                        item.ContainerAction = _actionService.GetByStatus(3);// Sortie stock
+                        item.ActionID = item.ContainerAction.Id;
+                        item.CellStock = null;
+                        item.CellID = null;
+                        item.BigContainer = null;
+                        item.ContainerID = null;
                     }
-                    
+                    else
+                    {
+                        item.ContainerAction = _actionService.GetByStatus(action);/*0: Stocké vide, store without product 2 : store with product 3 : Shipment*/
+                        item.ActionID = item.ContainerAction.Id;
+                        if (CellScanner != null)
+                        {
+                            item.CellStock = CellScanner;
+                            item.CellID = CellScanner.Id;
+                        }
+                        if ((ContainerScanner != null && ContainerScanner.InJail) || (PalletScanner != null && PalletScanner.InJail)) item.InJail = true;
+                        if ((ContainerScanner != null && ContainerScanner.InMaintenance) || (PalletScanner != null && PalletScanner.InMaintenance)) item.InMaintenance = true;
+                    }
                     //item.FillStatus = Fillstatus; 
-                    if((ContainerScanner != null && ContainerScanner.InJail) || (PalletScanner != null && PalletScanner.InJail)) item.InJail = true;
-                    if ((ContainerScanner != null && ContainerScanner.InMaintenance) || (PalletScanner != null && PalletScanner.InMaintenance)) item.InMaintenance = true;
+
                     _contenaireService.UpSert(item);
                 }
             }
             upDateCellState();
             upDateCellState(oldCellule);
             _goodStock = true;
-           }
+        }
 
         public override async void OnMessageReceived(InputMessage msg)
         {
@@ -660,8 +677,27 @@ namespace KANTAIM.APK.Components.Pages
                     else cellScan(msg.Code);
                     break;
             }
-            
+
             await InvokeAsync(StateHasChanged);
+        }
+
+        void Return()
+        {
+            if (ContainerScanner.ContainerAction.Status != 2)
+            {
+                Stock = false;
+                ScanPallet = false;
+                Fillstatus = 0;
+            }
+            else
+            {
+                NavigationManager.NavigateTo($"/");
+            }
+        }
+
+        void PalletEmpty()
+        {
+
         }
     }
 }
