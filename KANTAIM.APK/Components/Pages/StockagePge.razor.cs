@@ -274,7 +274,7 @@ namespace KANTAIM.APK.Components.Pages
 
         void findCells()
         {
-            List<Container> list = new List<Container>(_contenaireService.GetAllByOperationStatus(ActionStatus.Store)
+            List <Container> list = new List<Container>(_contenaireService.GetAllByOperationStatus(ActionStatus.Store)
                                                                                 .Where(c => c.CellStock != null &&
                                                                                 c.ContainerType.IsContainable == false &&
                                                                                 c.ProductID == Product.Id &&
