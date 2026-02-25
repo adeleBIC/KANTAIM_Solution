@@ -96,15 +96,15 @@ namespace KANTAIM.APK.Components.Pages
                     {
                         string part = parts[0];
                         // Vérifier si la partie n'est pas vide et commence par un chiffre
-                        if (!string.IsNullOrEmpty(part) && char.IsDigit(part[0]))
+                        if (!string.IsNullOrEmpty(part) && int.TryParse(part[0].ToString(), out int typeNumber))
                         {
                             // Récupérer le premier caractère (qui est le numéro du type)
-                            char typeNumber = part[0];
+                            //char typeNumber = part[0];
 
                             // Utiliser une structure switch pour traiter chaque type différemment
                             switch (typeNumber)
                             {
-                                case '1':
+                                case 1:
                                     // Traiter le conteneur
                                     string c = parts[1];
                                     if (int.TryParse(c, out int containerNumber))
@@ -151,28 +151,36 @@ namespace KANTAIM.APK.Components.Pages
 
                                     }
                                     break;
-                                case '2':
+                                case 2:
                                     _snackService.Add("Impossible de scanner une machine en premier !", MudBlazor.Severity.Error);
                                     break;
-                                case '3':
-                                    string? PressName = parts[1];
-                                    if (int.TryParse(PressName, out int PressNumber))
+                                case 3:
+                                    string? pressName = parts[1];
+                                    if (int.TryParse(pressName, out int pressNumber))
                                     {
-                                        NavigationManager.NavigateTo($"/InitialisationPge/3/{PressNumber}");
+                                        NavigationManager.NavigateTo($"/InitialisationPge/3/{pressNumber}");
                                     }
 
                                     // Traiter la presse
                                     break;
-                                case '4':
+                                case 4:
                                     _snackService.Add("Impossible de scanner une cellule en premier !", MudBlazor.Severity.Error);
                                     break;
-                                case '5':
+                                case 6:
                                     // Recherche le produit
-                                    string? ProduitName = parts[1];
-                                    if (int.TryParse(ProduitName, out int ProduitNumber))
+                                    string? produitName = parts[1];
+                                    if (int.TryParse(produitName, out int produitNumber))
                                     {
-                                        NavigationManager.NavigateTo($"/FindProductPge/5/{ProduitNumber}");
+                                        NavigationManager.NavigateTo($"/FindProductPge/5/{produitNumber}");
                                     }
+                                    break;
+                                case 99:
+                                    if (parts[1] != "RESET")
+                                    {
+
+                                    }
+
+                                    // Traiter la presse
                                     break;
                                 default:
                                     // Cas par défaut si le numéro du type n'est pas valide
