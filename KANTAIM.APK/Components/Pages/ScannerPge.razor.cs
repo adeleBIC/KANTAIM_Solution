@@ -94,9 +94,9 @@ namespace KANTAIM.APK.Components.Pages
 
                     if (parts != null)
                     {
-                        string part = parts[0];
+                        string? part = parts[0];
                         // Vérifier si la partie n'est pas vide et commence par un chiffre
-                        if (!string.IsNullOrEmpty(part) && int.TryParse(part[0].ToString(), out int typeNumber))
+                        if (!string.IsNullOrEmpty(part) && int.TryParse(part, out int typeNumber))
                         {
                             // Récupérer le premier caractère (qui est le numéro du type)
                             //char typeNumber = part[0];
@@ -175,12 +175,11 @@ namespace KANTAIM.APK.Components.Pages
                                     }
                                     break;
                                 case 99:
-                                    if (parts[1] != "RESET")
+                                    if (parts[1] == "17418419")
                                     {
-
+                                        //NavigationManager.NavigateTo($"/FindProductPge/5/{produitNumber}");
                                     }
-
-                                    // Traiter la presse
+                                    else _snackService.Add("Mauvais QRCode scanné !", MudBlazor.Severity.Error);
                                     break;
                                 default:
                                     // Cas par défaut si le numéro du type n'est pas valide
