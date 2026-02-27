@@ -5,6 +5,7 @@ using KANTAIM.DAL.Model;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System.ComponentModel;
+using KANTAIM.APK.Resources;
 
 namespace KANTAIM.APK.Components.Pages
 {
@@ -21,11 +22,13 @@ namespace KANTAIM.APK.Components.Pages
         [Inject] public ScanService _scanService { get; set; }
         public int State { get; set; }
         public DAL.Model.Container? ContainerScanner { get; set; }
+        public Dictionary<int, string> ContainerStatus { get; set; }
 
         public string? TextValue { get; set; }
 
         protected override void OnInitialized()
         {
+            ContainerStatus = new StatusContainer().Status;
             State = 0;
         }
 
@@ -37,9 +40,10 @@ namespace KANTAIM.APK.Components.Pages
             {
                 int.TryParse(parts[0], out int type);
                 int.TryParse(parts[1], out int contNumber);
-                if (type != 1)
+                if (type == 1)
                 {
                     ContainerScanner = _contenaireService.GetContainerByNumber(contNumber);
+                    State = 1;
                 }
                 else _snackService.Add("Mauvais QRCode scanné !", MudBlazor.Severity.Error);
             }

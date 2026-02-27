@@ -55,18 +55,17 @@
 </style>
 @switch (State)
 {
-    case 0:
-        <div class="display-container">
-            <div class="status-display">
-                <MudText> @TextValue</MudText>
-            </div>
-            <h3 class="title">Scanner le contenaire à réinitialiser</h3>
-        </div>
-        break;
-    
     case 1:
         <div class="display-container">
             <div class="status-display">
+
+                <div class="status-item">Type: @ContainerScanner.ContainerType.Name - Numéro: @ContainerScanner.Number</div>
+                <div class="status-item">Etat: @ContainerScanner.ContainerAction.Name</div>
+                <div class="status-item">Remplissage: @ContainerStatus[ContainerScanner.FillStatus]</div>
+                @if (ContainerScanner.Product != null)
+                {
+                    <div class="status-item">Stocké dans: @ContainerScanner.CellStock.Name</div>
+                }
                 @if (ContainerScanner.Product != null)
                 {
                     if (ContainerScanner.Press != null)
@@ -96,6 +95,15 @@
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => State = 2)" class="bouton">Confirmer</MudButton>
                 <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="@(() => State = 0)" class="bouton">Annuler</MudButton>
             </div>
+        </div>
+        break;
+
+    case 0:
+        <div class="display-container">
+            <div class="status-display">
+                <MudText> @TextValue</MudText>
+            </div>
+            <h3 class="title">Scanner le contenaire à réinitialiser</h3>
         </div>
         break;
 }
