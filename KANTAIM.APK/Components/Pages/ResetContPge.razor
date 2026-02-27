@@ -1,0 +1,101 @@
+﻿@page "/ResetContPge"
+@using KANTAIM.DAL.Model;
+@using MudBlazor
+@using static MudBlazor.Icons
+@using Microsoft.AspNetCore.Components.Routing
+@inherits BasePage
+
+<style>
+    .main-container {
+        padding: 10px;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    .selection-container, .display-container {
+        background-color: #FFFFFF;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+
+    .title {
+        color: #333333;
+        text-align: center;
+    }
+
+    .redtitle {
+        color: red;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .status-display, .status-item {
+        color: #555555;
+        margin: 6px 0;
+        padding: 6px;
+        background-color: #f2f2f2;
+        border-radius: 10px;
+    }
+
+    .button-group {
+        display: flex;
+        justify-content: space-evenly;
+    }
+
+    .fillstatus-container {
+        text-align: center;
+    }
+
+
+    .bouton {
+        margin: 5px;
+    }
+
+</style>
+@switch (State)
+{
+    case 0:
+        <div class="display-container">
+            <div class="status-display">
+                <MudText> @TextValue</MudText>
+            </div>
+            <h3 class="title">Scanner le contenaire à réinitialiser</h3>
+        </div>
+        break;
+    
+    case 1:
+        <div class="display-container">
+            <div class="status-display">
+                @if (ContainerScanner.Product != null)
+                {
+                    if (ContainerScanner.Press != null)
+                    {
+                        <div class="status-item">Presse: @ContainerScanner.Press.Number - Moule: @ContainerScanner.Press.Shape.Name</div>
+                    }
+                }
+                @if (ContainerScanner.Product != null)
+                {
+                    <div class="status-item">Produit: @ContainerScanner.Product.Name</div>
+                }
+
+                @if (ContainerScanner.ProdColor != null)
+                {
+                    <div class="status-item">Couleur: @ContainerScanner.ProdColor.Name<MudIcon Icon="@Icons.Material.Filled.Circle" Style="@($"color:{ContainerScanner.ProdColor.ColorNumber};")" /></div>
+                }
+
+                @if (ContainerScanner?.ContainerType.NbrMaxContainer > 0)
+                {
+                    <div class="status-item">
+                        Nombre de Bac : @_contenaireService.CountBac(ContainerScanner.Id)
+                    </div>
+                }
+            </div>
+            <h3 class="title">Confirmer la réinitialisation du contenaire</h3>
+            <div class="button-group">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => State = 2)" class="bouton">Confirmer</MudButton>
+                <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="@(() => State = 0)" class="bouton">Annuler</MudButton>
+            </div>
+        </div>
+        break;
+}

@@ -177,7 +177,7 @@ namespace KANTAIM.APK.Components.Pages
                                 case 99:
                                     if (parts[1] == "17418419")
                                     {
-                                        //NavigationManager.NavigateTo($"/FindProductPge/5/{produitNumber}");
+                                        NavigationManager.NavigateTo($"/ResetContPge");
                                     }
                                     else _snackService.Add("Mauvais QRCode scanné !", MudBlazor.Severity.Error);
                                     break;
@@ -187,7 +187,6 @@ namespace KANTAIM.APK.Components.Pages
                             }
                         }
                     }
-
                 }
             }
             else
