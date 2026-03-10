@@ -242,7 +242,7 @@ namespace KANTAIM.APK.Components.Pages
                     return;
                 }
                 // Vérifier si le Contenaire que l'on veut initialiser est bien vide
-                if (ContainerScanner.ContainerAction.Status != 0)
+                if (ContainerScanner.ContainerAction.Status != 0 && ContainerScanner.ContainerAction.Status != 90)
                 {
                     ContainerScanner = null;
                     _snackService.Add("Contenaire doit être vide pour l'initialiser sous la presse!", Severity.Error);

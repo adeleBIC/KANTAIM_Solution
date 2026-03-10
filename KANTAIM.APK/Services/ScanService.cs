@@ -8,7 +8,7 @@ namespace KANTAIM.APK.Services
         {
             if(txt != null)
             {
-                Regex pattern = new Regex(@"^[1-9]+#[0-9]+(#[0-9]+)*\$$");
+                Regex pattern = new Regex(@"^[0-9]+#[0-9]+(#[0-9]+)*\$$");
                 if(pattern.IsMatch(txt))
                 {
                     string[] v = txt.Split('$');

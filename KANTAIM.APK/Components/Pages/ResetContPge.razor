@@ -62,7 +62,7 @@
                 <div class="status-item">Type: @ContainerScanner.ContainerType.Name - Numéro: @ContainerScanner.Number</div>
                 <div class="status-item">Etat: @ContainerScanner.ContainerAction.Name</div>
                 <div class="status-item">Remplissage: @ContainerStatus[ContainerScanner.FillStatus]</div>
-                @if (ContainerScanner.Product != null)
+                @if (ContainerScanner.CellStock != null)
                 {
                     <div class="status-item">Stocké dans: @ContainerScanner.CellStock.Name</div>
                 }

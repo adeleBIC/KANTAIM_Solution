@@ -47,7 +47,7 @@ namespace KANTAIM.APK.Components.Pages
                 if (type == 1)
                 {
                     ContainerScanner = _contenaireService.GetContainerByNumber(contNumber);
-                    ListContainerInPallet = _contenaireService.GetAllBacs(contNumber).ToList();
+                    ListContainerInPallet = _contenaireService.GetAllBacs(ContainerScanner.Id).ToList();
                     if (!ContainerScanner.InJail && !ContainerScanner.InMaintenance)
                     {
                         State = 1;
@@ -68,11 +68,11 @@ namespace KANTAIM.APK.Components.Pages
         {
             if (ContainerScanner != null)
             {
-                ContainerScanner.Status = StatusContainer.Empty;
+                ContainerScanner.FillStatus = StatusContainer.Empty;
 
                 ContainerScanner.ContainerID = null;
                 ContainerScanner.CellID = null;
-                ContainerScanner.ActionID = _actionService.GetByStatus(99)?.Id ?? 99;
+                ContainerScanner.ActionID = _actionService.GetByStatus(90)?.Id ?? 90;
                 ContainerScanner.ProductID= null;
                 ContainerScanner.ProdColorID = null;
                 ContainerScanner.PressID = null;
@@ -80,13 +80,14 @@ namespace KANTAIM.APK.Components.Pages
 
                 if (ContainerScanner.ContainerType.NbrMaxContainer > 0) //Palette
                 {
+                    var action = _actionService.GetByStatus(OperationContainer.Shipment);
                     foreach (DAL.Model.Container item in ListContainerInPallet)
                     {
                         item.BigContainer = null;
                         item.CellID = null;
                         item.ContainerID = null;
-                        item.ContainerAction = _actionService.GetByStatus(OperationContainer.Shipment);
-                        item.ActionID = ContainerScanner.ContainerAction.Id;
+                        item.ContainerAction = action;
+                        item.ActionID = action.Id;
                         _contenaireService.UpSert(item);
                     }
                 }
