@@ -86,13 +86,13 @@
                 @if (ContainerScanner?.ContainerType.NbrMaxContainer > 0)
                 {
                     <div class="status-item">
-                        Nombre de Bac : @_contenaireService.CountBac(ContainerScanner.Id)
+                        Nombre de Bac : @ListContainerInPallet.Count()
                     </div>
                 }
             </div>
             <h3 class="title">Confirmer la réinitialisation du contenaire</h3>
             <div class="button-group">
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => State = 2)" class="bouton">Confirmer</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => ResetContainer())" class="bouton">Confirmer</MudButton>
                 <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="@(() => State = 0)" class="bouton">Annuler</MudButton>
             </div>
         </div>

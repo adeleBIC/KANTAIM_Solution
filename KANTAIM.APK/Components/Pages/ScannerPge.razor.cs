@@ -117,6 +117,7 @@ namespace KANTAIM.APK.Components.Pages
                                                 switch (containerScanner.ContainerAction.Status)
                                                 {
                                                     case 0:
+                                                    case 90:
                                                         if (containerScanner.ContainerType.IsContainable)
                                                         {
                                                             _snackService.Add("Ce contenaire est un bac, impossible de le scanner en premier !", MudBlazor.Severity.Error);
@@ -174,7 +175,7 @@ namespace KANTAIM.APK.Components.Pages
                                         NavigationManager.NavigateTo($"/FindProductPge/5/{produitNumber}");
                                     }
                                     break;
-                                case 99:
+                                case 90:
                                     if (parts[1] == "17418419")
                                     {
                                         NavigationManager.NavigateTo($"/ResetContPge");

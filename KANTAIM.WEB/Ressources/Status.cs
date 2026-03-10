@@ -52,6 +52,7 @@
         public const int Inject = 4;
         public const int Transfer = 5;
         public const int Install = 6;
+        public const int Reset = 90;
         public const int Canceled = 99;
 
         public Dictionary<int, String> Operations = new Dictionary<int, string>();
@@ -65,6 +66,7 @@
             Operations.Add(Inject, "Mise en Machine");
             Operations.Add(Transfer, "Déplacement contenaire");
             Operations.Add(Install, "Mise en contenaire");
+            Operations.Add(Reset, "Reset contenaire");
             Operations.Add(Canceled, "Annulé");
         }
     }

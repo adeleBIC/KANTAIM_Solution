@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System.ComponentModel;
 using KANTAIM.APK.Resources;
+using System.Xml.Serialization;
 
 namespace KANTAIM.APK.Components.Pages
 {
@@ -16,6 +17,7 @@ namespace KANTAIM.APK.Components.Pages
         [Inject] public ColorService _colorService { get; set; }
         [Inject] public ContenaireService _contenaireService { get; set; }
         [Inject] public ColorProductService _colorProductServiceService { get; set; }
+        [Inject] public ActionService _actionService { get; set; }
         [Inject] public ProfilSessionService _profilSessionService { get; set; }
         [Inject] public LogService _logService { get; set; }
         [Inject] ISnackbar _snackService { get; set; }
@@ -23,6 +25,8 @@ namespace KANTAIM.APK.Components.Pages
         public int State { get; set; }
         public DAL.Model.Container? ContainerScanner { get; set; }
         public Dictionary<int, string> ContainerStatus { get; set; }
+
+        public List<DAL.Model.Container> ListContainerInPallet { get; set; }
 
         public string? TextValue { get; set; }
 
@@ -43,16 +47,68 @@ namespace KANTAIM.APK.Components.Pages
                 if (type == 1)
                 {
                     ContainerScanner = _contenaireService.GetContainerByNumber(contNumber);
-                    State = 1;
-                    if (true)
+                    ListContainerInPallet = _contenaireService.GetAllBacs(contNumber).ToList();
+                    if (!ContainerScanner.InJail && !ContainerScanner.InMaintenance)
                     {
-
+                        State = 1;
+                    }
+                    else
+                    {
+                        _snackService.Add("Le conteneur est en maintenance ou en prison !", MudBlazor.Severity.Error);
+                        ContainerScanner = null;
                     }
                 }
                 else _snackService.Add("Mauvais QRCode scanné !", MudBlazor.Severity.Error);
             }
             else _snackService.Add("Mauvais QRCode scanné !", MudBlazor.Severity.Error);
             await InvokeAsync(StateHasChanged);
+        }
+
+        public async void ResetContainer()
+        {
+            if (ContainerScanner != null)
+            {
+                ContainerScanner.Status = StatusContainer.Empty;
+
+                ContainerScanner.ContainerID = null;
+                ContainerScanner.CellID = null;
+                ContainerScanner.ActionID = _actionService.GetByStatus(99)?.Id ?? 99;
+                ContainerScanner.ProductID= null;
+                ContainerScanner.ProdColorID = null;
+                ContainerScanner.PressID = null;
+                ContainerScanner.MachineID = null;
+
+                if (ContainerScanner.ContainerType.NbrMaxContainer > 0) //Palette
+                {
+                    foreach (DAL.Model.Container item in ListContainerInPallet)
+                    {
+                        item.BigContainer = null;
+                        item.CellID = null;
+                        item.ContainerID = null;
+                        item.ContainerAction = _actionService.GetByStatus(OperationContainer.Shipment);
+                        item.ActionID = ContainerScanner.ContainerAction.Id;
+                        _contenaireService.UpSert(item);
+                    }
+                }
+
+                Log u = new Log()
+                {
+                    EventTime = DateTime.Now,
+                    Operation = OperationContainer.Reset,
+                    Container = ContainerScanner,
+                    ContainerID = ContainerScanner.Id,
+                    FillStatus = StatusContainer.Empty
+                };
+
+                ContainerScanner.LastEvent = u.EventTime;
+
+                _contenaireService.UpSert(ContainerScanner);
+                _logService.UpSert(u);
+
+                _snackService.Add("Conteneur réinitialisé avec succès !", MudBlazor.Severity.Success);
+                State = 0;
+                await InvokeAsync(StateHasChanged);
+            }
         }
     }
 }
