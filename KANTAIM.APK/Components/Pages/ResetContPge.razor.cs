@@ -44,6 +44,10 @@ namespace KANTAIM.APK.Components.Pages
                 {
                     ContainerScanner = _contenaireService.GetContainerByNumber(contNumber);
                     State = 1;
+                    if (true)
+                    {
+
+                    }
                 }
                 else _snackService.Add("Mauvais QRCode scanné !", MudBlazor.Severity.Error);
             }
