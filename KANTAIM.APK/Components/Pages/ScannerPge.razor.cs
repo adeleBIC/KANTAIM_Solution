@@ -167,7 +167,7 @@ namespace KANTAIM.APK.Components.Pages
                                 case 4:
                                     _snackService.Add("Impossible de scanner une cellule en premier !", MudBlazor.Severity.Error);
                                     break;
-                                case 6:
+                                case 5:
                                     // Recherche le produit
                                     string? produitName = parts[1];
                                     if (int.TryParse(produitName, out int produitNumber))

@@ -44,10 +44,14 @@
 
                 @if (ShowAllCellsPhantom)
                 {
-                    <div class="content cell-log-container">
+                    <div class=" cell-log-container">
                         @foreach (var cellLog in ContainerPhantomFindList.OrderBy(u => u.LastEvent))
                         {
-                            <h3 class="title">Cellule: @cellLog.Number (Stockée le: @cellLog.LastEvent)</h3>
+                            <h3 class="title">
+                                Cellule: @cellLog.Number
+                                Contenaire : @cellLog.Number
+                                (Stockée le: @cellLog.LastEvent)
+                            </h3>
                         }
                     </div>
                 }
@@ -60,10 +64,12 @@
     {
         @if (ShowAllCells)
         {
-            <div class="content cell-log-container">
+            <div class=" cell-log-container">
                 @foreach (var cellLog in ContainerFindList.OrderBy(u => u.LastEvent))
                 {
-                    <h3 class="title">Cellule: @cellLog.CellStock.Name (Stockée le: @cellLog.LastEvent)</h3>
+                    <h3 class="title">Cellule: @cellLog.CellStock.Name
+                        Contenaire : @cellLog.Number
+                        (Stockée le: @cellLog.LastEvent)</h3>
                 }
             </div>
         }
