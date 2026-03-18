@@ -48,7 +48,7 @@
                         @foreach (var cellLog in ContainerPhantomFindList.OrderBy(u => u.LastEvent))
                         {
                             <h3 class="title">
-                                Cellule: @cellLog.Number
+                                Cellule: @cellLog.CellStock.Name
                                 Contenaire : @cellLog.Number
                                 (Stockée le: @cellLog.LastEvent)
                             </h3>

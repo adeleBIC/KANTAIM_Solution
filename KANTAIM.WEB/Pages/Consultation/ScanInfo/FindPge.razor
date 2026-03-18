@@ -181,15 +181,19 @@
                                 <MudTable Items="product.Colors" Dense="true">
                                     <HeaderContent>
                                         <MudTh>Couleur</MudTh>
-                                        <MudTh>Conteneurs</MudTh>
+                                        <MudTh>Conteneurs (Stock)</MudTh>
                                         <MudTh>Qté/Conteneur</MudTh>
-                                        <MudTh>Qté Totale</MudTh>
+                                        <MudTh>Qté Totale (Stock)</MudTh>
+                                        <MudTh>Conteneurs (Sortie)</MudTh>
+                                        <MudTh>Qté Totale (Sortie)</MudTh>
                                     </HeaderContent>
                                     <RowTemplate>
                                         <MudTd>@context.ProdColor.Name</MudTd>
                                         <MudTd>@context.TotalContainers.ToString("N0")</MudTd>
                                         <MudTd>@context.QuantityPerContainer.ToString("N0")</MudTd>
                                         <MudTd>@context.TotalQuantity.ToString("N0")</MudTd>
+                                        <MudTd style="color: #e65100; font-weight: bold;">@context.SortieContainers.ToString("N0")</MudTd>
+                                        <MudTd style="color: #e65100; font-weight: bold;">@context.SortieQuantity.ToString("N0")</MudTd>
                                     </RowTemplate>
                                 </MudTable>
                             </MudExpansionPanel>

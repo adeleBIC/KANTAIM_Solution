@@ -22,6 +22,7 @@ namespace KANTAIM.APK.Components.Pages
         [Inject] public LogService _logService { get; set; }
         [Inject] ISnackbar _snackService { get; set; }
         [Inject] public ScanService _scanService { get; set; }
+        [Inject] public CellService _cellService { get; set; }
         public int State { get; set; }
         public DAL.Model.Container? ContainerScanner { get; set; }
         public Dictionary<int, string> ContainerStatus { get; set; }
@@ -68,6 +69,7 @@ namespace KANTAIM.APK.Components.Pages
         {
             if (ContainerScanner != null)
             {
+                var cell = ContainerScanner.CellStock;
                 ContainerScanner.FillStatus = StatusContainer.Empty;
 
                 ContainerScanner.ContainerID = null;
@@ -102,6 +104,12 @@ namespace KANTAIM.APK.Components.Pages
                 };
 
                 ContainerScanner.LastEvent = u.EventTime;
+
+                if (_contenaireService.CountCells(cell.Id) == 0) cell.Status = StatusCell.Empty;
+                else cell.Status = StatusCell.InFill;
+
+
+                _cellService.Upsert(cell);
 
                 _contenaireService.UpSert(ContainerScanner);
                 _logService.UpSert(u);

@@ -9,8 +9,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
+using static KANTAIM.WEB.Pages.Consultation.ScanInfo.FindPge;
 using static KANTAIM.WEB.Pages.Kanban.FindProductPge;
 using static MudBlazor.Colors;
+using System.Diagnostics;
 
 namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
 {
@@ -51,6 +53,8 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
             public int TotalContainers { get; set; }
             public int QuantityPerContainer { get; set; }
             public int TotalQuantity { get; set; }
+            public int SortieContainers { get; set; }
+            public int SortieQuantity { get; set; }
         }
 
         public class ProductNode
@@ -59,6 +63,9 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
             public List<ProductColorNode> Colors { get; set; } = new();
             public int TotalContainers => Colors.Sum(c => c.TotalContainers);
             public int TotalQuantity => Colors.Sum(c => c.TotalQuantity);
+            public int SortieContainers => Colors.Sum(c => c.SortieContainers);
+            public int SortieQuantity => Colors.Sum(c => c.SortieQuantity);
+
         }
 
         public class ProductFamilyNode
@@ -67,6 +74,10 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
             public List<ProductNode> Products { get; set; } = new();
             public int TotalContainers => Products.Sum(p => p.TotalContainers);
             public int TotalQuantity => Products.Sum(p => p.TotalQuantity);
+            public int SortieContainers => Products.Sum(p => p.SortieContainers);
+            public int SortieQuantity => Products.Sum(p => p.SortieQuantity);
+
+
         }
 
         private List<ProductFamilyNode> productTree = new();
@@ -75,117 +86,128 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
         {
             productTree.Clear();
 
-            var allProductFamilies = _productfamilyService.GetAll();
-            var allProducts = _productService.GetAll();
-            var allColorProducts = _colorProductService.GetAll();
-            var allColors = _colorService.GetAll();
-            var containers = _contenaireList
+            var families = _productfamilyService.GetAll();
+            var products = _productService.GetAll().Where(p => p.Active).ToList();
+            var colorLinks = _colorProductService.GetAll();
+            var colors = _colorService.GetAll();
+
+            var stockContainers = _contenaireList
                 .Where(c => c.CellID != null && c.ProductID != null && c.ProdColorID != null)
                 .ToList();
 
-            foreach (var family in allProductFamilies)
+            var sortieContainers = _contenaireList
+                .Where(c => c.ActionID == ActionStatus.InDischarge)
+                .ToList();
+
+            var stockGroups = stockContainers
+                .GroupBy(c => (c.ProductID, c.ProdColorID))
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            var sortieGroups = sortieContainers
+                .GroupBy(c => (c.ProductID, c.ProdColorID))
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            foreach (var family in families)
             {
                 var familyNode = new ProductFamilyNode
                 {
                     ProductFamily = family
                 };
 
-                var productsInFamily = allProducts
+                var familyProducts = products
                     .Where(p => p.ProductFamilyID == family.Id)
                     .ToList();
 
-                foreach (var product in productsInFamily)
+                foreach (var product in familyProducts)
                 {
-                    if(product.Active)
+                    var productNode = new ProductNode
                     {
-                        var productNode = new ProductNode
-                        {
-                            Product = product
-                        };
+                        Product = product
+                    };
 
-                        var colorLinks = allColorProducts
-                            .Where(cp => cp.ProductID == product.Id)
+                    var productColors = colorLinks
+                        .Where(cp => cp.ProductID == product.Id)
+                        .Select(cp => colors.FirstOrDefault(c => c.Id == cp.ColorID))
+                        .Where(c => c != null)
+                        .ToList();
+
+                    foreach (var color in productColors)
+                    {
+                        var key = (product.Id, color.Id);
+
+                        stockGroups.TryGetValue(key, out var stockList);
+                        sortieGroups.TryGetValue(key, out var sortieList);
+
+                        stockList ??= new List<Container>();
+                        sortieList ??= new List<Container>();
+
+                        stockList = stockList
+                            .Where(c =>
+                                c.CellStock != null &&
+                                c.CellStock.RackCells != null &&
+                                c.CellStock.RackCells.Any(rc => rc.Rack.WorkshopID == selectedWorkshopId))
                             .ToList();
 
-                        foreach (var colorLink in colorLinks)
+                        double stockWeighted = 0;
+                        int stockCount = 0;
+
+                        foreach (var container in stockList)
                         {
-                            var prodColor = allColors.FirstOrDefault(c => c.Id == colorLink.ColorID);
-                            if (prodColor == null) continue;
+                            if (container.ContainerType.NbrMaxContainer > 0)
+                                continue;
 
-                            // Conteneurs pour ce produit + couleur + atelier sélectionné
-                            var colorContainers = containers
-                                .Where(c =>
-                                    c.ProductID == product.Id &&
-                                    c.ProdColorID == prodColor.Id &&
-                                    c.CellStock != null &&
-                                    c.CellStock.RackCells != null &&
-                                    c.CellStock.RackCells.Any(rc => rc.Rack.WorkshopID == selectedWorkshopId))
-                                .ToList();
-
-                            double totalWeightedContainers = 0;
-                            int totalContainersCount = 0;
-
-                            foreach (var container in colorContainers)
+                            double weight = container.FillStatus switch
                             {
-                                if (container.ContainerType.NbrMaxContainer > 0)
-                                {
-                                    // Si c'est une palette, on compte pas
-                                }
-                                else
-                                {
-                                    double weight = 0;
-
-                                    switch (container.FillStatus)
-                                    {
-                                        case StatusContainer.Empty:
-                                            weight = 0;
-                                            break;
-                                        case StatusContainer.HalfFull:
-                                            weight = 0.25;
-                                            break;
-                                        case StatusContainer.Full:
-                                            weight = 1;
-                                            break;
-                                        case StatusContainer.Canceled:
-                                            weight = 0;
-                                            break;
-                                        default:
-                                            weight = 0;
-                                            break;
-                                    }
-
-                                    totalWeightedContainers += weight;
-                                    totalContainersCount++;
-                                }
-
-                            }
-
-                            var colorNode = new ProductColorNode
-                            {
-                                ProdColor = prodColor,
-                                QuantityPerContainer = product.QuantityPerContainer,
-                                TotalContainers = totalContainersCount,
+                                StatusContainer.Empty => 0,
+                                StatusContainer.HalfFull => 0.25,
+                                StatusContainer.Full => 1,
+                                _ => 0
                             };
 
-
-                            colorNode.TotalQuantity = (int)(totalWeightedContainers * product.QuantityPerContainer);
-
-                            productNode.Colors.Add(colorNode);
+                            stockWeighted += weight;
+                            stockCount++;
                         }
 
-                        // Ajouter le produit s’il a au moins une couleur (avec ou sans conteneurs)
-                        if (productNode.Colors.Any())
+                        double sortieWeighted = 0;
+                        int sortieCount = 0;
+
+
+                        foreach (var container in sortieList)
                         {
-                            familyNode.Products.Add(productNode);
+                            double weight = container.FillStatus switch
+                            {
+                                StatusContainer.Empty => 0,
+                                StatusContainer.HalfFull => 0.25,
+                                StatusContainer.Full => 1,
+                                _ => 0
+                            };
+
+                            sortieWeighted += weight;
+                            sortieCount++;
+                            Debug.WriteLine($"[SORTIE] Produit: {product.Name} | ContainerID: {container.Id} | FillStatus: {container.FillStatus} | Weight: {weight}");
                         }
+
+                        var colorNode = new ProductColorNode
+                        {
+                            ProdColor = color,
+                            QuantityPerContainer = product.QuantityPerContainer,
+
+                            TotalContainers = stockCount,
+                            TotalQuantity = (int)(stockWeighted * product.QuantityPerContainer),
+
+                            SortieContainers = sortieCount,
+                            SortieQuantity = (int)(sortieWeighted * product.QuantityPerContainer)
+                        };
+
+                        productNode.Colors.Add(colorNode);
                     }
-            
+
+                    if (productNode.Colors.Any())
+                        familyNode.Products.Add(productNode);
                 }
 
                 if (familyNode.Products.Any())
-                {
                     productTree.Add(familyNode);
-                }
             }
         }
 
@@ -326,12 +348,16 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
 
         private string GetFamilyHeader(ProductFamilyNode family)
         {
-            return $"{family.ProductFamily.Name} (Conteneurs: {family.TotalContainers.ToString("N0")}, Quantité: {family.TotalQuantity.ToString("N0")})";
+            return $"{family.ProductFamily.Name} " +
+                   $"(Stock — Conteneurs: {family.TotalContainers:N0}, Qté: {family.TotalQuantity:N0} | " +
+                   $"Sortie — Conteneurs: {family.SortieContainers:N0}, Qté: {family.SortieQuantity:N0})";
         }
 
         private string GetProductHeader(ProductNode product)
         {
-            return $"{product.Product.Name} (Conteneurs: {product.TotalContainers.ToString("N0")}, Quantité: {product.TotalQuantity.ToString("N0")})";
+            return $"{product.Product.Name} " +
+                   $"(Stock — Conteneurs: {product.TotalContainers:N0}, Qté: {product.TotalQuantity:N0} | " +
+                   $"Sortie — Conteneurs: {product.SortieContainers:N0}, Qté: {product.SortieQuantity:N0})";
         }
 
         private int cellNb;
@@ -352,8 +378,8 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
             if (selectedProductFamilyId == 0)
             {
                 cellNb = _cellList.Count();
-                contenaireNb = productTree.Sum(f => f.TotalContainers);
-                productNb = productTree.Sum(f => f.TotalQuantity);
+                contenaireNb = productTree.Sum(f => f.TotalContainers) + productTree.Sum(f => f.SortieContainers);
+                productNb = productTree.Sum(f => f.TotalQuantity + f.SortieQuantity);
             }
             else
             {
@@ -370,8 +396,8 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
                                 var colorNode = productNode.Colors.FirstOrDefault(c => c.ProdColor.Id == selectedColorId);
                                 if (colorNode != null)
                                 {
-                                    contenaireNb = colorNode.TotalContainers;
-                                    productNb = colorNode.TotalQuantity;
+                                    contenaireNb = colorNode.TotalContainers + colorNode.SortieContainers;
+                                    productNb = colorNode.TotalQuantity + colorNode.SortieContainers;
 
                                     refreshCellList = _cellList
                                         .Where(cell => cell.Containers.Any(c =>
@@ -382,8 +408,8 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
                             }
                             else
                             {
-                                contenaireNb = productNode.TotalContainers;
-                                productNb = productNode.TotalQuantity;
+                                contenaireNb = productNode.TotalContainers + productNode.SortieContainers;
+                                productNb = productNode.TotalQuantity + productNode.SortieQuantity;
                                 refreshCellList = _cellList
                                     .Where(cell => cell.Containers.Any(c =>
                                         c.ProductID == selectedProductId))
@@ -393,8 +419,8 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
                     }
                     else
                     {
-                        contenaireNb = familyNode.TotalContainers;
-                        productNb = familyNode.TotalQuantity;
+                        contenaireNb = familyNode.TotalContainers + familyNode.SortieContainers;
+                        productNb = familyNode.TotalQuantity + familyNode.SortieQuantity;
 
                         var productIds = familyNode.Products.Select(p => p.Product.Id).ToHashSet();
                         refreshCellList = _cellList

@@ -108,6 +108,7 @@ namespace KANTAIM.APK.Components.Pages
                                             .ToList();
 
             if (!ContainerFindList.Any()) ContainerFindList = noPhantom;
+          
 
             var phantom = orderedList.Where(c => c.CellStock.IsPhantom).ToList();
 
