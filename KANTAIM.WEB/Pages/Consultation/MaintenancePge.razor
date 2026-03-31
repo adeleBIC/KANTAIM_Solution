@@ -81,7 +81,7 @@
 
 
 
-@if (Containers != null)
+@if (!_isLoading && Containers != null)
 {
     <MudDataGrid Items="@Containers" Dense=true
                  Virtualize="true" SelectOnRowClick=false MultiSelection=true Bordered=true
@@ -99,7 +99,7 @@
                     @context.Item.container.CellStock.Name
                 </CellTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.stockTime" Title="Date de Stock en Prison" />
+            <PropertyColumn Property="x => x.stockTime" Title="Date de Stock en Maintenance" />
             <TemplateColumn>
                 <CellTemplate>
                     <MudStack Row>

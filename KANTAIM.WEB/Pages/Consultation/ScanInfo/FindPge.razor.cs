@@ -397,7 +397,7 @@ namespace KANTAIM.WEB.Pages.Consultation.ScanInfo
                                 if (colorNode != null)
                                 {
                                     contenaireNb = colorNode.TotalContainers + colorNode.SortieContainers;
-                                    productNb = colorNode.TotalQuantity + colorNode.SortieContainers;
+                                    productNb = colorNode.TotalQuantity + colorNode.SortieQuantity;
 
                                     refreshCellList = _cellList
                                         .Where(cell => cell.Containers.Any(c =>

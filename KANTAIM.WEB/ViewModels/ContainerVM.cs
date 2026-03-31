@@ -258,6 +258,12 @@ namespace KANTAIM.WEB.ViewModels
         {
             List<ValidationResult> list = new List<ValidationResult>();
 
+            // New validation: cannot mark InJail or InMaintenance if no Cell assigned
+            var cellExists = cellID != null && Cells.Any(c => c.Id == cellID);
+            if ((inJail || inMaintenance) && !cellExists)
+            {
+                list.Add(new ValidationResult("Le conteneur doit être stocké dans une cellule pour être mis en prison ou en maintenance.", new string[] { "CellID" }));
+            }
             //if (string.IsNullOrWhiteSpace(QRCode)) list.Add(new ValIDationResult("Le QRCode est obligatoire", new string[] { "QRCode" }));
             if (Number == 0) list.Add(new ValidationResult("Number obligatoire", new string[] { "Number" }));
             if (Id == ContainerID) list.Add(new ValidationResult("Le container de stockage ne peut être lui même", new string[] { "ContainerID" }));

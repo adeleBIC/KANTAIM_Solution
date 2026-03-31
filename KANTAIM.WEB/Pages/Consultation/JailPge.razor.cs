@@ -33,13 +33,13 @@ namespace KANTAIM.WEB.Pages.Consultation
         [Inject] ISnackbar _snackService { get; set; }
         [Inject] public ActionService _actionService { get; set; }
         [Inject] public CellService _cellService { get; set; }
-
+        private bool _isLoading = false;
         public IEnumerable<ContainerWithEvents> Containers { get; set; }
         
         public Dictionary<int, string> ContainerStatus { get; set; }
         public Dictionary<int, string> CellStatus { get; set; }
         private string _searchString;
-
+        private bool _isRefreshing = false;
 
         bool isPopoverOpen = false;
         List<Container> contenairesNames = new List<Container>();
@@ -94,33 +94,71 @@ namespace KANTAIM.WEB.Pages.Consultation
 
         protected override async Task OnInitializedAsync()
         {
-            contenairesNames = _contenaireService.GetAll().Where(c => c.InJail == false).ToList();
             CellStatus = new StatusCell().Status;
             ContainerStatus = new StatusContainer().Status;
-            Containers = new List<ContainerWithEvents> { };
-            await Task.Run(RefreshData);
-        }
-        void RefreshData()
-        {
-            Containers = _contenaireService.GetAll()
-            .Where(u => u.InJail == true)
-            .Select(u =>
+
+            // Yield so Blazor renders the skeleton before we block.
+            await Task.Yield();
+
+            await Task.Run(() =>
             {
-                int id;
-                // Récupérer ProdTime et StockTime depuis _logService
-                if(u.ContainerType != null && (u.BigContainer == null || !u.ContainerType.IsContainable))
-                {
-                    id = u.Id;
-                } else
-                {
-                    id = u.BigContainer.Id;
-                }
-                var prodTime = _logService.GetByContenaireIdAction(id, OperationContainer.Initisalisation)?.EventTime ?? DateTime.MinValue;
-                var stockTime = _logService.GetByContenaireIdAction(id, OperationContainer.Store)?.EventTime ?? DateTime.MinValue;
-                return new ContainerWithEvents(u, prodTime.ToShortTimeString() + "   " + prodTime.ToShortDateString(), stockTime.ToShortTimeString() + "   " + stockTime.ToShortDateString());
-            })
-            .ToList();
+                contenairesNames = _contenaireService.GetAll()
+                    .Where(c => !c.InJail)
+                    .ToList();
+
+                RefreshDataInternal();
+            });
+
+            _isLoading = false;
+            StateHasChanged();
         }
+
+        async Task RefreshData()
+        {
+            _isRefreshing = true;
+            StateHasChanged();
+
+            await Task.Run(RefreshDataInternal);
+
+            _isRefreshing = false;
+            StateHasChanged();
+        }
+
+        void RefreshDataInternal()
+        {
+            var jailContainers = _contenaireService.GetAll()
+                .Where(u => u.InJail == true)
+                .ToList();
+
+            var logIds = jailContainers
+                .Select(u =>
+                    u.ContainerType != null && (u.BigContainer == null || !u.ContainerType.IsContainable)
+                        ? u.Id
+                        : u.BigContainer.Id)
+                .Distinct()
+                .ToList();
+
+            var timesMap = _logService.GetTimesForContainers(logIds);
+
+            Containers = jailContainers.Select(u =>
+            {
+                var id = u.ContainerType != null && (u.BigContainer == null || !u.ContainerType.IsContainable)
+                    ? u.Id : u.BigContainer.Id;
+
+                timesMap.TryGetValue(id, out var times);
+
+                return new ContainerWithEvents(u, Format(times.ProdTime), Format(times.StockTime));
+            }).ToList();
+
+            contenairesNames = _contenaireService.GetAll()
+                .Where(c => !c.InJail)
+                .ToList();
+        }
+
+        static string Format(DateTime? dt) =>
+            dt.HasValue && dt.Value != DateTime.MinValue
+                ? $"{dt.Value.ToShortTimeString()}   {dt.Value.ToShortDateString()}"
+                : "—";
 
         // quick filter - filter gobally across multiple columns with the same input
         private Func<ContainerWithEvents, bool> _quickFilter => x =>

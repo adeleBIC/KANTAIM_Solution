@@ -49,6 +49,9 @@ namespace KANTAIM.WEB.Pages.Administration
         private List<Press> _presses;
         private List<Machine> _machines;
 
+
+
+
         protected override async Task OnInitializedAsync()
         {
             _isLoading = true;
@@ -274,6 +277,35 @@ namespace KANTAIM.WEB.Pages.Administration
         {
             await LoadPageDataAsync();
             StateHasChanged();
+        }
+        private Task OnInJailChanged(ContainerVM item, bool value)
+        {
+            
+            var cellExists = item.CellID != null && item.Cells.Any(c => c.Id == item.CellID);
+            if (value && !cellExists)
+            {
+                _snackService.Add("Impossible : le conteneur n'est pas stocké (CellStock absent)", Severity.Error);
+              
+                return Task.CompletedTask;
+            }
+
+            item.InJail = value;
+            StateHasChanged();
+            return Task.CompletedTask;
+        }
+
+        private Task OnInMaintenanceChanged(ContainerVM item, bool value)
+        {
+            var cellExists = item.CellID != null && item.Cells.Any(c => c.Id == item.CellID);
+            if (value && !cellExists)
+            {
+                _snackService.Add("Impossible : le conteneur n'est pas stocké (CellStock absent)", Severity.Error);
+                return Task.CompletedTask;
+            }
+
+            item.InMaintenance = value;
+            StateHasChanged();
+            return Task.CompletedTask;
         }
     }
 }

@@ -35,7 +35,8 @@ namespace KANTAIM.WEB.Pages.Consultation
         [Inject] public CellService _cellService { get; set; }
 
         public IEnumerable<ContainerWithEvents> Containers { get; set; }
-
+        private bool _isLoading = false;
+        private bool _isRefreshing = false;
         public Dictionary<int, string> ContainerStatus { get; set; }
         public Dictionary<int, string> CellStatus { get; set; }
         private string _searchString;
@@ -99,33 +100,73 @@ namespace KANTAIM.WEB.Pages.Consultation
 
         protected override async Task OnInitializedAsync()
         {
-            contenairesNames = _contenaireService.GetAll().Where(c => c.InMaintenance == false).ToList();
             CellStatus = new StatusCell().Status;
             ContainerStatus = new StatusContainer().Status;
-            Containers = new List<ContainerWithEvents> { };
-            await Task.Run(RefreshData);
-        }
-        void RefreshData()
-        {
-            Containers = _contenaireService.GetAll()
-            .Where(u => u.InMaintenance == true)
-            .Select(u =>
+
+            // Yield so Blazor renders the skeleton before we block.
+            await Task.Yield();
+
+            await Task.Run(() =>
             {
-                int id;
-                // Récupérer ProdTime et StockTime depuis _logService
-                if (u.ContainerType != null && (u.BigContainer == null || !u.ContainerType.IsContainable))
-                {
-                    id = u.Id;
-                }
-                else
-                {
-                    id = u.BigContainer.Id;
-                }
-                var stockTime = _logService.GetByContenaireIdAction(id, OperationContainer.Store)?.EventTime ?? DateTime.MinValue;
-                return new ContainerWithEvents(u, stockTime.ToShortTimeString() + "   " + stockTime.ToShortDateString());
-            })
-            .ToList();
+                contenairesNames = _contenaireService.GetAll()
+                    .Where(c => !c.InMaintenance)
+                    .ToList();
+
+                RefreshDataInternal();
+            });
+
+            _isLoading = false;
+            StateHasChanged();
         }
+        async Task RefreshData()
+        {
+            _isRefreshing = true;
+            StateHasChanged();
+
+            await Task.Run(RefreshDataInternal);
+
+            _isRefreshing = false;
+            StateHasChanged();
+        }
+
+        // Pure data work — runs on thread pool, no UI calls allowed.
+        void RefreshDataInternal()
+        {
+            var maintenanceContainers = _contenaireService.GetAll()
+                .Where(u => u.InMaintenance == true && u.CellStock != null)
+                .ToList();
+
+            var logIds = maintenanceContainers
+                .Select(u =>
+                    u.ContainerType != null && (u.BigContainer == null || !u.ContainerType.IsContainable)
+                        ? u.Id
+                        : u.BigContainer.Id)
+                .Distinct()
+                .ToList();
+
+            // Single DB round-trip replaces N full-table reads.
+            var timesMap = _logService.GetTimesForContainers(logIds);
+
+            Containers = maintenanceContainers.Select(u =>
+            {
+                var id = u.ContainerType != null && (u.BigContainer == null || !u.ContainerType.IsContainable)
+                    ? u.Id : u.BigContainer.Id;
+
+                timesMap.TryGetValue(id, out var times);
+
+                return new ContainerWithEvents(u, Format(times.StockTime));
+            }).ToList();
+
+            contenairesNames = _contenaireService.GetAll()
+                .Where(c => !c.InMaintenance)
+                .ToList();
+        }
+
+        static string Format(DateTime? dt) =>
+            dt.HasValue && dt.Value != DateTime.MinValue
+                ? $"{dt.Value.ToShortTimeString()}   {dt.Value.ToShortDateString()}"
+                : "—";
+        
 
         // quick filter - filter gobally across multiple columns with the same input
         private Func<ContainerWithEvents, bool> _quickFilter => x =>
