@@ -13,7 +13,19 @@
     <img id="img" src="./css/Images/LogoMLV.png" height="600" />
 </div>
 
-
+@if (_userService.CurrentUserLvl >= 99)
+{
+    <div id="dev-toggle">
+        <MudToggleGroup T="bool"
+                        @bind-Value="_devModeService.DevMode"
+                        Outline="true"
+                        CheckMark="true"
+                        Color="Color.Tertiary">
+            <MudToggleItem Value="@false" Text="Prod" />
+            <MudToggleItem Value="@true" Text="Dev" />
+        </MudToggleGroup>
+    </div>
+}
 
 <style>
     #main {
@@ -32,3 +44,7 @@
     }
 </style>
 
+@code {
+    [Inject] public DevModeService _devModeService { get; set; }
+    [Inject] public UserService _userService { get; set; }
+}

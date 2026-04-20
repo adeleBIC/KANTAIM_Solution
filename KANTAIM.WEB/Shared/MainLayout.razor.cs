@@ -26,6 +26,7 @@ namespace KANTAIM.WEB.Shared
         [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
         [Inject] public DevModeService _devModeService { get; set; }
         [Inject] ISnackbar _snackService { get; set; }
+        [Inject] IWebHostEnvironment Env { get; set; }
 
         private bool _isDarkMode;
 
@@ -39,12 +40,14 @@ namespace KANTAIM.WEB.Shared
             //userName = "EU\\MMANIH";
 #endif
 
+            bool IsDevUrl = NavigationManager.Uri.Contains("_dev", StringComparison.OrdinalIgnoreCase);
+
+            if (Env.IsDevelopment() || IsDevUrl) _devModeService.DevMode = true;
+
             User user = _userService.GetByName(userName);
             _userService.SetCurrentUserLvl(userName);
             _isDarkMode = user?.DarkMode ?? false;
             _devModeService.OnChange += StateHasChanged;
-
-            //UserLvl = user?.UserAccessLvl.AccesLvL ?? 0;
 
             await InvokeAsync(StateHasChanged);
         }

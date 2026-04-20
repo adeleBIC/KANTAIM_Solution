@@ -105,6 +105,12 @@ namespace KANTAIM.DAL
             }
         }
 
+        protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+        {
+            configurationBuilder.Properties<decimal>()
+                .HavePrecision(18, 6);
+        }
+
         public async Task<bool> TestConnectionAsync()
         {
             try
