@@ -63,10 +63,21 @@ namespace KANTAIM.APK.Components.Pages
         }
 
         private Profil profilSelected;
+        // Après la déclaration de ShowAllCellsPhantom
+        public bool IsEmptyMode => Id == 99;
+        public List<Container> EmptyContainerList { get; set; }
 
+    
         protected override void OnInitialized()
         {
             profilSelected = _profilSessionService.CurrentProfil;
+
+            if (IsEmptyMode)
+            {
+                FindEmptyCells();
+                return;
+            }
+
             ProductScanner = _productService.GetByNumber(Number);
             Colors = new List<ProdColor>();
 
@@ -74,11 +85,47 @@ namespace KANTAIM.APK.Components.Pages
             {
                 Colors.Add(_colorService.GetById(colorProduct.ColorID));
             }
-            if(Colors.Count() == 0)
+            if (Colors.Count() == 0)
             {
                 findCells();
             }
         }
+
+        void FindEmptyCells()
+        {
+            var rackIds = profilSelected.RackProfils.Select(rp => rp.RackId).ToList();
+
+            ContainerFindList = _contenaireService
+                .GetAll()
+                .Where(c => c.CellStock != null &&
+                            c.CellStock.RackCells.Any(rc => rackIds.Contains(rc.RackId)) &&
+                            c.FillStatus == StatusContainer.Empty &&
+                            c.ContainerType?.IsContainable == false &&
+                            c.ContainerType?.NbrMaxContainer == 0 &&
+                            !c.CellStock.IsJail &&
+                            !c.CellStock.IsMaintenance &&
+                            !c.CellStock.IsPhantom &&
+                            c.CellStock.RackCells != null)
+                .OrderBy(c => c.LastEvent)
+                .ToList();
+            CellPropose = ContainerFindList.FirstOrDefault()?.CellStock;
+        }
+
+        //protected override void OnInitialized()
+        //{
+        //    profilSelected = _profilSessionService.CurrentProfil;
+        //    ProductScanner = _productService.GetByNumber(Number);
+        //    Colors = new List<ProdColor>();
+
+        //    foreach (ColorProduct colorProduct in _colorProductServiceService.GetAllPerProduct(ProductScanner.Id))
+        //    {
+        //        Colors.Add(_colorService.GetById(colorProduct.ColorID));
+        //    }
+        //    if(Colors.Count() == 0)
+        //    {
+        //        findCells();
+        //    }
+        //}
 
         void findCells()
         {

@@ -21,18 +21,59 @@
             </div>
             <h3 class="title">Scannez le contenaire s'il vous plaît</h3>
             <MudText> @TextValue</MudText>
-            </div>
-    }
-    else if (ContainerFindList != null && ContainerFindList.Count == 0)
-    {
-        <div class="content">
-            Il n'y a pas <b>@ProductScanner.Name</b> en
-            @if (ColorChoose != null)
-            {
-                <b style="@($"color:{ColorChoose.Name};")">@ColorChoose.Name</b>
-            }
-            stocké dans la cellule
         </div>
+    }
+    else 
+    if (ContainerFindList != null && ContainerFindList.Count == 0)
+    {
+        if (ProductScanner != null)
+        {
+            <div class="content">
+            <p>
+                Il n'y a pas <b>@ProductScanner.Name</b> en
+                @if (ColorChoose != null)
+                {
+                    <b style="@($"color:{ColorChoose.Name};")">@ColorChoose.Name</b>
+                }
+                stocké dans les cellules
+            </p>
+
+
+            @if (ContainerPhantomFindList != null && ContainerPhantomFindList.Count > 0)
+            {
+                <MudButton Class="bouton-large" OnClick="ToggleCellListPhantom" Variant="MudBlazor.Variant.Filled" Style="margin-top: 20px;">
+                    @(ShowAllCellsPhantom ? "Masquer" : "Afficher contenaires en zone fantôme")
+                </MudButton>
+
+                @if (ShowAllCellsPhantom)
+                {
+                    <div class=" cell-log-container">
+                        @foreach (var cellLog in ContainerPhantomFindList.OrderBy(u => u.LastEvent))
+                        {
+                            <h3 class="title">
+                                Cellule: @cellLog.CellStock.Name
+                                Contenaire : @cellLog.Number
+                                (Stockée le: @cellLog.LastEvent)
+                            </h3>
+                        }
+                    </div>
+                }
+            }
+
+        </div>
+        }
+        else
+        {
+            <div class="content">
+                <p>
+                    Il n'y a pas contenaire vide stocké dans les cellules
+                </p>
+            </div>
+            <div class="button-container">
+                <MudButton Class="bouton" OnClick="GoBack" Color="Color.Error" Variant="MudBlazor.Variant.Filled">Retour</MudButton>
+            </div>
+        }
+        
     }
 
     @if (ContainerFindList != null && ContainerFindList.Count > 0)
@@ -47,7 +88,7 @@
             </div>
         }
     }
-    else
+    else if (ProductScanner != null)
     {
         <div class="content">
         <br>Produit : @ProductScanner.Name
@@ -71,7 +112,7 @@
         <div class="button-container">
             <MudButton Class="bouton" OnClick="GoBack" Color="Color.Error" Variant="MudBlazor.Variant.Filled">Retour</MudButton>
         </div>
-    }
+    } 
 </div>
 
 <style>
