@@ -27,9 +27,28 @@
         margin: 5px;
     }
 
+    .button-group {
+        display: flex;
+        justify-content: space-evenly;
+    }
+
+
     .footer {
         margin-top: auto;
         padding: 1rem;
+    }
+
+    .button-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .bouton {
+        width: 120px;
+        height: 50px;
+        margin: 10px;
+        font-size: 16px;
     }
 </style>
 
@@ -48,13 +67,22 @@
             }
 
             <MudSelect T="Profil" @bind-Value="ProfilSelected" Label="Profil" Variant="MudBlazor.Variant.Outlined">
-                @foreach (var p in Profils) 
+                @foreach (var p in Profils)
                 {
                     <MudSelectItem T="Profil" Value="@(p)">@p.Name</MudSelectItem>
                 }
             </MudSelect>
         </div>
-
+        @* === Bouton Trouver contenaires vides === *@
+        <div class="button-group" style="margin-top: 10px; justify-content: center;">
+            <MudButton Class="bouton"
+                       Style="width:280px;"
+                       Color="Color.Primary"
+                       Variant="MudBlazor.Variant.Filled"
+                       Href="/FindProductPge/99/0">
+                Trouver contenaires vides
+            </MudButton>
+        </div>
         <!-- Spacer qui pousse le bloc suivant vers le bas -->
         <div style="flex-grow: 1;"></div>
 

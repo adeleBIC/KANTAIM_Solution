@@ -116,7 +116,9 @@ namespace KANTAIM.APK.Components.Pages
 
                 _snackService.Add("Conteneur réinitialisé avec succès !", MudBlazor.Severity.Success);
                 State = 0;
-                await InvokeAsync(StateHasChanged);
+                NavigationManager.NavigateTo($"/");
+               
+                //await InvokeAsync(StateHasChanged);
             }
         }
     }
