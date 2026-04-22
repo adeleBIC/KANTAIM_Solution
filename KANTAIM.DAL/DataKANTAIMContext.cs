@@ -10,7 +10,7 @@ namespace KANTAIM.DAL
     public partial class DataKANTAIMContext : DbContext
     {
         static string? cs;
-        private bool _devMode = false; // Set this to true for development mode
+        private bool _devMode = true; // Set this to true for development mode
         public DataKANTAIMContext() => _devMode = false;
         public DataKANTAIMContext(bool devMod)
         {

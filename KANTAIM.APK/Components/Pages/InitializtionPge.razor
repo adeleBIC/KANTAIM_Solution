@@ -142,7 +142,10 @@
                         @foreach (var c in Colors)
                         {
                             var textColor = GetContrastingTextColor(c.ColorNumber);
-                            <MudButton Class="bouton" Style="@($"background:{c.ColorNumber}; color:{textColor};")" OnClick="()=>ColorSelected(c.Id)" Variant="MudBlazor.Variant.Filled">
+                            <MudButton Class="bouton"
+                                   Style="@($"background:{c.ColorNumber}; color:{textColor};")"
+                                    OnClick="()=>ColorSelected(c.Id)"
+                                    Variant="MudBlazor.Variant.Filled">
                                 @c.Name
                             </MudButton>
                         }

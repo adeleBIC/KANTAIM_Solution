@@ -100,10 +100,7 @@
             <div class="colors-container">
                 @foreach (var color in Colors)
                 {
-                    var textColor = GetContrastingTextColor(color.ColorNumber);
-                    <MudButton Class="bouton"                            
-                        Style="@($"background:{color.ColorNumber}; color:{textColor};")"                            
-                        OnClick="() => ColorSelected(color.Id)" Variant="MudBlazor.Variant.Filled">                        
+                    <MudButton Class="bouton" Style="@($"background: {color.ColorNumber};")" OnClick="() => ColorSelected(color.Id)" Variant="MudBlazor.Variant.Filled">
                         @color.Name
                     </MudButton>
                 }
