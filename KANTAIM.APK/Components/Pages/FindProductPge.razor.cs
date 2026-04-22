@@ -38,9 +38,11 @@ namespace KANTAIM.APK.Components.Pages
         public List<ProdColor> Colors { get; set; }
 
         public List<Container> ContainerFindList { get; set; }
+        public List<Container> ContainerPhantomFindList { get; set; }
         public Container? ContainerScanner { get; set; }
         public DAL.Model.Cell? CellPropose { get; set; }
         public bool ShowAllCells { get; set; }
+        public bool ShowAllCellsPhantom { get; set; }
         private bool contFind;
 
         public bool ContFind
@@ -56,6 +58,11 @@ namespace KANTAIM.APK.Components.Pages
             ShowAllCells = !ShowAllCells;
         }
 
+        void ToggleCellListPhantom()
+        {
+            ShowAllCellsPhantom = !ShowAllCellsPhantom;
+        }
+
         public class CellLog
         {
             public DAL.Model.Cell Cell { get; set; }
@@ -63,21 +70,10 @@ namespace KANTAIM.APK.Components.Pages
         }
 
         private Profil profilSelected;
-        // Après la déclaration de ShowAllCellsPhantom
-        public bool IsEmptyMode => Id == 99;
-        public List<Container> EmptyContainerList { get; set; }
 
-    
         protected override void OnInitialized()
         {
             profilSelected = _profilSessionService.CurrentProfil;
-
-            if (IsEmptyMode)
-            {
-                FindEmptyCells();
-                return;
-            }
-
             ProductScanner = _productService.GetByNumber(Number);
             Colors = new List<ProdColor>();
 
@@ -91,57 +87,65 @@ namespace KANTAIM.APK.Components.Pages
             }
         }
 
-        void FindEmptyCells()
+        void findCells()
         {
             var rackIds = profilSelected.RackProfils.Select(rp => rp.RackId).ToList();
 
-            ContainerFindList = _contenaireService
-                .GetAll()
-                .Where(c => c.CellStock != null &&
-                            c.CellStock.RackCells.Any(rc => rackIds.Contains(rc.RackId)) &&
-                            c.FillStatus == StatusContainer.Empty &&
-                            c.ContainerType?.IsContainable == false &&
-                            c.ContainerType?.NbrMaxContainer == 0 &&
-                            !c.CellStock.IsJail &&
-                            !c.CellStock.IsMaintenance &&
-                            !c.CellStock.IsPhantom &&
-                            c.CellStock.RackCells != null)
-                .OrderBy(c => c.LastEvent)
-                .ToList();
+            var orderedList = _contenaireService.GetAllByOperationStatus(ActionStatus.Store)
+                                                .Where(c => c.CellStock != null &&
+                                                            c.ProductID == ProductScanner.Id &&
+                                                            (ColorChoose == null || c.ProdColorID == ColorChoose.Id) &&
+                                                            c.CellID != ContainerScanner?.CellID &&
+                                                            !c.CellStock.IsJail &&
+                                                            !c.CellStock.IsMaintenance)
+                                                .OrderBy(c => c.LastEvent)
+                                                .ToList();
+
+            var noPhantom = orderedList.Where(c => !c.CellStock.IsPhantom).ToList();
+
+            ContainerFindList = noPhantom.Where(c => c.CellStock.RackCells != null &&
+                                                        c.CellStock.RackCells.Any(rc => rackIds.Contains(rc.RackId)))
+                                            .ToList();
+
+            if (!ContainerFindList.Any()) ContainerFindList = noPhantom;
+
+
+            var phantom = orderedList.Where(c => c.CellStock.IsPhantom).ToList();
+
+            ContainerPhantomFindList = phantom.Where(c => c.CellStock.RackCells != null &&
+                                                        c.CellStock.RackCells.Any(rc => rackIds.Contains(rc.RackId)))
+                                                 .ToList();
+
+            if (!ContainerPhantomFindList.Any()) ContainerPhantomFindList = phantom;
+
             CellPropose = ContainerFindList.FirstOrDefault()?.CellStock;
-        }
 
-        //protected override void OnInitialized()
-        //{
-        //    profilSelected = _profilSessionService.CurrentProfil;
-        //    ProductScanner = _productService.GetByNumber(Number);
-        //    Colors = new List<ProdColor>();
+            //ContainerFindList = new List<Container>(_contenaireService.GetAllByOperationStatus(ActionStatus.Store)
+            //                                                        .Where(c => c.CellStock != null &&
+            //                                                                    c.ProductID == ProductScanner.Id &&
+            //                                                                    (ColorChoose == null || c.ProdColorID == ColorChoose.Id) &&
+            //                                                                    c.CellID != ContainerScanner?.CellID &&
+            //                                                                    !c.CellStock.IsJail &&
+            //                                                                    !c.CellStock.IsMaintenance &&
+            //                                                                    !c.CellStock.IsPhantom &&
+            //                                                                    c.CellStock.RackCells != null &&
+            //                                                                    c.CellStock.RackCells.Any(rc => profilSelected.RackProfils.Any(rp => rp.RackId == rc.RackId)))
+            //                                                        .OrderBy(c => c.LastEvent));
 
-        //    foreach (ColorProduct colorProduct in _colorProductServiceService.GetAllPerProduct(ProductScanner.Id))
-        //    {
-        //        Colors.Add(_colorService.GetById(colorProduct.ColorID));
-        //    }
-        //    if(Colors.Count() == 0)
-        //    {
-        //        findCells();
-        //    }
-        //}
-
-        void findCells()
-        {
-            ContainerFindList = new List<Container>(_contenaireService.GetAllByOperationStatus(ActionStatus.Store)
-                                                                    .Where(c => c.CellStock != null &&
-                                                                    c.ProductID == ProductScanner.Id &&
-                                                                    (ColorChoose == null || c.ProdColorID == ColorChoose.Id) &&
-                                                                    c.CellID != ContainerScanner?.CellID &&
-                                                                    c.CellStock.RackCells != null &&
-                                                                    c.CellStock.RackCells.Any(rc => profilSelected.RackProfils.Any(rp => rp.RackId == rc.RackId)))
-                                                                    .OrderBy(c => c.LastEvent));
-
-            if (ContainerFindList != null && ContainerFindList.Count > 0) {CellPropose = ContainerFindList.FirstOrDefault()?.CellStock ?? null; }
+            //ContainerPhantomFindList = new List<Container>(_contenaireService.GetAllByOperationStatus(ActionStatus.Store)
+            //                                                        .Where(c => c.CellStock != null &&
+            //                                                                    c.ProductID == ProductScanner.Id &&
+            //                                                                    (ColorChoose == null || c.ProdColorID == ColorChoose.Id) &&
+            //                                                                    c.CellID != ContainerScanner?.CellID &&
+            //                                                                    !c.CellStock.IsJail &&
+            //                                                                    !c.CellStock.IsMaintenance &&
+            //                                                                    c.CellStock.IsPhantom &&
+            //                                                                    c.CellStock.RackCells != null &&
+            //                                                                    c.CellStock.RackCells.Any(rc => profilSelected.RackProfils.Any(rp => rp.RackId == rc.RackId)))
+            //                                                        .OrderBy(c => c.LastEvent));
+            //if (ContainerFindList != null && ContainerFindList.Count > 0) {CellPropose = ContainerFindList.FirstOrDefault()?.CellStock ?? null; }
 
         }
-
 
         async void ColorSelected(int colorid)
         {
@@ -214,6 +218,19 @@ namespace KANTAIM.APK.Components.Pages
             ContainerScan(msg.Code);
 
             await InvokeAsync(StateHasChanged);
+        }
+
+        private string GetContrastingTextColor(string hexColor)
+        {
+            if (string.IsNullOrEmpty(hexColor) || !hexColor.StartsWith("#") || (hexColor.Length != 7 && hexColor.Length != 9)) return "#000000"; // fallback 
+
+            // Extraire les composantes R, G, B
+            var r = Convert.ToInt32(hexColor.Substring(1, 2), 16);
+            var g = Convert.ToInt32(hexColor.Substring(3, 2), 16);
+            var b = Convert.ToInt32(hexColor.Substring(5, 2), 16);
+            var luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+            return luminance > 0.5 ? "#000000" : "#FFFFFF";
         }
     }
 }
