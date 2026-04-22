@@ -52,6 +52,7 @@
         public const int Inject = 4;
         public const int Transfer = 5;
         public const int Install = 6;
+        public const int Reset = 90;
         public const int Canceled = 99;
 
         public Dictionary<int, string> Operations = new Dictionary<int, string>();
