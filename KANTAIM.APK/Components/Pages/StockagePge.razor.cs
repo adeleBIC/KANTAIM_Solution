@@ -128,7 +128,7 @@ namespace KANTAIM.APK.Components.Pages
                 {
                     bacList = _contenaireService.GetAll()
                                 .Where(c => c.ContainerID == ContainerScanner.Id)
-                                 .OrderBy(c => c.LastEvent)
+                                 .OrderByDescending(c => c.LastEvent)
                                 .ToList();
                     IsPallet = true;// S'il est palette, soit on fait stocker dans la cellule, soit on met bac dessus.
                 }
